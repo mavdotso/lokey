@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { ClipboardIcon } from '@radix-ui/react-icons';
 import { toast } from "sonner"
 
-
 export default function SharePage() {
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(true);
@@ -41,6 +40,7 @@ export default function SharePage() {
     function copyToClipboard() {
         navigator.clipboard.writeText(password).then(() => {
             setShowPassword(false);
+            toast.success("Password copied to clipboard");
         });
     };
 
