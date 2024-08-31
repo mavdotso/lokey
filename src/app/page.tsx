@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckIcon, CopyIcon } from 'lucide-react';
+import { CheckIcon, CopyIcon, KeySquareIcon } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { toast } from "sonner"
+import Link from 'next/link';
 
 
 export default function Home() {
@@ -52,15 +53,17 @@ export default function Home() {
 
   return (
     <div className="flex flex-col bg-gradient-to-b from-purple-50 to-background min-h-screen">
-      <header className="flex justify-between items-center p-4">
-        <div className="font-bold text-2xl">lokey</div>
-        <nav className="space-x-4">
+      <header className="flex justify-between items-center mx-auto p-4 container">
+        <Link href={"/"} className="flex items-center gap-2 font-medium text-xl"><KeySquareIcon className='w-4 h-4' /> lokey.cc</Link>
+
+        <nav className="space-x-4 text-sm">
           <a href="#" className="text-muted-foreground hover:text-foreground">Product</a>
           <a href="#" className="text-muted-foreground hover:text-foreground">Solutions</a>
           <a href="#" className="text-muted-foreground hover:text-foreground">Customers</a>
           <a href="#" className="text-muted-foreground hover:text-foreground">Pricing</a>
           <a href="#" className="text-muted-foreground hover:text-foreground">Resources</a>
         </nav>
+
         <div className="space-x-2">
           <Button variant="outline">Log in</Button>
           <Button>Sign Up</Button>
@@ -71,7 +74,7 @@ export default function Home() {
         <div className="mb-8 text-center">
           <h1 className="mb-4 font-bold text-5xl">Secure Password Sharing <br /> With <span className="text-chart-5">Superpowers</span></h1>
           <p className="mb-4 text-muted-foreground text-xl">
-            Share passwords securely with one-time links that expire after use.
+            Share passwords securely <br /> with one-time links that expire after use.
           </p>
           <div className="flex justify-center space-x-4 mb-8">
             <Button size="lg">Start for Free</Button>
@@ -94,7 +97,7 @@ export default function Home() {
                 spellCheck="false"
               />
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Creating...' : 'Share Password'}
+                {isLoading ? 'Generating link...' : 'Share password'}
               </Button>
             </form>
 
