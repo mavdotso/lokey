@@ -22,7 +22,7 @@ function encrypt(text: string): string {
 export async function POST(req: Request) {
     try {
         const json = await req.json();
-        const { password } = json;
+        const { password, expiration } = json;
 
         if (!password) {
             return new Response('Password is required', { status: 400 });
@@ -30,7 +30,10 @@ export async function POST(req: Request) {
 
         const id = crypto.randomBytes(16).toString('hex');
         const encryptedPassword = encrypt(password);
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        // Calculate expiration date based on the selected option
+        const expirationDays = parseInt(expiration) || 1;
+        const expiresAt = new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000);
 
         await db.insert(passwords).values({
             id,

@@ -3,13 +3,16 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckIcon, CopyIcon, KeySquareIcon } from 'lucide-react';
+import { CheckIcon, CopyIcon } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { toast } from "sonner"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 
 export default function Home() {
   const [password, setPassword] = useState('');
+  const [expiration, setExpiration] = useState('1');
   const [link, setLink] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +30,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, expiration }),
       });
 
       if (!response.ok) {
@@ -54,32 +57,52 @@ export default function Home() {
     <main className="flex flex-col flex-grow justify-center items-center p-4">
       <div className="mb-8 text-center">
         <h1 className="mb-4 font-bold text-5xl">Secure Password Sharing <br /> With <span className="text-chart-5">Superpowers</span></h1>
-        <p className="mb-4 text-muted-foreground text-xl">
+        <p className="text-muted-foreground text-xl">
           Share passwords securely <br /> with one-time links that expire after use.
         </p>
-        <div className="flex justify-center space-x-4 mb-8">
+        {/* <div className="flex justify-center space-x-4 mb-8">
           <Button size="lg">Start for Free</Button>
           <Button variant="outline" size="lg">How It Works</Button>
-        </div>
+        </div> */}
       </div>
 
       <Card className="w-full max-w-xl">
         <CardContent className="p-6">
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter the password you want to share"
-              className="w-full"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck="false"
-            />
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Generating link...' : 'Share password'}
-            </Button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex gap-4">
+              <div className="flex-grow">
+                <Label>Password</Label>
+                <Input
+                  type="textarea"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter the password you want to share"
+                  className="w-full"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                />
+              </div>
+              <div>
+                <Label>Expiration</Label>
+                <Select value={expiration} onValueChange={setExpiration}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Expiration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 day</SelectItem>
+                    <SelectItem value="3">3 days</SelectItem>
+                    <SelectItem value="7">7 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col justify-end">
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? 'Generating...' : 'Share password'}
+                </Button>
+              </div>
+            </div>
           </form>
 
           {link && (
