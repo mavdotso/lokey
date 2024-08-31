@@ -1,7 +1,7 @@
 import { db } from '@/db';
-import { passwordLinksTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import crypto from 'crypto';
+import { passwords } from '@/db/schema';
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'defaultEncryptionKey';
 
@@ -25,20 +25,20 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     try {
         const id = params.id;
 
-        const [passwordLink] = await db.select().from(passwordLinksTable).where(eq(passwordLinksTable.id, id)).limit(1);
+        const [passwordLink] = await db.select().from(passwords).where(eq(passwords.id, id)).limit(1);
 
         if (!passwordLink) {
             return new Response('Link not found or already used', { status: 404 });
         }
 
         if (new Date(passwordLink.expiresAt) < new Date()) {
-            await db.delete(passwordLinksTable).where(eq(passwordLinksTable.id, id));
+            await db.delete(passwords).where(eq(passwords.id, id));
             return new Response('Link has expired', { status: 410 });
         }
 
         const decryptedPassword = decrypt(passwordLink.password);
 
-        await db.delete(passwordLinksTable).where(eq(passwordLinksTable.id, id));
+        await db.delete(passwords).where(eq(passwords.id, id));
 
         return new Response(JSON.stringify({ password: decryptedPassword }));
     } catch (error) {

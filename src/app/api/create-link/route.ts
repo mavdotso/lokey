@@ -1,5 +1,6 @@
 import { db } from '@/db';
-import { passwordLinksTable } from '@/db/schema';
+import { passwords } from '@/db/schema';
+import { getURL } from '@/lib/utils';
 import crypto from 'crypto';
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'defaultEncryptionKey';
@@ -31,13 +32,13 @@ export async function POST(req: Request) {
         const encryptedPassword = encrypt(password);
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-        await db.insert(passwordLinksTable).values({
+        await db.insert(passwords).values({
             id,
             password: encryptedPassword,
             expiresAt,
         });
 
-        const BASE_URL = process.env.NODE_ENV === 'production' ? `https://${process.env.NEXT_PUBLIC_URL}` : 'http://localhost:3000';
+        const BASE_URL = getURL();
 
         return new Response(
             JSON.stringify({

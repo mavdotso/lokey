@@ -1,6 +1,6 @@
 ### MVP
 
--   [ ] User login (Supabase)
+-   [x] User login (Supabase)
 -   [ ] Create links with custom expiration
     -   [ ] 1, 3, 5, 7 days / custom
     -   [ ] One-time or multiple time
