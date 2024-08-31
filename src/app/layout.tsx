@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} text-balance`}>{children}</body>
+      <body className={`${inter.className} text-balance flex flex-col bg-gradient-to-b from-purple-50 to-background min-h-screen`}>
+        <Header />
+        {children}
+        <Footer />
+      </body>
       <Toaster />
     </html>
   );
