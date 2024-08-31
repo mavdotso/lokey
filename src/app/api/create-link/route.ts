@@ -20,11 +20,11 @@ export async function POST(req: Request) {
             expiresAt,
         });
 
-        const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL || 'localhost:3000';
+        const BASE_URL = process.env.NODE_ENV === 'production' ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000';
 
         return new Response(
             JSON.stringify({
-                link: `https://${baseUrl}/share/${id}`,
+                link: `${BASE_URL}/share/${id}`,
             })
         );
     } catch (error) {
