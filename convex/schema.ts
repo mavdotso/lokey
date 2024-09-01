@@ -1,5 +1,5 @@
 import { defineSchema, defineTable } from 'convex/server';
-import { v } from 'convex/values';
+import { v, Validator } from 'convex/values';
 
 // Enums
 const userRole = v.union(v.literal('admin'), v.literal('manager'), v.literal('member'));
@@ -51,12 +51,16 @@ const spaceSchema = {
 const userSchema = {
     email: v.string(),
     name: v.optional(v.string()),
-    role: userRole,
     emailVerified: v.optional(v.number()),
     image: v.optional(v.string()),
     billingAddress: v.optional(v.any()),
     paymentMethod: v.optional(v.any()),
     updatedAt: v.optional(v.string()),
+};
+
+const userRoleSchema = {
+    userId: v.id('users'),
+    role: userRole,
 };
 
 const userSpaceSchema = {
@@ -148,13 +152,13 @@ const activityNotificationSchema = {
 // New schemas for authentication
 const accountSchema = {
     userId: v.id('users'),
-    type: v.string(),
+    type: v.union(v.literal('email'), v.literal('oidc'), v.literal('oauth'), v.literal('webauthn')),
     provider: v.string(),
     providerAccountId: v.string(),
     refresh_token: v.optional(v.string()),
     access_token: v.optional(v.string()),
     expires_at: v.optional(v.number()),
-    token_type: v.optional(v.string()),
+    token_type: v.optional(v.string() as Validator<Lowercase<string>>),
     scope: v.optional(v.string()),
     id_token: v.optional(v.string()),
     session_state: v.optional(v.string()),
@@ -173,8 +177,8 @@ const authenticatorSchema = {
 
 const sessionSchema = {
     userId: v.id('users'),
-    sessionToken: v.string(),
     expires: v.number(),
+    sessionToken: v.string(),
 };
 
 const verificationTokenSchema = {
@@ -187,6 +191,9 @@ const verificationTokenSchema = {
 const schema = defineSchema({
     spaces: defineTable(spaceSchema),
     users: defineTable(userSchema).index('email', ['email']),
+    userRoles: defineTable(userRoleSchema).index('userId', ['userId']),
+    sessions: defineTable(sessionSchema).index('sessionToken', ['sessionToken']).index('userId', ['userId']),
+    accounts: defineTable(accountSchema).index('providerAndAccountId', ['provider', 'providerAccountId']).index('userId', ['userId']),
     userSpaces: defineTable(userSpaceSchema),
     customCredentialTypes: defineTable(customCredentialTypeSchema),
     credentials: defineTable(credentialSchema),
@@ -196,12 +203,10 @@ const schema = defineSchema({
     prices: defineTable(priceSchema),
     subscriptions: defineTable(subscriptionSchema),
     activityNotifications: defineTable(activityNotificationSchema),
-    accounts: defineTable(accountSchema).index('providerAndAccountId', ['provider', 'providerAccountId']).index('userId', ['userId']),
     authenticators: defineTable(authenticatorSchema).index('userId', ['userId']).index('credentialID', ['credentialID']),
-    sessions: defineTable(sessionSchema).index('sessionToken', ['sessionToken']).index('userId', ['userId']),
     verificationTokens: defineTable(verificationTokenSchema).index('identifierToken', ['identifier', 'token']),
 });
 
-export { accountSchema, authenticatorSchema, sessionSchema, userSchema, verificationTokenSchema };
+export { accountSchema, authenticatorSchema, sessionSchema, userSchema, verificationTokenSchema, userRoleSchema };
 
 export default schema;

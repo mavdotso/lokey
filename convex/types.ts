@@ -3,25 +3,30 @@ import { Id } from './_generated/dataModel';
 export type Space = {
     _id?: Id<'spaces'>;
     _creationTime?: number;
-    name: string;
-    createdAt: string;
-    updatedAt: string;
     spaceOwner: string;
-    iconId?: string;
+    title: string;
+    iconId: string;
     data?: string;
-    inTrash?: boolean;
+    inTrash?: string;
     logo?: string;
 };
 
 export type User = {
     _id?: Id<'users'>;
     _creationTime?: number;
-    fullName?: string;
-    avatarUrl?: string;
-    billingAddress?: Record<string, any>;
+    email: string;
+    name?: string;
+    emailVerified?: number;
+    image?: string;
+    billingAddress?: any;
+    paymentMethod?: any;
     updatedAt?: string;
-    paymentMethod?: Record<string, any>;
-    email?: string;
+};
+
+export type UserRole = {
+    _id?: Id<'userRoles'>;
+    _creationTime?: number;
+    userId: Id<'users'>;
     role: 'admin' | 'manager' | 'member';
 };
 
@@ -103,7 +108,7 @@ export type Product = {
     name?: string;
     description?: string;
     image?: string;
-    metadata?: Record<string, any>;
+    metadata?: any;
 };
 
 export type Price = {
@@ -118,7 +123,7 @@ export type Price = {
     interval?: 'year' | 'month' | 'week' | 'day';
     intervalCount?: number;
     trialPeriodDays?: number;
-    metadata?: Record<string, any>;
+    metadata?: any;
 };
 
 export type Subscription = {
@@ -126,7 +131,7 @@ export type Subscription = {
     _creationTime?: number;
     userId: Id<'users'>;
     status?: 'unpaid' | 'past_due' | 'incomplete_expired' | 'incomplete' | 'canceled' | 'active' | 'trialing';
-    metadata?: Record<string, any>;
+    metadata?: any;
     priceId?: Id<'prices'>;
     quantity?: number;
     cancelAtPeriodEnd?: boolean;
@@ -148,4 +153,49 @@ export type ActivityNotification = {
     message: string;
     createdAt: string;
     readAt?: string;
+};
+
+export type Account = {
+    _id?: Id<'accounts'>;
+    _creationTime?: number;
+    userId: Id<'users'>;
+    type: 'email' | 'oidc' | 'oauth' | 'webauthn';
+    provider: string;
+    providerAccountId: string;
+    refresh_token?: string;
+    access_token?: string;
+    expires_at?: number;
+    token_type?: string;
+    scope?: string;
+    id_token?: string;
+    session_state?: string;
+};
+
+export type Authenticator = {
+    _id?: Id<'authenticators'>;
+    _creationTime?: number;
+    credentialID: string;
+    userId: Id<'users'>;
+    providerAccountId: string;
+    credentialPublicKey: string;
+    counter: number;
+    credentialDeviceType: string;
+    credentialBackedUp: boolean;
+    transports?: string;
+};
+
+export type Session = {
+    _id?: Id<'sessions'>;
+    _creationTime?: number;
+    userId: Id<'users'>;
+    expires: number;
+    sessionToken: string;
+};
+
+export type VerificationToken = {
+    _id?: Id<'verificationTokens'>;
+    _creationTime?: number;
+    identifier: string;
+    token: string;
+    expires: number;
 };
