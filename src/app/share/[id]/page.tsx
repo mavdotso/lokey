@@ -5,10 +5,13 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { ClipboardIcon } from '@radix-ui/react-icons';
 import { toast } from "sonner"
+import { Button } from '@/components/ui/button';
+import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export default function SharePage() {
     const [password, setPassword] = useState('')
-    const [showPassword, setShowPassword] = useState(true);
+    const [showPassword, setShowPassword] = useState(false);
+    const [isCopied, setIsCopied] = useState(false);
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(true)
     const params = useParams()
@@ -39,58 +42,70 @@ export default function SharePage() {
 
     function copyToClipboard() {
         navigator.clipboard.writeText(password).then(() => {
-            setShowPassword(false);
+            setIsCopied(true);
             toast.success("Password copied to clipboard");
+            setTimeout(() => setIsCopied(false), 2000);
         });
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center bg-gray-100 min-h-screen">
-                <div className="font-semibold text-2xl text-gray-800">Loading...</div>
-            </div>
-        );
-    }
-
     return (
-        <div className="flex justify-center items-center bg-gray-100 min-h-screen">
-            <div className="bg-white shadow-md p-8 rounded-lg w-full max-w-md">
-                <h1 className="mb-6 font-bold text-2xl text-center text-gray-800">Shared Password</h1>
+        <>
+            <div className="pt-10">
+                <h2 className="pb-4 font-bold text-5xl">
+                    A password has been securely shared with you.
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                    This password will be deleted after you close this page. <br /> Make sure to copy and store it securely.
+                </p>
+            </div>
+
+            <div className='flex flex-col pt-8 max-w-md'>
                 {error ? (
-                    <div className="text-center text-red-600">{error}</div>
+                    <div className="text-destructive">{error}</div>
                 ) : (
                     <>
-                        <div className="mb-4">
-                            <Label htmlFor="password" className="block mb-2 font-medium text-gray-700 text-sm">
-                                Password:
-                            </Label>
-                            <div className="relative">
-                                <Input
-                                    type="text"
-                                    id="password"
-                                    value={showPassword ? password : '********'}
-                                    readOnly
-                                    className="border-gray-300 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 w-full focus:outline-none pr-10"
-                                />
-                                {showPassword && (
-                                    <button
-                                        onClick={copyToClipboard}
-                                        className="top-1/2 right-2 absolute text-gray-500 hover:text-gray-700 transform -translate-y-1/2"
-                                        title="Copy to clipboard"
+                        <div className="space-y-4">
+                            <div>
+                                <Label>Shared Password</Label>
+                                <div className="relative">
+                                    <Input
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        readOnly
+                                        className="pr-20 w-full"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="top-0 right-10 absolute h-full"
+                                        onClick={() => setShowPassword(!showPassword)}
                                     >
-                                        <ClipboardIcon className="w-5 h-5" />
-                                    </button>
-                                )}
+                                        {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="top-0 right-0 absolute h-full"
+                                        onClick={copyToClipboard}
+                                    >
+                                        {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
+                                    </Button>
+                                </div>
                             </div>
                         </div>
-                        <p className="mt-4 text-gray-600 text-sm">
-                            {showPassword
-                                ? "This password was shared securely with you. Click the copy icon to save it to your clipboard. The password will be hidden after copying."
-                                : "The password has been copied to your clipboard and is no longer visible for security reasons."}
+                        <p className="py-4 text-muted-foreground text-sm">
+                            <span className="pr-2">⏳</span>
+                            This is a one-time use password. <br />It will be deleted after you close this page.
                         </p>
                     </>
                 )}
             </div>
-        </div>
+            <p className="pt-4 text-muted-foreground text-xs">
+                Want to share your own passwords securely? <br />
+                <a href="/" className="text-primary hover:underline">Create a free account</a> to get started.
+            </p>
+        </>
     );
 }
