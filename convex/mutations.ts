@@ -159,6 +159,7 @@ export const decryptPassword = mutation({
         }
 
         const now = new Date();
+
         const isExpired = (credential.expiresAt && new Date(credential.expiresAt) <= now) || (credential.maxViews && credential.viewCount >= credential.maxViews);
 
         if (isExpired) {
@@ -169,19 +170,11 @@ export const decryptPassword = mutation({
             const decryptedData = crypto.decrypt(credential.encryptedData);
 
             // Increment the view count
-            const newViewCount = (credential.viewCount || 0) + 1;
+            const newViewCount = credential.viewCount + 1;
             await ctx.db.patch(args._id, {
                 viewCount: newViewCount,
                 updatedAt: new Date().toISOString(),
             });
-
-            // Check if this view has caused the credential to expire
-            if (credential.maxViews && newViewCount >= credential.maxViews) {
-                await ctx.db.patch(args._id, {
-                    expiresAt: now.toISOString(),
-                });
-                return { isExpired: true };
-            }
 
             return { isExpired: false, data: decryptedData };
         } catch (error: any) {
