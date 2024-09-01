@@ -11,6 +11,15 @@
 -   [ ] Send the link to a client to share the password with you (vice-versa process)
 -   [ ] Insert the website you're providing the password for
     -   [ ] Fetch the website icon
+-   [ ] Different credentials types
+
+### For teams
+
+-   [ ] Create a team
+-   [ ] Request passwords
+    -   [ ] Add instructions on where to get the passwords from
+-   [ ] Access management
+-   [ ] Custom expiration
 
 ### Potentially:
 
@@ -23,5 +32,4 @@
 -   [ ] Reveal with a private key
 -   [ ] Generate a QR code
 -   [ ] Notifications / webhooks
--   [ ] Teams
 -   [ ] Add to password manager button

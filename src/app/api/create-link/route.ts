@@ -1,23 +1,7 @@
 import { db } from '@/db';
-import { passwords } from '@/db/schema';
-import { getURL } from '@/lib/utils';
+import { credentials } from '@/db/schema';
+import { encrypt, getURL } from '@/lib/utils';
 import crypto from 'crypto';
-
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'defaultEncryptionKey';
-
-function deriveKey(password: string): Buffer {
-    return crypto.pbkdf2Sync(password, 'salt', 100000, 32, 'sha256');
-}
-
-const key = deriveKey(ENCRYPTION_KEY);
-
-function encrypt(text: string): string {
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return `${iv.toString('hex')}:${encrypted}`;
-}
 
 export async function POST(req: Request) {
     try {
@@ -31,14 +15,19 @@ export async function POST(req: Request) {
         const id = crypto.randomBytes(16).toString('hex');
         const encryptedPassword = encrypt(password);
 
-        // Calculate expiration date based on the selected option
         const expirationDays = parseInt(expiration) || 1;
         const expiresAt = new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000);
 
-        await db.insert(passwords).values({
+        await db.insert(credentials).values({
             id,
-            password: encryptedPassword,
+            name: 'Shared Password',
+            description: 'Temporary shared password',
+            type: 'password',
+            encryptedData: encryptedPassword,
+            createdAt: new Date(),
+            updatedAt: new Date(),
             expiresAt,
+            viewCount: 0,
         });
 
         const BASE_URL = getURL();

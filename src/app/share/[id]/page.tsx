@@ -21,7 +21,7 @@ export default function SharePage() {
             fetchAttempted.current = true;
 
             try {
-                const response = await fetch(`/api/get-password/${id}`);
+                const response = await fetch(`/api/get-credentials/${id}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch password');
                 }
