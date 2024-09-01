@@ -158,8 +158,6 @@ export const decryptPassword = mutation({
             throw new Error('Credential not found');
         }
 
-        console.log(credential);
-
         const now = new Date();
         const isExpired = (credential.expiresAt && new Date(credential.expiresAt) <= now) || (credential.maxViews && credential.viewCount >= credential.maxViews);
 
