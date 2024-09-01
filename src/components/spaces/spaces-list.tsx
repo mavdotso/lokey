@@ -1,6 +1,5 @@
-import { getSpacesByUserId } from '@/lib/db/queries';
-import { SelectSpace } from '@/lib/db/schema';
 import React, { useEffect, useState } from 'react';
+import { getSpacesByUserId } from '../../../convex/queries';
 
 interface SpaceListProps {
     userId: string;
