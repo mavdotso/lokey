@@ -45,7 +45,6 @@ export type CustomCredentialType = {
     name: string;
     description?: string;
     schema: any;
-    createdAt: string;
     updatedAt: string;
 };
 
@@ -80,7 +79,6 @@ export type Credential = {
     subtype?: string;
     customTypeId?: Id<'customCredentialTypes'>;
     encryptedData: any;
-    createdAt: string;
     updatedAt: string;
     expiresAt?: string;
     maxViews?: number;
@@ -151,7 +149,6 @@ export type ActivityNotification = {
     spaceId: Id<'spaces'>;
     userId: Id<'users'>;
     message: string;
-    createdAt: string;
     readAt?: string;
 };
 

@@ -74,7 +74,6 @@ const customCredentialTypeSchema = {
     name: v.string(),
     description: v.optional(v.string()),
     schema: v.any(),
-    createdAt: v.string(),
     updatedAt: v.string(),
 };
 
@@ -86,7 +85,6 @@ const credentialSchema = {
     subtype: v.optional(v.string()),
     customTypeId: v.optional(v.id('customCredentialTypes')),
     encryptedData: v.any(),
-    createdAt: v.string(),
     updatedAt: v.string(),
     expiresAt: v.optional(v.string()),
     maxViews: v.optional(v.number()),
@@ -145,7 +143,6 @@ const activityNotificationSchema = {
     spaceId: v.id('spaces'),
     userId: v.id('users'),
     message: v.string(),
-    createdAt: v.string(),
     readAt: v.optional(v.string()),
 };
 

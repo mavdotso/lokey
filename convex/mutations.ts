@@ -100,7 +100,6 @@ export const createCredential = mutation({
     handler: async (ctx, args) => {
         const credentialId = await ctx.db.insert('credentials', {
             ...args,
-            createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             viewCount: 0,
         });
