@@ -1,28 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { getSpacesByUserId } from '../../../convex/queries';
+import { useQuery } from 'convex/react';
+import React from 'react';
+import { api } from '../../../convex/_generated/api';
 
 interface SpaceListProps {
     userId: string;
 }
 
 export function SpacesList({ userId }: SpaceListProps) {
-    const [spaces, setSpaces] = useState<SelectSpace[]>([]);
+    const spaces = useQuery(api.queries.getSpacesByUserId, { userId });
 
-    useEffect(() => {
-        async function fetchWorkspaces() {
-            const spacesById = await getSpacesByUserId(userId);
-            setSpaces(spacesById);
-        }
-
-        fetchWorkspaces();
-    }, [userId]);
+    if (spaces === undefined) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
             <h2>Your Workspaces</h2>
             <ul>
                 {spaces.map((space) => (
-                    <li key={space.id}>{space.name}</li>
+                    space ? <li key={space._id}>{space.title}</li> : <p>No spaces found</p>
                 ))}
             </ul>
         </div>

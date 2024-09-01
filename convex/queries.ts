@@ -1,6 +1,5 @@
 import { query } from './_generated/server';
 import { v } from 'convex/values';
-import { getViewerId } from './auth';
 
 export const getSpacesByUserId = query({
     args: { userId: v.string() },
