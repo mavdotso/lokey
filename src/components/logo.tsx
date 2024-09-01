@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { KeyIcon, KeySquareIcon } from 'lucide-react';
+import { KeyIcon } from 'lucide-react';
 
 export function Logo() {
     return (
