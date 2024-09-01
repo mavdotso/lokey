@@ -1,6 +1,7 @@
 ### Bugs
 
--   [ ] User session doesn't save / user can't login
+-   [x] User session doesn't save / user can't login
+-   [ ] Make sure the links expire after one view
 
 ### MVP
 

@@ -9,7 +9,7 @@ export default auth((request) => {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
-    if (!isLoggedIn && pathname !== '/sign-in') {
+    if (!isLoggedIn && pathname === '/dashboard') {
         return NextResponse.redirect(new URL('/sign-in', request.url));
     }
 
