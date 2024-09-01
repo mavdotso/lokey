@@ -1,7 +1,10 @@
-import { db } from '@/lib/db';
-import { credentials } from '@/lib/db/schema';
+import { ConvexHttpClient } from 'convex/browser';
 import { encrypt, getURL } from '@/lib/utils';
 import crypto from 'crypto';
+import { api } from '../../../../convex/_generated/api';
+import { Id } from '../../../../convex/_generated/dataModel';
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(req: Request) {
     try {
@@ -18,16 +21,14 @@ export async function POST(req: Request) {
         const expirationDays = parseInt(expiration) || 1;
         const expiresAt = new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000);
 
-        await db.insert(credentials).values({
+        const { credentialId } = await convex.mutation(api.mutations.createCredential, {
             id,
             name: 'Shared Password',
             description: 'Temporary shared password',
             type: 'password',
             encryptedData: encryptedPassword,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            expiresAt,
-            viewCount: 0,
+            expiresAt: expiresAt.toISOString(),
+            spaceId: 'default' as Id<'spaces'>,
         });
 
         const BASE_URL = getURL();

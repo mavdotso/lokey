@@ -37,3 +37,13 @@ export const getUserSubscriptionStatus = query({
         }
     },
 });
+
+export const getCredential = query({
+    args: { id: v.string() },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query('credentials')
+            .filter((q) => q.eq(q.field('_id'), args.id))
+            .first();
+    },
+});

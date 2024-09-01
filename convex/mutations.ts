@@ -66,3 +66,83 @@ export const assignUserRole = mutation({
         return { success: true };
     },
 });
+
+export const createCredential = mutation({
+    args: {
+        id: v.string(),
+        spaceId: v.id('spaces'),
+        name: v.string(),
+        description: v.string(),
+        type: v.union(
+            v.literal('password'),
+            v.literal('login_password'),
+            v.literal('api_key'),
+            v.literal('oauth_token'),
+            v.literal('ssh_key'),
+            v.literal('ssl_certificate'),
+            v.literal('env_variable'),
+            v.literal('database_credential'),
+            v.literal('access_key'),
+            v.literal('encryption_key'),
+            v.literal('jwt_token'),
+            v.literal('two_factor_secret'),
+            v.literal('webhook_secret'),
+            v.literal('smtp_credential'),
+            v.literal('ftp_credential'),
+            v.literal('vpn_credential'),
+            v.literal('dns_credential'),
+            v.literal('device_key'),
+            v.literal('key_value'),
+            v.literal('custom'),
+            v.literal('other')
+        ),
+        encryptedData: v.string(),
+        expiresAt: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const credentialId = await ctx.db.insert('credentials', {
+            ...args,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            viewCount: 0,
+        });
+        return { credentialId };
+    },
+});
+
+export const incrementViewCount = mutation({
+    args: { id: v.string() },
+    handler: async (ctx, args) => {
+        const credential = await ctx.db
+            .query('credentials')
+            .filter((q) => q.eq(q.field('_id'), args.id))
+            .first();
+
+        if (!credential) {
+            throw new Error('Credential not found');
+        }
+
+        await ctx.db.patch(credential._id, {
+            viewCount: (credential.viewCount || 0) + 1,
+            updatedAt: new Date().toISOString(),
+        });
+    },
+});
+
+export const setExpired = mutation({
+    args: { id: v.string() },
+    handler: async (ctx, args) => {
+        const credential = await ctx.db
+            .query('credentials')
+            .filter((q) => q.eq(q.field('_id'), args.id))
+            .first();
+
+        if (!credential) {
+            throw new Error('Credential not found');
+        }
+
+        await ctx.db.patch(credential._id, {
+            expiresAt: new Date().toISOString(),
+        });
+    },
+});

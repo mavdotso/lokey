@@ -1,20 +1,14 @@
-'use client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { signInWithEmail } from '@/lib/server-actions/auth-actions'
-import { useState } from 'react'
+import { signIn } from '@/lib/auth'
 import { toast } from 'sonner'
 
 export default function SignIn() {
-    const [email, setEmail] = useState('')
 
-    async function handleLogin(email: string) {
-        try {
-            await signInWithEmail({ email })
-            toast.success('Check your email for the login link!')
-        } catch (error: any) {
-            toast.error(error.error_description || error.message)
-        }
+    async function handleSubmit(formData: FormData) {
+        'use server';
+        await signIn("resend", formData);
+        toast.success('Check your email for a magic link');
     }
 
     return (
@@ -28,17 +22,15 @@ export default function SignIn() {
                         Or start your 14-day free trial
                     </p>
                 </div>
-                <div className="flex gap-4">
-                    <Input
-                        type="email"
-                        placeholder="Your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <Button onClick={() => handleLogin(email)}>
-                        Send magic link
+                <form action={handleSubmit} className="flex flex-row justify-center gap-2 space-y-4 py-4 max-w-lg">
+                    <Input type="email" name="email" placeholder="Enter your email" required />
+                    <Button type="submit">
+                        Sign in with Magic link
                     </Button>
-                </div>
+                </form>
+                <span className="text-center text-secondary-foreground text-xs">
+                    You will recieve a sign-in link to your email address
+                </span>
             </div>
         </div>
     )

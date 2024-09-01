@@ -5,12 +5,12 @@ export default auth((request) => {
     const isLoggedIn = !!request.auth;
     const { pathname } = request.nextUrl;
 
-    if (isLoggedIn && pathname === '/signin') {
+    if (isLoggedIn && pathname === '/sign-in') {
         return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
-    if (!isLoggedIn && pathname !== '/signin') {
-        return NextResponse.redirect(new URL('/signin', request.url));
+    if (!isLoggedIn && pathname !== '/sign-in') {
+        return NextResponse.redirect(new URL('/sign-in', request.url));
     }
 
     return NextResponse.next();

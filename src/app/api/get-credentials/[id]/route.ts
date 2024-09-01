@@ -1,13 +1,14 @@
-import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
-import { credentials } from '@/lib/db/schema';
+import { ConvexHttpClient } from 'convex/browser';
 import { decrypt } from '@/lib/utils';
+import { api } from '../../../../../convex/_generated/api';
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
     try {
         const id = params.id;
 
-        const [credential] = await db.select().from(credentials).where(eq(credentials.id, id)).limit(1);
+        const credential = await convex.query(api.queries.getCredential, { id });
 
         if (!credential) {
             return new Response('Credential not found', { status: 404 });
@@ -25,21 +26,14 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
             return new Response('Credential has reached maximum views', { status: 410 });
         }
 
-        const encryptedData = credential.encryptedData as string;
-        const decryptedPassword = decrypt(encryptedData);
+        const decryptedPassword = decrypt(credential.encryptedData);
 
-        // Increment view count
-        await db
-            .update(credentials)
-            .set({
-                viewCount: credential.viewCount + 1,
-                updatedAt: now,
-            })
-            .where(eq(credentials.id, id));
+        // Increment view count and update
+        await convex.mutation(api.mutations.incrementViewCount, { id });
 
         // Check if this view has caused the credential to expire
         if (credential.maxViews && credential.viewCount + 1 >= credential.maxViews) {
-            await db.update(credentials).set({ expiresAt: now }).where(eq(credentials.id, id));
+            await convex.mutation(api.mutations.setExpired, { id });
         }
 
         return new Response(JSON.stringify({ password: decryptedPassword }));
