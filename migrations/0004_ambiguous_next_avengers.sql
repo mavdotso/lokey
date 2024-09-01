@@ -1,1 +1,0 @@
-ALTER TYPE "credential_type" ADD VALUE 'password';

@@ -1,1 +1,0 @@
-ALTER TABLE "credentials" ALTER COLUMN "view_count" SET NOT NULL;
