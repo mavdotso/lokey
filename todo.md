@@ -1,3 +1,7 @@
+### Bugs
+
+-   [ ] User session doesn't save / user can't login
+
 ### MVP
 
 -   [x] User login (Supabase)

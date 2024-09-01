@@ -1,6 +1,6 @@
-import { db } from '@/db';
+import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
-import { credentials } from '@/db/schema';
+import { credentials } from '@/lib/db/schema';
 import { decrypt } from '@/lib/utils';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {

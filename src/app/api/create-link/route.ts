@@ -1,5 +1,5 @@
-import { db } from '@/db';
-import { credentials } from '@/db/schema';
+import { db } from '@/lib/db';
+import { credentials } from '@/lib/db/schema';
 import { encrypt, getURL } from '@/lib/utils';
 import crypto from 'crypto';
 
