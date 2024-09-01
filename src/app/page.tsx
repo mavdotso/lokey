@@ -55,7 +55,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="pt-10">
+      <div className="pt-12">
         <h1 className="pb-4 font-bold text-5xl">
           Secure Password Sharing <br /> With Superpowers
         </h1>

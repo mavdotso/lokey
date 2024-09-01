@@ -1,11 +1,25 @@
+import { CreditCard, Box, Blocks } from 'lucide-react';
+import Link from 'next/link';
+
+const navItems = [
+
+    { label: 'Features', href: '#', icon: Blocks },
+    { label: 'Pricing', href: '#', icon: CreditCard },
+];
+
 export function MainNav() {
     return (
-        <nav className="space-x-4 text-sm">
-            <a href="#" className="text-muted-foreground hover:text-foreground">Product</a>
-            <a href="#" className="text-muted-foreground hover:text-foreground">Solutions</a>
-            <a href="#" className="text-muted-foreground hover:text-foreground">Customers</a>
-            <a href="#" className="text-muted-foreground hover:text-foreground">Pricing</a>
-            <a href="#" className="text-muted-foreground hover:text-foreground">Resources</a>
+        <nav className="flex space-x-6">
+            {navItems.map((item) => (
+                <Link
+                    key={item.label}
+                    href={item.href}
+                    className="flex items-center space-x-2 text-muted-foreground text-sm hover:text-foreground"
+                >
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                </Link>
+            ))}
         </nav>
     );
 }
