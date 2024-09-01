@@ -13,12 +13,16 @@ export function SpacesList({ userId }: SpaceListProps) {
         return <div>Loading...</div>;
     }
 
+    if (spaces.length === 0) {
+        return <p>No spaces found</p>;
+    }
+
     return (
         <div>
             <h2>Your Workspaces</h2>
             <ul>
                 {spaces.map((space) => (
-                    space ? <li key={space._id}>{space.title}</li> : <p>No spaces found</p>
+                    <li key={space?._id}>{space?.title}</li>
                 ))}
             </ul>
         </div>
