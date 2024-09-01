@@ -35,6 +35,7 @@ export default function Home() {
         type: 'password',
         data: password,
         expiresAt: new Date(Date.now() + parseInt(expiration) * 24 * 60 * 60 * 1000).toISOString(),
+        maxViews: 1
       });
 
       const shareLink = `${getURL()}/shared/${credentialId}`;
