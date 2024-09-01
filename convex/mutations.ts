@@ -1,6 +1,7 @@
 import { mutation } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
+import { crypto } from '@/lib/utils';
 
 export const createSpace = mutation({
     args: {
@@ -69,8 +70,9 @@ export const assignUserRole = mutation({
 
 export const createCredential = mutation({
     args: {
+        spaceId: v.optional(v.id('spaces')),
         name: v.string(),
-        description: v.string(),
+        description: v.optional(v.string()),
         type: v.union(
             v.literal('password'),
             v.literal('login_password'),
@@ -94,13 +96,26 @@ export const createCredential = mutation({
             v.literal('custom'),
             v.literal('other')
         ),
-        encryptedData: v.string(),
-        expiresAt: v.string(),
+        subtype: v.optional(v.string()),
+        customTypeId: v.optional(v.id('customCredentialTypes')),
+        data: v.string(),
+        expiresAt: v.optional(v.string()),
+        maxViews: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
+        const encryptedData = crypto.encrypt(args.data);
+
         const credentialId = await ctx.db.insert('credentials', {
-            ...args,
+            spaceId: args.spaceId,
+            name: args.name,
+            description: args.description,
+            type: args.type,
+            subtype: args.subtype,
+            customTypeId: args.customTypeId,
+            encryptedData,
             updatedAt: new Date().toISOString(),
+            expiresAt: args.expiresAt,
+            maxViews: args.maxViews,
             viewCount: 0,
         });
         return { credentialId };
@@ -119,27 +134,61 @@ export const incrementViewCount = mutation({
             throw new Error('Credential not found');
         }
 
-        await ctx.db.patch(credential._id, {
-            viewCount: (credential.viewCount || 0) + 1,
+        const newViewCount = (credential.viewCount || 0) + 1;
+        const updates: any = {
+            viewCount: newViewCount,
             updatedAt: new Date().toISOString(),
-        });
+        };
+
+        // Check if maxViews is set and has been exceeded
+        if (credential.maxViews && newViewCount > credential.maxViews) {
+            updates.expiresAt = new Date().toISOString();
+        }
+
+        await ctx.db.patch(credential._id, updates);
     },
 });
 
-export const setExpired = mutation({
-    args: { id: v.string() },
+export const decryptPassword = mutation({
+    args: { _id: v.id('credentials') },
     handler: async (ctx, args) => {
-        const credential = await ctx.db
-            .query('credentials')
-            .filter((q) => q.eq(q.field('_id'), args.id))
-            .first();
+        const credential = await ctx.db.get(args._id);
 
         if (!credential) {
             throw new Error('Credential not found');
         }
 
-        await ctx.db.patch(credential._id, {
-            expiresAt: new Date().toISOString(),
-        });
+        console.log(credential);
+
+        const now = new Date();
+        const isExpired = (credential.expiresAt && new Date(credential.expiresAt) <= now) || (credential.maxViews && credential.viewCount >= credential.maxViews);
+
+        if (isExpired) {
+            return { isExpired: true };
+        }
+
+        try {
+            const decryptedData = crypto.decrypt(credential.encryptedData);
+
+            // Increment the view count
+            const newViewCount = (credential.viewCount || 0) + 1;
+            await ctx.db.patch(args._id, {
+                viewCount: newViewCount,
+                updatedAt: new Date().toISOString(),
+            });
+
+            // Check if this view has caused the credential to expire
+            if (credential.maxViews && newViewCount >= credential.maxViews) {
+                await ctx.db.patch(args._id, {
+                    expiresAt: now.toISOString(),
+                });
+                return { isExpired: true };
+            }
+
+            return { isExpired: false, data: decryptedData };
+        } catch (error: any) {
+            console.error('Decryption error:', error);
+            throw new Error(`Failed to decrypt data: ${error.message}`);
+        }
     },
 });

@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import React, { useState, useEffect, useRef } from 'react';
 import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import { useMutation } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import { Id } from "../../../../convex/_generated/dataModel";
 
 export default function SharePage() {
     const [password, setPassword] = useState('')
@@ -18,27 +21,35 @@ export default function SharePage() {
     const id = params.id as string
     const fetchAttempted = useRef(false)
 
+    const decryptPassword = useMutation(api.mutations.decryptPassword);
+
     useEffect(() => {
         const fetchPassword = async () => {
             if (!id || fetchAttempted.current) return;
             fetchAttempted.current = true;
 
             try {
-                const response = await fetch(`/api/get-credentials/${id}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch password');
+                setIsLoading(true);
+                const result = await decryptPassword({ _id: id as Id<"credentials"> });
+
+                if (result.isExpired) {
+                    setError('This password has expired and is no longer available.');
+                    setPassword('');
+                } else {
+                    setPassword(result.data ?? '');
+                    setError('');
                 }
-                const data = await response.json();
-                setPassword(data.password);
             } catch (err) {
-                setError('This link has expired or is invalid.');
+                console.error('Error fetching password:', err);
+                setError('Failed to decrypt password. This link may have expired or is invalid.');
+                setPassword('');
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchPassword();
-    }, [id]);
+    }, [id, decryptPassword]);
 
     function copyToClipboard() {
         navigator.clipboard.writeText(password).then(() => {

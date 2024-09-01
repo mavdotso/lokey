@@ -7,7 +7,9 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-
+import { useMutation } from 'convex/react';
+import { getURL } from '@/lib/utils';
+import { api } from '../../convex/_generated/api';
 
 export default function Home() {
   const [password, setPassword] = useState('');
@@ -18,6 +20,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
+  const createCredential = useMutation(api.mutations.createCredential);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
@@ -25,20 +29,16 @@ export default function Home() {
     setLink('');
 
     try {
-      const response = await fetch('/api/create-link', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password, expiration }),
+      const { credentialId } = await createCredential({
+        name: 'Shared Password',
+        description: 'One-time shared password',
+        type: 'password',
+        data: password,
+        expiresAt: new Date(Date.now() + parseInt(expiration) * 24 * 60 * 60 * 1000).toISOString(),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create link');
-      }
-
-      const data = await response.json();
-      setLink(data.link);
+      const shareLink = `${getURL()}/shared/${credentialId}`;
+      setLink(shareLink);
     } catch (err) {
       setError('An error occurred while creating the link. Please try again.');
     } finally {
@@ -112,7 +112,6 @@ export default function Home() {
             </div>
           </div>
         </form>
-
 
         {link && (
           <div className="space-y-4 pt-6">
