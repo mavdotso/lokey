@@ -15,27 +15,24 @@ export async function POST(req: Request) {
             return new Response('Password is required', { status: 400 });
         }
 
-        const id = crypto.randomBytes(16).toString('hex');
         const encryptedPassword = encrypt(password);
 
         const expirationDays = parseInt(expiration) || 1;
         const expiresAt = new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000);
 
         const { credentialId } = await convex.mutation(api.mutations.createCredential, {
-            id,
             name: 'Shared Password',
             description: 'Temporary shared password',
             type: 'password',
             encryptedData: encryptedPassword,
             expiresAt: expiresAt.toISOString(),
-            spaceId: 'default' as Id<'spaces'>,
         });
 
         const BASE_URL = getURL();
 
         return new Response(
             JSON.stringify({
-                link: `${BASE_URL}/shared/${id}`,
+                link: `${BASE_URL}/shared/${credentialId}`,
             })
         );
     } catch (error) {

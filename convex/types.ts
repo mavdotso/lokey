@@ -52,7 +52,7 @@ export type CustomCredentialType = {
 export type Credential = {
     _id?: Id<'credentials'>;
     _creationTime?: number;
-    spaceId: Id<'spaces'>;
+    spaceId?: Id<'spaces'>;
     name: string;
     description?: string;
     type:

@@ -69,8 +69,6 @@ export const assignUserRole = mutation({
 
 export const createCredential = mutation({
     args: {
-        id: v.string(),
-        spaceId: v.id('spaces'),
         name: v.string(),
         description: v.string(),
         type: v.union(

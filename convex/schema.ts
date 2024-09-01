@@ -79,7 +79,7 @@ const customCredentialTypeSchema = {
 };
 
 const credentialSchema = {
-    spaceId: v.id('spaces'),
+    spaceId: v.optional(v.id('spaces')),
     name: v.string(),
     description: v.optional(v.string()),
     type: credentialType,
