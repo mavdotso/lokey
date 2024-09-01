@@ -85,10 +85,10 @@ export default function Home() {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="top-0 right-0 absolute h-full"
+                  className="top-0 right-0 absolute h-full group"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                  {showPassword ? <EyeOffIcon className="group-hover:text-primary w-4 h-4 text-muted-foreground" /> : <EyeIcon className="group-hover:text-primary w-4 h-4 text-muted-foreground" />}
                 </Button>
               </div>
             </div>

@@ -1,11 +1,11 @@
 'use client'
-import React, { useState, useEffect, useRef } from 'react';
+import { toast } from "sonner"
 import { useParams } from 'next/navigation'
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { ClipboardIcon } from '@radix-ui/react-icons';
-import { toast } from "sonner"
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import React, { useState, useEffect, useRef } from 'react';
 import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export default function SharePage() {
@@ -52,7 +52,7 @@ export default function SharePage() {
         <>
             <div className="pt-10">
                 <h2 className="pb-4 font-bold text-5xl">
-                    A password has been securely shared with you.
+                    A password has been securely shared with you
                 </h2>
                 <p className="text-lg text-muted-foreground">
                     This password will be deleted after you close this page. <br /> Make sure to copy and store it securely.
@@ -62,6 +62,13 @@ export default function SharePage() {
             <div className='flex flex-col pt-8 max-w-md'>
                 {error ? (
                     <div className="text-destructive">{error}</div>
+                ) : isLoading ? (
+                    <div className="space-y-4">
+                        <div>
+                            <Label>Shared Password</Label>
+                            <Skeleton className="rounded-md w-full h-10" />
+                        </div>
+                    </div>
                 ) : (
                     <>
                         <div className="space-y-4">

@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
         return new Response(
             JSON.stringify({
-                link: `${BASE_URL}/share/${id}`,
+                link: `${BASE_URL}/shared/${id}`,
             })
         );
     } catch (error) {
