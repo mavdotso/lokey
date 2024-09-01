@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,12 +18,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} text-balance flex flex-col bg-gradient-to-b from-purple-50 to-background min-h-screen`}>
-        <Header />
-        {children}
-        <Footer />
+      <body className={inter.className}>
+        <div className="flex flex-col mx-auto max-w-3xl min-h-screen container">
+          <Header />
+          <main className="flex-grow">{children}</main>
+        </div>
+        <Toaster />
       </body>
-      <Toaster />
     </html>
   );
 }

@@ -4,7 +4,7 @@ import { MainNav } from '@/components/main-nav';
 
 export function Header() {
     return (
-        <header className="flex justify-between items-center mx-auto p-4 container">
+        <header className="flex justify-between items-center py-4">
             <Logo />
             <MainNav />
             <div className="space-x-2">
