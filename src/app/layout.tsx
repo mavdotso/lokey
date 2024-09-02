@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import ConvexClientProvider from "@/lib/providers/convex-client-provider";
 import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/lib/providers/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,10 +24,16 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={cn('min-h-screen', inter.className)}>
-        <ConvexClientProvider session={session}>
-          <main>{children}</main>
-        </ConvexClientProvider>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange>
+          <ConvexClientProvider session={session}>
+            <main>{children}</main>
+          </ConvexClientProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -3,6 +3,9 @@ import { Search, Trash2Icon } from 'lucide-react';
 import Link from 'next/link';
 import { SpacesDropdown } from '../spaces/spaces-dropdown';
 import { auth } from '@/lib/auth';
+import { Separator } from '@radix-ui/react-select';
+import UserCard from '@/components/sidebar/user-card';
+import ThemeToggle from '@/components/global/theme-toggle';
 
 interface SidebarProps {
     params: { spaceId: string };
@@ -25,7 +28,7 @@ const navItems: NavItem[] = [
 export default async function Sidebar({ params, className, onToggleSidebar }: SidebarProps) {
     const session = await auth()
     return (
-        <aside className={`w-56 h-full bg-card border-r border-muted flex flex-col ${className}`}>
+        <aside className={`w-64 h-full bg-card border-r border-muted flex flex-col ${className}`}>
             <div className="flex justify-between items-center gap-4 p-4 font-semibold text-gray-700">
                 <SpacesDropdown userId={session!.user!.id!} />
             </div>
@@ -39,6 +42,10 @@ export default async function Sidebar({ params, className, onToggleSidebar }: Si
                     )
                 )}
             </nav>
+            <Separator />
+            {session && <UserCard session={session} />}
+            <Separator />
+            <ThemeToggle />
         </aside>
     );
 }

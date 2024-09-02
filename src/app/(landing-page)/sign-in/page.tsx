@@ -22,7 +22,7 @@ export default function SignIn() {
                         Or start your 14-day free trial
                     </p>
                 </div>
-                <form action={handleSubmit} className="flex flex-row justify-center gap-2 space-y-4 py-4 max-w-lg">
+                <form action={handleSubmit} className="flex flex-row justify-center items-center gap-2 py-4 max-w-lg">
                     <Input type="email" name="email" placeholder="Enter your email" required />
                     <Button type="submit">
                         Sign in with Magic link
