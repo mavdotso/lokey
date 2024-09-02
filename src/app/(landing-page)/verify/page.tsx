@@ -15,7 +15,7 @@ export default function Verify() {
                     Magic Link Sent. <br /> Check Your Email!
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                    We've sent a magic link to your email address. Click the link to sign in.
+                    We&apos;ve sent a magic link to your email address. Click the link to sign in.
                 </p>
             </div>
 
@@ -41,7 +41,7 @@ export default function Verify() {
                 </div>
             </div>
             <p className="pt-4 text-muted-foreground text-xs">
-                Didn't receive the email? <br />
+                Didn&apos;t receive the email? <br />
                 <Link href="/sign-in" className="text-primary hover:underline">Click here to try again</Link> or check your spam folder.
             </p>
         </>
