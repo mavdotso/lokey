@@ -48,7 +48,7 @@ export function CreateSpaceForm() {
         if (newSpaceId) {
             router.push(`/dashboard/${newSpaceId}`)
         }
-    }, [newSpaceId])
+    }, [newSpaceId, router])
 
     return (
         <Card className="w-full max-w-md">

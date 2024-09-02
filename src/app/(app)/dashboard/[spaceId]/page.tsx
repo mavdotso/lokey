@@ -8,26 +8,27 @@ import { Id } from '../../../../../convex/_generated/dataModel';
 
 export default function DashboardPage() {
     const session = useSession();
+    const credentials = useQuery(api.queries.getCredentialsByUserId, {
+        userId: session.data?.user?.id ?? ''
+    });
 
-    if (!session || !session.data || !session.data.user) return
-
-    const credentials = useQuery(api.queries.getCredentialsByUserId, { userId: session.data.user.id! });
-
-    if (!credentials) {
-        return <p>Loading...</p>;
+    if (!session || !session.data || !session.data.user) {
+        return <p>Loading session...</p>;
     }
 
-    const handleCredentialCreated = (credentialId: Id<"credentials">) => {
-        // Handle newly created credential, e.g., refresh the list of credentials
+    if (credentials === undefined) {
+        return <p>Loading credentials...</p>;
+    }
+
+    function handleCredentialCreated(credentialId: Id<"credentials">) {
         console.log('New credential created:', credentialId);
-        // You might want to refetch the credentials list here
     }
 
     return (
         <div>
             <h1>Your Credentials</h1>
             {credentials.length === 0 ? (
-                <p>You haven't created any credentials yet.</p>
+                <p>You haven&apos;t created any credentials yet.</p>
             ) : (
                 <ul>
                     {credentials.map((cred) => (
