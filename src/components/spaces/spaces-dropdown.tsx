@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
+import { Plus, RocketIcon, Space, SpaceIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useQuery, useMutation } from 'convex/react';
@@ -58,14 +58,17 @@ export function SpacesDropdown({ userId }: SpacesDropdownProps) {
                 </SelectTrigger>
                 <SelectContent>
                     {spaces.map((space) => (
-                        <SelectItem key={space._id} value={space._id}>
-                            {space.title}
+                        <SelectItem key={space._id} value={space._id} className='cursor-pointer'>
+                            <div className='flex flex-row items-center gap-2 p-1'>
+                                <RocketIcon className='w-4 h-4' />
+                                <p>{space.title}</p>
+                            </div>
                         </SelectItem>
                     ))}
                     <Separator className='my-1' />
                     <DialogTrigger asChild>
                         <div
-                            className="flex flex-row items-center gap-4 hover:bg-muted p-2 rounded-md w-full transition-all cursor-pointer"
+                            className="flex flex-row items-center gap-2 hover:bg-muted p-2 rounded-md w-full text-sm transition-all cursor-pointer"
                             onClick={() => setIsDialogOpen(true)}
                         >
                             <Plus className="w-4 h-4" />

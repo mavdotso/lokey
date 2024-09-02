@@ -8,8 +8,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import React, { useState, useEffect, useRef } from 'react';
 import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 import { useMutation } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
-import { Id } from "../../../../convex/_generated/dataModel";
+import { api } from "../../../../../convex/_generated/api";
+import { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function SharePage() {
     const [password, setPassword] = useState('')

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { Header } from "@/components/header";
 import ConvexClientProvider from "@/lib/providers/convex-client-provider";
 import { auth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,12 +22,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={cn('min-h-screen', inter.className)}>
         <ConvexClientProvider session={session}>
-          <div className="flex flex-col mx-auto max-w-2xl min-h-screen container">
-            <Header />
-            <main className="flex-grow">{children}</main>
-          </div>
+          <main>{children}</main>
         </ConvexClientProvider>
         <Toaster />
       </body>
