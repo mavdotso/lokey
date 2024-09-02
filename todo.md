@@ -17,7 +17,7 @@
 
 ### For teams
 
--   [ ] Create a team
+-   [x] Create a team
 -   [ ] Send the link to a client to share the password with you (vice-versa process)
 -   [ ] Insert the website you're providing the password for
     -   [ ] Fetch the website icon

@@ -3,7 +3,7 @@ import { v, Validator } from 'convex/values';
 
 // Enums
 const userRole = v.union(v.literal('admin'), v.literal('manager'), v.literal('member'));
-const credentialType = v.union(
+export const credentialType = v.union(
     v.literal('password'),
     v.literal('login_password'),
     v.literal('api_key'),

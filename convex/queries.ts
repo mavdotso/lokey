@@ -13,6 +13,30 @@ export const getSpacesByUserId = query({
     },
 });
 
+export const getCredentialsByUserId = query({
+    args: { userId: v.string() },
+    handler: async (ctx, args) => {
+        const userSpaces = await ctx.db
+            .query('userSpaces')
+            .filter((q) => q.eq(q.field('userId'), args.userId))
+            .collect();
+
+        const spaceIds = userSpaces.map((space) => space.spaceId);
+
+        const credentials = await ctx.db
+            .query('credentials')
+            .filter((q) => q.or(...spaceIds.map((id) => q.eq(q.field('spaceId'), id))))
+            .collect();
+
+        return credentials.map((cred) => ({
+            id: cred._id,
+            name: cred.name,
+            type: cred.type,
+            updatedAt: cred.updatedAt,
+        }));
+    },
+});
+
 export const getUserSubscriptionStatus = query({
     args: { userId: v.string() },
     handler: async (ctx, args) => {
