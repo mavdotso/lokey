@@ -11,12 +11,7 @@ import { Space } from '../../../convex/types';
 import { Id } from '../../../convex/_generated/dataModel';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { CreateSpaceForm } from './create-space-form';
-
-interface SpaceGroupProps {
-    title: string;
-    spaces: Space[];
-    onSelect: (spaceId: Id<"spaces">) => void;
-}
+import { useMemo } from 'react';
 
 interface SpacesDropdownProps {
     userId: string;
@@ -27,9 +22,9 @@ export function SpacesDropdown({ userId }: SpacesDropdownProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedSpaceId, setSelectedSpaceId] = useState<Id<"spaces"> | null>(null);
 
-    const spaces = useQuery(api.queries.getSpacesByUserId, { userId }) ?? [];
+    const spacesQuery = useQuery(api.queries.getSpacesByUserId, { userId });
 
-    if (!spaces) return
+    const spaces = useMemo(() => spacesQuery ?? [], [spacesQuery]);
 
     useEffect(() => {
         if (spaces.length > 0 && !selectedSpaceId) {
