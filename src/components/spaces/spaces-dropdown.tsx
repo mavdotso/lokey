@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, RocketIcon, Space, SpaceIcon } from 'lucide-react';
+import { Plus, RocketIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useQuery, useMutation } from 'convex/react';
@@ -59,8 +59,10 @@ export function SpacesDropdown({ userId }: SpacesDropdownProps) {
                 <SelectContent>
                     {spaces.map((space) => (
                         <SelectItem key={space._id} value={space._id} className='cursor-pointer'>
-                            <div className='flex flex-row items-center gap-2 p-1'>
-                                <RocketIcon className='w-4 h-4' />
+                            <div className='flex flex-row items-center gap-2'>
+                                <div className='bg-accent p-1 rounded-[5px]'>
+                                    <RocketIcon className='w-4 h-4 stroke-primary' />
+                                </div>
                                 <p>{space.title}</p>
                             </div>
                         </SelectItem>
