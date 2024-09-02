@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User } from 'lucide-react';
-import LogoutButton from '../auth/logout-button';
+import SignoutButton from '../auth/signout-button';
 import { Session } from 'next-auth';
 import ThemeToggle from '../global/theme-toggle';
 
@@ -19,9 +19,9 @@ export default function UserCard({ session }: { session: Session }) {
                 </div>
             </aside>
             <div className="flex flex-shrink-0 justify-center items-center gap-2">
-                <LogoutButton>
+                <SignoutButton>
                     <LogOut className="w-4 h-4" />
-                </LogoutButton>
+                </SignoutButton>
                 <ThemeToggle />
             </div>
         </div>

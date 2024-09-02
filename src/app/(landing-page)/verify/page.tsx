@@ -5,7 +5,6 @@ import { CheckCircleIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-
 export default function Verify() {
     const router = useRouter()
     return (

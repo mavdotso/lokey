@@ -2,13 +2,13 @@
 import { Search, Trash2Icon } from 'lucide-react';
 import Link from 'next/link';
 import { SpacesDropdown } from '../spaces/spaces-dropdown';
-import { auth } from '@/lib/auth';
 import { Separator } from '@radix-ui/react-select';
 import UserCard from '@/components/sidebar/user-card';
-import ThemeToggle from '@/components/global/theme-toggle';
+import { Session } from 'next-auth';
 
 interface SidebarProps {
     params: { spaceId: string };
+    session: Session;
     className?: string;
     onToggleSidebar?: () => void;
 }
@@ -25,8 +25,7 @@ const navItems: NavItem[] = [
     { icon: Trash2Icon, name: 'Trash', onClick: () => { } },
 ];
 
-export default async function Sidebar({ params, className, onToggleSidebar }: SidebarProps) {
-    const session = await auth()
+export default function Sidebar({ params, session, className, onToggleSidebar }: SidebarProps) {
     return (
         <aside className={`w-64 h-full bg-card border-r border-muted flex flex-col p-4 ${className}`}>
             <div className="flex justify-between items-center gap-2 font-semibold text-gray-700">

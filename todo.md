@@ -5,14 +5,14 @@
 
 ### MVP
 
--   [x] User login (Supabase)
+-   [x] User login
 -   [x] Create links with custom expiration
     -   [x] 1, 3, 5, 7 days
     -   [ ] One-time or multiple time
 -   [ ] Has the user seen the link or not in the dashboard
 -   [ ] Share link via email / text
 -   [x] Resend
-    -   [ ] Email templates
+    -   [ ] Email templates (?)
 -   [x] Different credentials types
 
 ### For teams

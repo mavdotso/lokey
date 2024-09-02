@@ -1,16 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { signIn } from '@/lib/auth'
-import { toast } from 'sonner'
+import { signin } from '@/lib/server-actions'
 
 export default function SignIn() {
-
-    async function handleSubmit(formData: FormData) {
-        'use server';
-        await signIn("resend", formData);
-        toast.success('Check your email for a magic link');
-    }
-
     return (
         <div className="flex flex-col justify-center bg-background">
             <div className="space-y-4 w-full max-w-md">
@@ -22,7 +14,7 @@ export default function SignIn() {
                         Or start your 14-day free trial
                     </p>
                 </div>
-                <form action={handleSubmit} className="flex flex-row justify-center items-center gap-2 py-4 max-w-lg">
+                <form action={signin} className="flex flex-row justify-center items-center gap-2 py-4 max-w-lg">
                     <Input type="email" name="email" placeholder="Enter your email" required />
                     <Button type="submit">
                         Sign in with Magic link
