@@ -2,7 +2,9 @@ import { SignJWT, importPKCS8 } from 'jose';
 import NextAuth from 'next-auth';
 import Resend from 'next-auth/providers/resend';
 import { ConvexAdapter } from './convex-adapter';
-import { html, text } from './resend/send-verification-request';
+import { text, VerificationEmail } from '@/components/emails/magic-link-email';
+import { render } from '@react-email/render';
+import { resend } from './resend';
 
 if (process.env.CONVEX_AUTH_PRIVATE_KEY === undefined) {
     throw new Error('Missing CONVEX_AUTH_PRIVATE_KEY Next.js environment variable');
@@ -18,26 +20,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         Resend({
             apiKey: process.env.AUTH_RESEND_KEY,
-            from: 'hi@mav.so',
+            server: {
+                host: process.env.EMAIL_SERVER_HOST,
+                port: process.env.EMAIL_SERVER_PORT,
+                auth: {
+                    user: process.env.EMAIL_SERVER_USER,
+                    pass: process.env.EMAIL_SERVER_PASSWORD,
+                },
+            },
+            from: process.env.EMAIL_FROM,
             async sendVerificationRequest({ identifier: email, url, provider: { server, from } }) {
                 const { host } = new URL(url);
-                const res = await fetch('https://api.resend.com/emails', {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${process.env.AUTH_RESEND_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        from,
-                        to: email,
-                        subject: `Sign in to ${host}`,
-                        html: html({ url, host }),
-                        text: text({ url, host }),
-                    }),
+
+                const { data, error } = await resend.emails.send({
+                    from: process.env.EMAIL_FROM!,
+                    to: email,
+                    subject: `Sign in to ${host}`,
+                    react: VerificationEmail({ url, host }),
+                    text: text({ url, host }),
                 });
 
-                if (!res.ok) {
-                    throw new Error('Resend error: ' + JSON.stringify(await res.json()));
+                if (error) {
+                    throw new Error('Resend error: ' + JSON.stringify(error.message));
                 }
             },
         }),
