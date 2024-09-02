@@ -2,6 +2,7 @@ import { SignJWT, importPKCS8 } from 'jose';
 import NextAuth from 'next-auth';
 import Resend from 'next-auth/providers/resend';
 import { ConvexAdapter } from './convex-adapter';
+import { html, text } from './resend/send-verification-request';
 
 if (process.env.CONVEX_AUTH_PRIVATE_KEY === undefined) {
     throw new Error('Missing CONVEX_AUTH_PRIVATE_KEY Next.js environment variable');
@@ -16,8 +17,29 @@ const CONVEX_SITE_URL = process.env.NEXT_PUBLIC_CONVEX_URL!.replace(/.cloud$/, '
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         Resend({
-            name: 'email',
-            from: 'mavdotso <noreply@mav.so>',
+            apiKey: process.env.AUTH_RESEND_KEY,
+            from: 'hi@mav.so',
+            async sendVerificationRequest({ identifier: email, url, provider: { server, from } }) {
+                const { host } = new URL(url);
+                const res = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${process.env.AUTH_RESEND_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        from,
+                        to: email,
+                        subject: `Sign in to ${host}`,
+                        html: html({ url, host }),
+                        text: text({ url, host }),
+                    }),
+                });
+
+                if (!res.ok) {
+                    throw new Error('Resend error: ' + JSON.stringify(await res.json()));
+                }
+            },
         }),
     ],
     adapter: ConvexAdapter,
