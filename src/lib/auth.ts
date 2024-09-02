@@ -36,6 +36,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return { ...session, convexToken };
         },
     },
+    pages: {
+        signIn: '/sign-in',
+        verifyRequest: '/verify',
+    },
 });
 
 declare module 'next-auth' {

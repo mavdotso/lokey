@@ -28,7 +28,7 @@ export default function SignIn() {
                         Sign in with Magic link
                     </Button>
                 </form>
-                <span className="text-center text-secondary-foreground text-xs">
+                <span className="text-center text-muted-foreground text-xs">
                     You will recieve a sign-in link to your email address
                 </span>
             </div>

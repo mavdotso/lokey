@@ -9,7 +9,7 @@ interface LogoutButtonProps {
 export default function LogoutButton({ children }: LogoutButtonProps) {
     async function logout() {
         "use server"
-        await signOut();
+        await signOut({ redirectTo: "/" });
     }
 
     return (

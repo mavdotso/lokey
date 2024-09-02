@@ -81,6 +81,7 @@ export default function LandingPage() {
                                     autoCorrect="off"
                                     autoCapitalize="off"
                                     spellCheck="false"
+                                    required
                                 />
                                 <Button
                                     type="button"
@@ -146,7 +147,7 @@ export default function LandingPage() {
             </div>
             <p className="pt-4 text-muted-foreground text-xs">
                 Want to manage your shared passwords or view their usage? <br />
-                <a href="#" className="text-primary hover:underline">Create a free account</a> to get started.
+                <a href="/sign-in" className="text-primary hover:underline">Create a free account</a> to get started.
             </p>
         </>
     );

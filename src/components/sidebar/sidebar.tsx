@@ -28,11 +28,11 @@ const navItems: NavItem[] = [
 export default async function Sidebar({ params, className, onToggleSidebar }: SidebarProps) {
     const session = await auth()
     return (
-        <aside className={`w-64 h-full bg-card border-r border-muted flex flex-col ${className}`}>
-            <div className="flex justify-between items-center gap-4 p-4 font-semibold text-gray-700">
+        <aside className={`w-64 h-full bg-card border-r border-muted flex flex-col p-4 ${className}`}>
+            <div className="flex justify-between items-center gap-2 font-semibold text-gray-700">
                 <SpacesDropdown userId={session!.user!.id!} />
             </div>
-            <nav className="px-4 text-sm overflow-y-auto">
+            <nav className="mt-4 text-sm overflow-y-auto">
                 {navItems.map((item) =>
                     item.href && (
                         <Link key={item.name} href={item.href} className="flex items-center hover:bg-muted px-2 py-1.5 rounded-md font-medium text-foreground/70 hover:text-foreground">
@@ -42,10 +42,11 @@ export default async function Sidebar({ params, className, onToggleSidebar }: Si
                     )
                 )}
             </nav>
-            <Separator />
-            {session && <UserCard session={session} />}
-            <Separator />
-            <ThemeToggle />
+            <div className="mt-auto">
+                <Separator />
+                {session && <UserCard session={session} />}
+                <Separator />
+            </div>
         </aside>
     );
 }

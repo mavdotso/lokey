@@ -2,10 +2,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User } from 'lucide-react';
 import LogoutButton from '../auth/logout-button';
 import { Session } from 'next-auth';
+import ThemeToggle from '../global/theme-toggle';
 
 export default function UserCard({ session }: { session: Session }) {
     return (
-        <div className="flex justify-between items-center gap-2 px-4 py-2 w-full">
+        <div className="flex justify-between items-center gap-2 py-2 w-full">
             <aside className="flex flex-grow justify-center items-center gap-2 min-w-0">
                 <Avatar>
                     <AvatarImage src={session.user?.image || ''} />
@@ -17,10 +18,11 @@ export default function UserCard({ session }: { session: Session }) {
                     <small className="text-muted-foreground truncate">{session.user?.email}</small>
                 </div>
             </aside>
-            <div className="flex flex-shrink-0 justify-center items-center">
+            <div className="flex flex-shrink-0 justify-center items-center gap-2">
                 <LogoutButton>
                     <LogOut className="w-4 h-4" />
                 </LogoutButton>
+                <ThemeToggle />
             </div>
         </div>
     );

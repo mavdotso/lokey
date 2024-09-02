@@ -122,7 +122,7 @@ export default function SharePage() {
             </div>
             <p className="pt-4 text-muted-foreground text-xs">
                 Want to share your own passwords securely? <br />
-                <a href="/" className="text-primary hover:underline">Create a free account</a> to get started.
+                <a href="/sign-in" className="text-primary hover:underline">Create a free account</a> to get started.
             </p>
         </>
     );
