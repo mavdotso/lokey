@@ -18,10 +18,31 @@ export const createSpace = mutation({
             throw new Error('User is not authenticated');
         }
 
+        console.log(identity);
+
+        // Get the user's ID
+        const user = await ctx.db
+            .query('users')
+            .filter((q) => q.eq(q.field('_id'), identity))
+            .unique();
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        // Create the space
         const spaceId = await ctx.db.insert('spaces', {
             ...args,
             spaceOwner: identity,
         });
+
+        // Create the userSpace entry
+        await ctx.db.insert('userSpaces', {
+            userId: user._id,
+            spaceId: spaceId,
+            role: 'admin', // The creator of the space is typically the admin
+        });
+
         return { spaceId };
     },
 });

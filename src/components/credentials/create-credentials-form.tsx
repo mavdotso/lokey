@@ -47,7 +47,6 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
             })
             toast.success('Credential created successfully!')
             onCredentialCreated(credentialId)
-            // Clear form fields
             setName('')
             setDescription('')
             setType('password')

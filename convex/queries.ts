@@ -1,5 +1,6 @@
 import { query } from './_generated/server';
 import { v } from 'convex/values';
+import { getViewerId } from './auth';
 
 export const getSpacesByUserId = query({
     args: { userId: v.string() },
@@ -10,6 +11,24 @@ export const getSpacesByUserId = query({
             .collect();
 
         return spaces.filter(Boolean);
+    },
+});
+
+export const getFirstUserSpace = query({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await getViewerId(ctx);
+
+        if (identity === null) {
+            throw new Error('User is not authenticated');
+        }
+
+        const space = await ctx.db
+            .query('spaces')
+            .filter((q) => q.eq(q.field('spaceOwner'), identity))
+            .first();
+
+        return space ? { data: space, error: null } : { data: null, error: 'No space found for user' };
     },
 });
 

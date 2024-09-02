@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
-import { Id } from '../../../convex/_generated/dataModel'
 import {
     Card,
     CardContent,
@@ -17,29 +16,39 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { useRouter } from 'next/navigation'
+import { Id } from '../../../convex/_generated/dataModel'
 
-
-interface CreateSpaceFormProps {
-    onSpaceCreated: (spaceId: Id<"spaces">) => void;
-}
-
-export function CreateSpaceForm({ onSpaceCreated }: CreateSpaceFormProps) {
+export function CreateSpaceForm() {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [newSpaceId, setNewSpaceId] = useState<Id<"spaces"> | null>(null)
     const createSpace = useMutation(api.mutations.createSpace)
+    const router = useRouter()
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
+        if (isSubmitting) return
+
+        setIsSubmitting(true)
         try {
-            await createSpace({ title, iconId: 'default' })
+            const { spaceId } = await createSpace({ title, iconId: 'default' })
             toast.success('Space created successfully!')
-            setTitle('')
-            setDescription('')
+            setNewSpaceId(spaceId)
         } catch (error) {
             toast.error('Failed to create space')
             console.error('Error creating space:', error)
+        } finally {
+            setIsSubmitting(false)
         }
     }
+
+    useEffect(() => {
+        if (newSpaceId) {
+            router.push(`/dashboard/${newSpaceId}`)
+        }
+    }, [newSpaceId])
 
     return (
         <Card className="w-full max-w-md">
@@ -56,6 +65,7 @@ export function CreateSpaceForm({ onSpaceCreated }: CreateSpaceFormProps) {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
+                            disabled={isSubmitting}
                         />
                     </div>
                     <div>
@@ -63,13 +73,16 @@ export function CreateSpaceForm({ onSpaceCreated }: CreateSpaceFormProps) {
                         <Textarea
                             id="description"
                             value={description}
-                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+                            onChange={(e) => setDescription(e.target.value)}
+                            disabled={isSubmitting}
                         />
                     </div>
                 </form>
             </CardContent>
             <CardFooter>
-                <Button type="submit" onClick={handleSubmit}>Create Space</Button>
+                <Button type="submit" onClick={handleSubmit} disabled={isSubmitting}>
+                    {isSubmitting ? 'Creating...' : 'Create Space'}
+                </Button>
             </CardFooter>
         </Card>
     )

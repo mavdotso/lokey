@@ -79,7 +79,7 @@ export function SpacesDropdown({ userId }: SpacesDropdownProps) {
                     <DialogTitle>Create a Space</DialogTitle>
                     <DialogDescription>Create a new space to organize your work.</DialogDescription>
                 </DialogHeader>
-                <CreateSpaceForm onSpaceCreated={handleSpaceCreated} />
+                <CreateSpaceForm />
             </DialogContent>
         </Dialog>
     );
