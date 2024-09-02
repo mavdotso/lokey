@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner'
 import { Id } from '../../../convex/_generated/dataModel'
 import { Credential } from '../../../convex/types'
+import { DatePicker } from '../global/date-picker'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
 interface CreateCredentialFormProps {
     onCredentialCreated: (credentialId: Id<"credentials">) => void;
@@ -20,6 +22,9 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
     const [description, setDescription] = useState('')
     const [type, setType] = useState<Credential['type']>('password')
     const [data, setData] = useState('')
+    const [expiresAt, setExpiresAt] = useState<Date | undefined>()
+    const [maxViews, setMaxViews] = useState<number>(1)
+    const [showData, setShowData] = useState(false)
 
     const params = useParams()
     const currentSpaceId = params.spaceId as Id<"spaces">
@@ -43,7 +48,9 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
                 name,
                 description,
                 type,
-                data
+                data,
+                expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
+                maxViews
             })
             toast.success('Credential created successfully!')
             onCredentialCreated(credentialId)
@@ -51,6 +58,8 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
             setDescription('')
             setType('password')
             setData('')
+            setExpiresAt(undefined)
+            setMaxViews(1)
         } catch (error) {
             toast.error('Failed to create credential')
             console.error('Error creating credential:', error)
@@ -59,47 +68,83 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <Label htmlFor="name">Name</Label>
-                <Input
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
+            <div className='flex gap-2'>
+                <div>
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder='Credentials name'
+                    />
+                </div>
+                <div className='flex-1'>
+                    <Label htmlFor="type">Credential type</Label>
+                    <Select value={type} onValueChange={(value) => setType(value as Credential['type'])}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {credentialTypes.map((credType) => (
+                                <SelectItem key={credType} value={credType}>
+                                    {credType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
             <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea
+                <Input
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    placeholder='Only for internal reference'
                 />
             </div>
             <div>
-                <Label htmlFor="type">Type</Label>
-                <Select onValueChange={(value) => setType(value as Credential['type'])}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {credentialTypes.map((type) => (
-                            <SelectItem key={type} value={type}>
-                                {type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                <Label htmlFor="data">Credentials</Label>
+                <div className="relative">
+                    <Input
+                        id="data"
+                        value={data}
+                        onChange={(e) => setData(e.target.value)}
+                        required
+                        type={showData ? "text" : "password"}
+                        placeholder='Put your sensitive data here'
+                    />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="top-0 right-0 absolute h-full"
+                        onClick={() => setShowData(!showData)}
+                    >
+                        {showData ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                    </Button>
+                </div>
             </div>
-            <div>
-                <Label htmlFor="data">Data</Label>
-                <Textarea
-                    id="data"
-                    value={data}
-                    onChange={(e) => setData(e.target.value)}
-                    required
-                />
+            <div className='flex gap-2'>
+                <div>
+                    <Label htmlFor="expiresAt">Expiration</Label>
+                    <DatePicker
+                        date={expiresAt}
+                        onDateChange={setExpiresAt}
+                    />
+                </div>
+                <div>
+                    <Label htmlFor="maxViews">Views limit</Label>
+                    <Input
+                        id="maxViews"
+                        type="number"
+                        value={maxViews}
+                        min={1}
+                        onChange={(e) => setMaxViews(e.target.value ? parseInt(e.target.value) : 1)}
+                    />
+                </div>
             </div>
+
             <Button type="submit">Create Credential</Button>
         </form>
     )

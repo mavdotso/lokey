@@ -146,7 +146,6 @@ const activityNotificationSchema = {
     readAt: v.optional(v.string()),
 };
 
-// New schemas for authentication
 const accountSchema = {
     userId: v.id('users'),
     type: v.union(v.literal('email'), v.literal('oidc'), v.literal('oauth'), v.literal('webauthn')),
