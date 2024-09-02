@@ -4,12 +4,10 @@ import { v } from 'convex/values';
 export const getSpacesByUserId = query({
     args: { userId: v.string() },
     handler: async (ctx, args) => {
-        const userSpaces = await ctx.db
-            .query('userSpaces')
-            .filter((q) => q.eq(q.field('userId'), args.userId))
+        const spaces = await ctx.db
+            .query('spaces')
+            .filter((q) => q.eq(q.field('spaceOwner'), args.userId))
             .collect();
-
-        const spaces = await Promise.all(userSpaces.map(async (userSpace) => await ctx.db.get(userSpace.spaceId)));
 
         return spaces.filter(Boolean);
     },

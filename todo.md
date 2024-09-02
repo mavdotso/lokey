@@ -1,19 +1,19 @@
 ### Bugs
 
 -   [x] User session doesn't save / user can't login
--   [ ] Make sure the links expire after one view
+-   [x] Make sure the links expire after one view
 
 ### MVP
 
 -   [x] User login (Supabase)
--   [ ] Create links with custom expiration
+-   [x] Create links with custom expiration
     -   [x] 1, 3, 5, 7 days
     -   [ ] One-time or multiple time
 -   [ ] Has the user seen the link or not in the dashboard
 -   [ ] Share link via email / text
--   [ ] Resend
+-   [x] Resend
     -   [ ] Email templates
--   [ ] Different credentials types
+-   [x] Different credentials types
 
 ### For teams
 
