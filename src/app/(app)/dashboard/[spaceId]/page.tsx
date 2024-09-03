@@ -20,7 +20,8 @@ export default function DashboardPage() {
     const session = useSession();
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState<CredentialSortOption>('name');
-    const [selectedType, setSelectedType] = useState<CredentialType | 'all'>('all');
+    const [selectedTypes, setSelectedTypes] = useState<CredentialType[]>([]);
+    const [hideInactive, setHideInactive] = useState(false);
 
     const credentials = useQuery(api.queries.getCredentialsByUserId, {
         userId: session.data?.user?.id ?? ''
@@ -40,10 +41,15 @@ export default function DashboardPage() {
         console.log('New credential created:', credentialId);
     }
 
+    function handleTypeChange(types: string[]) {
+        setSelectedTypes(types as CredentialType[]);
+    }
+
     const filteredCredentials = credentials
         .filter(cred =>
             cred.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            (selectedType === 'all' || cred.type === selectedType)
+            (selectedTypes.length === 0 || selectedTypes.includes(cred.type as CredentialType)) &&
+            (!hideInactive || cred.active)
         )
         .sort((a, b) => {
             if (sortOption === 'createdAt') return Number(a._creationTime) - Number(b._creationTime);
@@ -63,8 +69,10 @@ export default function DashboardPage() {
                 onSearchChange={setSearchTerm}
                 sortOption={sortOption}
                 onSortChange={(value: string) => setSortOption(value as CredentialSortOption)}
-                selectedType={selectedType}
-                onTypeChange={(value: CredentialType | 'all') => setSelectedType(value)}
+                selectedTypes={selectedTypes}
+                onTypeChange={handleTypeChange}
+                hideInactive={hideInactive}
+                onHideInactiveChange={setHideInactive}
             />
             {filteredCredentials.length === 0 ? (
                 <p>No credentials found.</p>
