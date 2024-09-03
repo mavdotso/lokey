@@ -6,6 +6,7 @@ import { formatTimestamp, getURL } from '@/lib/utils';
 import { CheckIcon, CopyIcon, EyeIcon, LinkIcon, ShareIcon, TimerIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/button';
+import { HashtagBadge } from './hashtag-badge';
 
 
 interface CredentialCardProps {
@@ -46,6 +47,17 @@ export function CredentialCard({ credential }: CredentialCardProps) {
         });
     };
 
+    function getCredentialTags() {
+        const tags: string[] = [credential.type];
+        if (credential.subtype) {
+            tags.push(credential.subtype);
+        }
+        if (credential.type === 'custom' && credential.customTypeId) {
+            tags.push('custom');
+        }
+        return tags;
+    }
+
     const shareLink = `${getURL()}/shared/${credential._id}`;
 
     return (
@@ -71,6 +83,11 @@ export function CredentialCard({ credential }: CredentialCardProps) {
                 </div>
             </div>
             <div className="flex justify-center items-center">
+                <div className="flex flex-wrap">
+                    {getCredentialTags().map((tag, index) => (
+                        <HashtagBadge key={index} text={tag} />
+                    ))}
+                </div>
                 <Button
                     type="button"
                     variant="ghost"
