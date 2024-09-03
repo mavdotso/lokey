@@ -4,8 +4,10 @@ import { api } from '../../../convex/_generated/api';
 import UserAvatar from '../global/user-avatar';
 import { formatTimestamp } from '@/lib/utils';
 
+type PartialCredential = Pick<Credential, '_id' | '_creationTime' | 'name' | 'createdBy' | 'type' | 'updatedAt'>;
+
 interface CredentialCardProps {
-    credential: Credential;
+    credential: PartialCredential;
 }
 
 export function CredentialCard({ credential }: CredentialCardProps) {

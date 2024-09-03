@@ -39,7 +39,7 @@ export default function DashboardPage() {
             ) : (
                 <div className="grid grid-cols-1 border-border rounded-md overflow-hidden">
                     {credentials.map((cred) => (
-                        <CredentialCard key={cred.id} credential={cred} />
+                        <CredentialCard key={cred._id} credential={cred} />
                     ))}
                 </div>
             )}

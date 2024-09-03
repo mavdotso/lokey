@@ -48,11 +48,19 @@ export const getCredentialsByUserId = query({
             .collect();
 
         return credentials.map((cred) => ({
-            id: cred._id,
+            _id: cred._id,
+            _creationTime: cred._creationTime,
             name: cred.name,
-            type: cred.type,
-            updatedAt: cred.updatedAt,
+            description: cred.description,
             createdBy: cred.createdBy,
+            type: cred.type,
+            subtype: cred.subtype,
+            customTypeId: cred.customTypeId,
+            encryptedData: cred.encryptedData,
+            updatedAt: cred.updatedAt,
+            expiresAt: cred.expiresAt,
+            maxViews: cred.maxViews,
+            viewCount: cred.viewCount,
         }));
     },
 });
