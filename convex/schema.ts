@@ -81,6 +81,7 @@ const credentialSchema = {
     spaceId: v.optional(v.id('spaces')),
     name: v.string(),
     description: v.optional(v.string()),
+    createdBy: v.optional(v.id('users')),
     type: credentialType,
     subtype: v.optional(v.string()),
     customTypeId: v.optional(v.id('customCredentialTypes')),

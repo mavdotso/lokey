@@ -121,6 +121,7 @@ export const createCredential = mutation({
         maxViews: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
         const encryptedData = crypto.encrypt(args.data);
 
         const credentialId = await ctx.db.insert('credentials', {
@@ -135,6 +136,7 @@ export const createCredential = mutation({
             expiresAt: args.expiresAt,
             maxViews: args.maxViews,
             viewCount: 0,
+            createdBy: identity || undefined,
         });
         return { credentialId };
     },

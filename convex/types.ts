@@ -54,6 +54,7 @@ export type Credential = {
     spaceId?: Id<'spaces'>;
     name: string;
     description?: string;
+    createdBy?: Id<'users'>;
     type:
         | 'password'
         | 'login_password'

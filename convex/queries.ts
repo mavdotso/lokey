@@ -52,6 +52,7 @@ export const getCredentialsByUserId = query({
             name: cred.name,
             type: cred.type,
             updatedAt: cred.updatedAt,
+            createdBy: cred.createdBy,
         }));
     },
 });

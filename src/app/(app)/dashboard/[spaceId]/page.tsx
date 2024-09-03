@@ -9,6 +9,7 @@ import { CredentialCard } from '@/components/credentials/credential-card';
 
 export default function DashboardPage() {
     const session = useSession();
+
     const credentials = useQuery(api.queries.getCredentialsByUserId, {
         userId: session.data?.user?.id ?? ''
     });
@@ -36,7 +37,7 @@ export default function DashboardPage() {
             {credentials.length === 0 ? (
                 <p>You haven&apos;t created any credentials yet.</p>
             ) : (
-                <div className="gap-4 grid grid-cols-1">
+                <div className="grid grid-cols-1 border-border rounded-md overflow-hidden">
                     {credentials.map((cred) => (
                         <CredentialCard key={cred.id} credential={cred} />
                     ))}
