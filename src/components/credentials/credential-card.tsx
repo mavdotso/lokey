@@ -2,49 +2,101 @@ import { useQuery } from 'convex/react';
 import { Credential } from '../../../convex/types';
 import { api } from '../../../convex/_generated/api';
 import UserAvatar from '../global/user-avatar';
-import { formatTimestamp } from '@/lib/utils';
+import { formatTimestamp, getURL } from '@/lib/utils';
+import { CheckIcon, CopyIcon, EyeIcon, LinkIcon, ShareIcon, TimerIcon } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '../ui/button';
 
-type PartialCredential = Pick<Credential, '_id' | '_creationTime' | 'name' | 'createdBy' | 'type' | 'updatedAt'>;
 
 interface CredentialCardProps {
-    credential: PartialCredential;
+    credential: Credential;
 }
 
 export function CredentialCard({ credential }: CredentialCardProps) {
 
-    console.log(credential)
+    const [isCopied, setIsCopied] = useState(false);
 
     const creator = useQuery(
         api.users.getUser,
         credential.createdBy ? { _id: credential.createdBy } : "skip"
     );
 
-    console.log(creator)
+    function isActive() {
+        const now = new Date().getTime();
+
+        const expiresAtTimestamp = typeof credential.expiresAt === 'string'
+            ? new Date(credential.expiresAt).getTime()
+            : Number(credential.expiresAt);
+
+        const notExpired = !credential.expiresAt || (isFinite(expiresAtTimestamp) && expiresAtTimestamp > now);
+        const hasRemainingViews = !credential.maxViews || (credential.viewCount || 0) < credential.maxViews;
+
+        return notExpired && hasRemainingViews;
+    }
+
+    function formatExpirationDate(expiresAt: number | null) {
+        if (!expiresAt) return 'No expiration';
+        return formatTimestamp(expiresAt.toString());
+    };
+
+    function copyToClipboard() {
+        navigator.clipboard.writeText(shareLink).then(() => {
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 2000);
+        });
+    };
+
+    const shareLink = `${getURL()}/shared/${credential._id}`;
 
     return (
-        <div className="flex justify-between items-center bg-card hover:bg-secondary p-4 border-b border-border text-xs">
-            <div className="flex items-center space-x-2">
-                <div className="bg-green-400 rounded-full w-2 h-2"></div>
-                <span className="font-medium text-foreground text-sm">{credential.name}</span>
+        <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr] bg-card hover:bg-secondary p-4 border-b border-border text-xs">
+            <div className="flex flex-col overflow-hidden">
+                <span className="font-medium text-foreground text-sm truncate">{credential.name}</span>
+                <span className="text-muted-foreground text-sm truncate">{credential.description}</span>
             </div>
-            <div className="flex flex-grow justify-center">
-                <div className="text-center text-muted-foreground">
-                    <span>Ready</span>
-                    <div className="flex items-center space-x-1">
-                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18 21l-4-4h3V7h-3l4-4 4 4h-3v10h3l-4 4z" />
-                        </svg>
-                        <span>main</span>
+            <div className="flex flex-col space-y-2">
+                <div className="flex items-center gap-2 pl-1 text-md">
+                    <div className={`w-2 h-2 rounded-full ${isActive() ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span className='text-md'>{isActive() ? 'Active' : 'Inactive'}</span>
+                </div>
+                <div className="flex items-center gap-4 text-muted-foreground">
+                    <div className='flex items-center gap-1'>
+                        <TimerIcon className='w-4 h-4' />
+                        <span>{formatExpirationDate(credential.expiresAt ? Number(credential.expiresAt) : null)}</span>
+                    </div>
+                    <div className='flex items-center gap-1'>
+                        <EyeIcon className='w-4 h-4' />
+                        <span>{credential.viewCount || 0} / {credential.maxViews || '∞'}</span>
                     </div>
                 </div>
             </div>
-            <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1 text-muted-foreground">
-                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z" />
-                    </svg>
-                    <span>{formatTimestamp(credential.updatedAt)}</span>
-                    {creator && (<span className='flex justify-center items-center gap-2'>by {creator.name || creator.email.split('@')[0]} <UserAvatar user={creator} /></span>)}
+            <div className="flex justify-center items-center">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={copyToClipboard}
+                >
+                    {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
+                </Button>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => console.log("share")}
+                >
+                    <ShareIcon className="w-4 h-4" />
+                </Button>
+            </div>
+            <div className="flex justify-end items-center space-x-2 text-muted-foreground">
+                <div className="flex items-center gap-1 ml-auto">
+                    <span className="whitespace-nowrap">{formatTimestamp(credential.updatedAt)} </span>
+                    {creator && (
+                        <div className='flex items-center gap-2'>
+                            <span className="max-w-[100px] truncate">{" "} by {creator.name || creator.email.split('@')[0]}</span>
+                            <UserAvatar user={creator} />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

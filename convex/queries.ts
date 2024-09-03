@@ -47,21 +47,7 @@ export const getCredentialsByUserId = query({
             .filter((q) => q.or(...spaceIds.map((id) => q.eq(q.field('spaceId'), id))))
             .collect();
 
-        return credentials.map((cred) => ({
-            _id: cred._id,
-            _creationTime: cred._creationTime,
-            name: cred.name,
-            description: cred.description,
-            createdBy: cred.createdBy,
-            type: cred.type,
-            subtype: cred.subtype,
-            customTypeId: cred.customTypeId,
-            encryptedData: cred.encryptedData,
-            updatedAt: cred.updatedAt,
-            expiresAt: cred.expiresAt,
-            maxViews: cred.maxViews,
-            viewCount: cred.viewCount,
-        }));
+        return credentials;
     },
 });
 
