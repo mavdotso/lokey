@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Plus, RocketIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
-import { Space } from '../../../convex/types';
 import { Id } from '../../../convex/_generated/dataModel';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { CreateSpaceForm } from './create-space-form';
 import { useMemo } from 'react';
+import LoadingScreen from '../global/loading-screen';
 
 interface SpacesDropdownProps {
     userId: string;
@@ -26,6 +26,8 @@ export function SpacesDropdown({ userId }: SpacesDropdownProps) {
 
     const spaces = useMemo(() => spacesQuery ?? [], [spacesQuery]);
 
+    if (spaces === undefined) return <LoadingScreen />
+
     useEffect(() => {
         if (spaces.length > 0 && !selectedSpaceId) {
             setSelectedSpaceId(spaces[0]._id as Id<"spaces">);
@@ -35,11 +37,6 @@ export function SpacesDropdown({ userId }: SpacesDropdownProps) {
     function handleSelect(spaceId: Id<"spaces">) {
         setSelectedSpaceId(spaceId);
         router.push(`/dashboard/${spaceId}`);
-    }
-
-    function handleSpaceCreated(spaceId: Id<"spaces">) {
-        handleSelect(spaceId);
-        setIsDialogOpen(false);
     }
 
     return (
@@ -75,10 +72,6 @@ export function SpacesDropdown({ userId }: SpacesDropdownProps) {
                 </SelectContent>
             </Select>
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Create a Space</DialogTitle>
-                    <DialogDescription>Create a new space to organize your work.</DialogDescription>
-                </DialogHeader>
                 <CreateSpaceForm />
             </DialogContent>
         </Dialog>

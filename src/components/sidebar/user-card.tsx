@@ -1,19 +1,14 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User } from 'lucide-react';
 import SignoutButton from '../auth/signout-button';
 import { Session } from 'next-auth';
 import ThemeToggle from '../global/theme-toggle';
+import UserAvatar from '../global/user-avatar';
 
 export default function UserCard({ session }: { session: Session }) {
     return (
         <div className="flex justify-between items-center gap-2 py-2 w-full">
             <aside className="flex flex-grow justify-center items-center gap-2 min-w-0">
-                <Avatar>
-                    <AvatarImage src={session.user?.image || ''} />
-                    <AvatarFallback>
-                        <User />
-                    </AvatarFallback>
-                </Avatar>
+                {session.user && <UserAvatar user={session.user} />}
                 <div className="flex flex-col min-w-0">
                     <small className="text-muted-foreground truncate">{session.user?.email}</small>
                 </div>

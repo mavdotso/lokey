@@ -2,6 +2,7 @@
 
 -   [x] User session doesn't save / user can't login
 -   [x] Make sure the links expire after one view
+-   [ ] spaces-dropdown.tsx fix the dialog / space creation
 
 ### MVP
 

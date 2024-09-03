@@ -1,10 +1,11 @@
 "use client"
 import { useQuery } from 'convex/react';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
 import { api } from '../../../../../convex/_generated/api';
 import { CreateCredentialDialog } from '@/components/credentials/create-credentials-dialog';
 import { Id } from '../../../../../convex/_generated/dataModel';
+import LoadingScreen from '@/components/global/loading-screen';
+import { CredentialCard } from '@/components/credentials/credential-card';
 
 export default function DashboardPage() {
     const session = useSession();
@@ -12,12 +13,14 @@ export default function DashboardPage() {
         userId: session.data?.user?.id ?? ''
     });
 
+    if (credentials === undefined) return <LoadingScreen />
+
     if (!session || !session.data || !session.data.user) {
-        return <p>Loading session...</p>;
+        return <LoadingScreen loadingText='Loading session...' />;
     }
 
     if (credentials === undefined) {
-        return <p>Loading credentials...</p>;
+        return <LoadingScreen loadingText='Loading credentials...' />;
     }
 
     function handleCredentialCreated(credentialId: Id<"credentials">) {
@@ -25,23 +28,20 @@ export default function DashboardPage() {
     }
 
     return (
-        <div>
-            <h1>Your Credentials</h1>
+        <div className='relative p-4 w-full'>
+            <div className='flex justify-between items-center mb-4'>
+                <h1 className='font-bold text-2xl'>Your Credentials</h1>
+                <CreateCredentialDialog onCredentialCreated={handleCredentialCreated} />
+            </div>
             {credentials.length === 0 ? (
                 <p>You haven&apos;t created any credentials yet.</p>
             ) : (
-                <ul>
+                <div className="gap-4 grid grid-cols-1">
                     {credentials.map((cred) => (
-                        <li key={cred.id}>
-                            <Link href={`/credential/${cred.id}`}>
-                                {cred.name} - {cred.type}
-                            </Link>
-                            <span> (Last updated: {new Date(cred.updatedAt).toLocaleString()})</span>
-                        </li>
+                        <CredentialCard key={cred.id} credential={cred} />
                     ))}
-                </ul>
+                </div>
             )}
-            <CreateCredentialDialog onCredentialCreated={handleCredentialCreated} />
         </div>
     );
 }
