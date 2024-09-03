@@ -9,6 +9,7 @@ import { CredentialCard } from '@/components/credentials/credential-card';
 import { useState } from 'react';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
 import { Separator } from '@/components/ui/separator';
+import { isCredentialActive } from '@/lib/utils';
 
 type CredentialSortOption = 'name' | 'createdAt' | 'updatedAt';
 type CredentialType = 'password' | 'login_password' | 'api_key' | 'oauth_token' | 'ssh_key' |
@@ -50,7 +51,7 @@ export default function DashboardPage() {
         .filter(cred =>
             cred.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
             (selectedTypes.length === 0 || selectedTypes.includes(cred.type as CredentialType)) &&
-            (!hideExpired || cred.active)
+            (!hideExpired || isCredentialActive(cred))
         )
         .sort((a, b) => {
             if (sortOption === 'createdAt') return Number(a._creationTime) - Number(b._creationTime);

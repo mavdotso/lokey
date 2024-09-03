@@ -9,8 +9,8 @@
 -   [x] User login
 -   [x] Create links with custom expiration
     -   [x] 1, 3, 5, 7 days
-    -   [ ] One-time or multiple time
--   [ ] Has the user seen the link or not in the dashboard
+    -   [x] One-time or multiple time
+-   [x] Has the user seen the link or not in the dashboard
 -   [ ] Share link via email / text
 -   [x] Resend
     -   [ ] Email templates (?)

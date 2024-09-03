@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import CryptoJS from 'crypto-js';
+import { Credential } from '../../convex/types';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -44,4 +45,15 @@ export function formatTimestamp(timestamp: string): string {
         const days = Math.floor(diffInSeconds / 86400);
         return `${days}d ago`;
     }
+}
+
+export function isCredentialActive(credential: Credential): boolean {
+    const now = new Date().getTime();
+
+    const expiresAtTimestamp = typeof credential.expiresAt === 'string' ? new Date(credential.expiresAt).getTime() : Number(credential.expiresAt);
+
+    const notExpired = !credential.expiresAt || (isFinite(expiresAtTimestamp) && expiresAtTimestamp > now);
+    const hasRemainingViews = !credential.maxViews || (credential.viewCount || 0) < credential.maxViews;
+
+    return notExpired && hasRemainingViews;
 }

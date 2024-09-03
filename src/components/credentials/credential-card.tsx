@@ -2,11 +2,12 @@ import { useQuery } from 'convex/react';
 import { Credential } from '../../../convex/types';
 import { api } from '../../../convex/_generated/api';
 import UserAvatar from '../global/user-avatar';
-import { formatTimestamp, getURL } from '@/lib/utils';
+import { formatTimestamp, getURL, isCredentialActive } from '@/lib/utils';
 import { CheckIcon, CopyIcon, EyeIcon, LinkIcon, ShareIcon, TimerIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import { HashtagBadge } from './hashtag-badge';
+import { formatRelative, parseISO } from 'date-fns';
 
 
 interface CredentialCardProps {
@@ -22,22 +23,19 @@ export function CredentialCard({ credential }: CredentialCardProps) {
         credential.createdBy ? { _id: credential.createdBy } : "skip"
     );
 
-    function isActive() {
-        const now = new Date().getTime();
+    const isActive = isCredentialActive(credential);
 
-        const expiresAtTimestamp = typeof credential.expiresAt === 'string'
-            ? new Date(credential.expiresAt).getTime()
-            : Number(credential.expiresAt);
-
-        const notExpired = !credential.expiresAt || (isFinite(expiresAtTimestamp) && expiresAtTimestamp > now);
-        const hasRemainingViews = !credential.maxViews || (credential.viewCount || 0) < credential.maxViews;
-
-        return notExpired && hasRemainingViews;
-    }
-
-    function formatExpirationDate(expiresAt: number | null) {
+    function formatExpirationDate(expiresAt: string | undefined) {
         if (!expiresAt) return 'No expiration';
-        return formatTimestamp(expiresAt.toString());
+        const date = parseISO(expiresAt);
+        if (isNaN(date.getTime())) return 'Invalid date';
+
+        const now = new Date();
+        if (date > now) {
+            return `Expires ${formatRelative(date, now)}`;
+        } else {
+            return 'Expired';
+        }
     };
 
     function copyToClipboard() {
@@ -68,14 +66,14 @@ export function CredentialCard({ credential }: CredentialCardProps) {
             </div>
             <div className="flex flex-col space-y-2">
                 <div className="flex items-center gap-2 pl-1 text-md">
-                    <div className={`w-2 h-2 rounded-full ${isActive() ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <span className='text-md'>{isActive() ? 'Active' : 'Expired'}</span>
+                    <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span className='text-md'>{isActive ? 'Active' : 'Expired'}</span>
                 </div>
-                {isActive() && (
+                {isActive && (
                     <div className="flex items-center gap-4 text-muted-foreground">
                         <div className='flex items-center gap-1'>
                             <TimerIcon className='w-4 h-4' />
-                            <span>{formatExpirationDate(credential.expiresAt ? Number(credential.expiresAt) : null)}</span>
+                            <span>{formatExpirationDate(credential.expiresAt)}</span>
                         </div>
                         <div className='flex items-center gap-1'>
                             <EyeIcon className='w-4 h-4' />

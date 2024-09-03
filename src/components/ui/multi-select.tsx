@@ -291,7 +291,7 @@ export const MultiSelect = React.forwardRef<
                                 >
                                     <div
                                         className={cn(
-                                            "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                            "mr-2 flex h-4 w-4 items-center justify-center rounded-[5px] border border-primary",
                                             selectedValues.length === options.length
                                                 ? "bg-primary text-primary-foreground"
                                                 : "opacity-50 [&_svg]:invisible"
@@ -299,7 +299,11 @@ export const MultiSelect = React.forwardRef<
                                     >
                                         <CheckIcon className="w-4 h-4" />
                                     </div>
-                                    <span>(Select All)</span>
+                                    {selectedValues.length === options.length ? (
+                                        <span>Unselect all</span>
+                                    ) : (
+                                        <span>Select all</span>
+                                    )}
                                 </CommandItem>
                                 {options.map((option) => {
                                     const isSelected = selectedValues.includes(option.value);
@@ -311,7 +315,7 @@ export const MultiSelect = React.forwardRef<
                                         >
                                             <div
                                                 className={cn(
-                                                    "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                                    "mr-2 flex h-4 w-4 items-center justify-center rounded-[5px] border border-primary",
                                                     isSelected
                                                         ? "bg-primary text-primary-foreground"
                                                         : "opacity-50 [&_svg]:invisible"
