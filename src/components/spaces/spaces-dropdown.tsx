@@ -26,13 +26,13 @@ export function SpacesDropdown({ userId }: SpacesDropdownProps) {
 
     const spaces = useMemo(() => spacesQuery ?? [], [spacesQuery]);
 
-    if (spaces === undefined) return <LoadingScreen />
-
     useEffect(() => {
         if (spaces.length > 0 && !selectedSpaceId) {
             setSelectedSpaceId(spaces[0]._id as Id<"spaces">);
         }
     }, [spaces, selectedSpaceId]);
+
+    if (spaces === undefined) return <LoadingScreen />
 
     function handleSelect(spaceId: Id<"spaces">) {
         setSelectedSpaceId(spaceId);
