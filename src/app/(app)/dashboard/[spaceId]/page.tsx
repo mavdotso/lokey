@@ -8,6 +8,7 @@ import LoadingScreen from '@/components/global/loading-screen';
 import { CredentialCard } from '@/components/credentials/credential-card';
 import { useState } from 'react';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
+import { Separator } from '@/components/ui/separator';
 
 type CredentialSortOption = 'name' | 'createdAt' | 'updatedAt';
 type CredentialType = 'password' | 'login_password' | 'api_key' | 'oauth_token' | 'ssh_key' |
@@ -21,7 +22,7 @@ export default function DashboardPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState<CredentialSortOption>('name');
     const [selectedTypes, setSelectedTypes] = useState<CredentialType[]>([]);
-    const [hideInactive, setHideInactive] = useState(false);
+    const [hideExpired, setHideExpired] = useState(false);
 
     const credentials = useQuery(api.queries.getCredentialsByUserId, {
         userId: session.data?.user?.id ?? ''
@@ -49,7 +50,7 @@ export default function DashboardPage() {
         .filter(cred =>
             cred.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
             (selectedTypes.length === 0 || selectedTypes.includes(cred.type as CredentialType)) &&
-            (!hideInactive || cred.active)
+            (!hideExpired || cred.active)
         )
         .sort((a, b) => {
             if (sortOption === 'createdAt') return Number(a._creationTime) - Number(b._creationTime);
@@ -58,11 +59,12 @@ export default function DashboardPage() {
         });
 
     return (
-        <div className='relative p-4 w-full'>
-            <div className='flex justify-between items-center mb-4'>
+        <div className='relative bg-background p-8 w-full h-full'>
+            <div className='flex justify-between items-center'>
                 <h1 className='font-bold text-2xl'>Your Credentials</h1>
                 <CreateCredentialDialog onCredentialCreated={handleCredentialCreated} />
             </div>
+            <Separator className='my-6' />
             <CredentialsSortControls
                 className='py-4'
                 searchTerm={searchTerm}
@@ -71,8 +73,8 @@ export default function DashboardPage() {
                 onSortChange={(value: string) => setSortOption(value as CredentialSortOption)}
                 selectedTypes={selectedTypes}
                 onTypeChange={handleTypeChange}
-                hideInactive={hideInactive}
-                onHideInactiveChange={setHideInactive}
+                hideExpired={hideExpired}
+                onHideExpiredChange={setHideExpired}
             />
             {filteredCredentials.length === 0 ? (
                 <p>No credentials found.</p>

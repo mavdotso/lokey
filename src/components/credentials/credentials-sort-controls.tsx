@@ -6,15 +6,6 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '.
 import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { MultiSelect } from '../ui/multi-select';
 
 const credentialTypes = [
@@ -34,8 +25,8 @@ interface CredentialsSortControlsProps {
     onSortChange: (value: string) => void;
     selectedTypes: CredentialType[];
     onTypeChange: (types: string[]) => void;
-    hideInactive: boolean;
-    onHideInactiveChange: (checked: boolean) => void;
+    hideExpired: boolean;
+    onHideExpiredChange: (checked: boolean) => void;
     className?: string
 }
 
@@ -46,8 +37,8 @@ export function CredentialsSortControls({
     onSortChange,
     selectedTypes,
     onTypeChange,
-    hideInactive,
-    onHideInactiveChange,
+    hideExpired,
+    onHideExpiredChange,
     className
 }: CredentialsSortControlsProps) {
 
@@ -87,16 +78,16 @@ export function CredentialsSortControls({
                 </Select>
                 <div className="flex flex-shrink-0 items-center space-x-2 whitespace-nowrap">
                     <Checkbox
-                        id="hideInactive"
-                        checked={hideInactive}
-                        onCheckedChange={(checked) => onHideInactiveChange(checked as boolean)}
+                        id="hideExpired"
+                        checked={hideExpired}
+                        onCheckedChange={(checked) => onHideExpiredChange(checked as boolean)}
                         className='rounded-[5px]'
                     />
                     <Label
-                        htmlFor="hideInactive"
+                        htmlFor="hideExpired"
                         className="peer-disabled:opacity-70 font-medium text-sm leading-none peer-disabled:cursor-not-allowed"
                     >
-                        Hide inactive
+                        Hide expired
                     </Label>
                 </div>
             </div>

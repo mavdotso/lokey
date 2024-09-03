@@ -27,9 +27,9 @@ export function CreateCredentialDialog({ onCredentialCreated }: CreateCredential
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button size={"lg"} className='gap-2'>
+                <Button className='gap-2'>
                     <PlusIcon className='w-5 h-5' />
-                    Create new Credentials
+                    Create new credentials
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

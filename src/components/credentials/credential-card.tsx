@@ -69,18 +69,20 @@ export function CredentialCard({ credential }: CredentialCardProps) {
             <div className="flex flex-col space-y-2">
                 <div className="flex items-center gap-2 pl-1 text-md">
                     <div className={`w-2 h-2 rounded-full ${isActive() ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <span className='text-md'>{isActive() ? 'Active' : 'Inactive'}</span>
+                    <span className='text-md'>{isActive() ? 'Active' : 'Expired'}</span>
                 </div>
-                <div className="flex items-center gap-4 text-muted-foreground">
-                    <div className='flex items-center gap-1'>
-                        <TimerIcon className='w-4 h-4' />
-                        <span>{formatExpirationDate(credential.expiresAt ? Number(credential.expiresAt) : null)}</span>
+                {isActive() && (
+                    <div className="flex items-center gap-4 text-muted-foreground">
+                        <div className='flex items-center gap-1'>
+                            <TimerIcon className='w-4 h-4' />
+                            <span>{formatExpirationDate(credential.expiresAt ? Number(credential.expiresAt) : null)}</span>
+                        </div>
+                        <div className='flex items-center gap-1'>
+                            <EyeIcon className='w-4 h-4' />
+                            <span>{credential.viewCount || 0} / {credential.maxViews || '∞'}</span>
+                        </div>
                     </div>
-                    <div className='flex items-center gap-1'>
-                        <EyeIcon className='w-4 h-4' />
-                        <span>{credential.viewCount || 0} / {credential.maxViews || '∞'}</span>
-                    </div>
-                </div>
+                )}
             </div>
             <div className="flex flex-wrap gap-1">
                 {getCredentialTags().map((tag, index) => (
