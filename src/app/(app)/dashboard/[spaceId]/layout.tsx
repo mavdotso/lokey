@@ -13,11 +13,13 @@ export default async function DashboardLayout({ children, params }: DashboardLay
     if (!session) return
 
     return (
-        <main className="relative bg-muted p-2 h-screen">
-            <div className='flex rounded-md h-full overflow-hidden'>
+        <main className="relative bg-muted h-screen">
+            <div className='flex rounded-md h-full'>
                 {session && <Sidebar session={session} params={params} />}
-                <div className="flex-1 overflow-hidden">
-                    {children}
+                <div className="flex-1 p-2">
+                    <div className="border border-border rounded-lg h-full overflow-hidden">
+                        {children}
+                    </div>
                 </div>
             </div>
         </main>

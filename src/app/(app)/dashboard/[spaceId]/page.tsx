@@ -66,17 +66,19 @@ export default function DashboardPage() {
                 <CreateCredentialDialog onCredentialCreated={handleCredentialCreated} />
             </div>
             <Separator className='my-6' />
-            <CredentialsSortControls
-                className='py-4'
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                sortOption={sortOption}
-                onSortChange={(value: string) => setSortOption(value as CredentialSortOption)}
-                selectedTypes={selectedTypes}
-                onTypeChange={handleTypeChange}
-                hideExpired={hideExpired}
-                onHideExpiredChange={setHideExpired}
-            />
+            <div className='flex justify-end w-full max-w-full'>
+                <CredentialsSortControls
+                    className='py-4 max-w-[60%]'
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    sortOption={sortOption}
+                    onSortChange={(value: string) => setSortOption(value as CredentialSortOption)}
+                    selectedTypes={selectedTypes}
+                    onTypeChange={handleTypeChange}
+                    hideExpired={hideExpired}
+                    onHideExpiredChange={setHideExpired}
+                />
+            </div>
             {filteredCredentials.length === 0 ? (
                 <p>No credentials found.</p>
             ) : (

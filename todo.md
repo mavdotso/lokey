@@ -1,34 +1,27 @@
 ### Bugs
 
--   [x] User session doesn't save / user can't login
--   [x] Make sure the links expire after one view
 -   [ ] spaces-dropdown.tsx fix the dialog / space creation
 
-### MVP
+### ToDo
 
--   [x] User login
--   [x] Create links with custom expiration
-    -   [x] 1, 3, 5, 7 days
-    -   [x] One-time or multiple time
--   [x] Has the user seen the link or not in the dashboard
+-   [ ] Design
+-   [ ] Onboarding flow
+
+    -   [ ] Create a workspace
+    -   [ ] Share first creadentials form
+
+-   [ ] Unify the credential types from one place
 -   [ ] Share link via email / text
--   [x] Resend
-    -   [ ] Email templates (?)
--   [x] Different credentials types
-
-### For teams
-
--   [x] Create a team
+-   [ ] Request passwords
+    -   [ ] Add instructions on where to get the passwords from
 -   [ ] Send the link to a client to share the password with you (vice-versa process)
 -   [ ] Insert the website you're providing the password for
     -   [ ] Fetch the website icon
--   [ ] Request passwords
-    -   [ ] Add instructions on where to get the passwords from
--   [ ] Access management
--   [ ] Custom expiration
+-   [ ] Email templates
 
 ### Potentially:
 
+-   [ ] Access management
 -   [ ] Custom SMTP
 -   [ ] Custom URL
 -   [ ] Files sharing

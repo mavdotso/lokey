@@ -48,14 +48,14 @@ export function CredentialsSortControls({
     }));
 
     return (
-        <div className={cn(`flex flex-col gap-4 max-w-full`, className)}>
+        <div className={cn(`flex flex-col gap-4 w-full max-w-full`, className)}>
             <div className="flex items-center gap-2">
                 <Input
                     type="text"
                     placeholder="Search credentials..."
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className='flex-shrink-0 bg-background w-48'
+                    className='bg-background'
                 />
                 <MultiSelect
                     options={credentialTypeOptions}
@@ -63,11 +63,10 @@ export function CredentialsSortControls({
                     defaultValue={selectedTypes}
                     placeholder="Select types"
                     variant="default"
-                    maxCount={3}
-                    className="flex-grow"
+                    maxCount={1}
                 />
                 <Select value={sortOption} onValueChange={onSortChange}>
-                    <SelectTrigger className="flex-shrink-0 bg-background w-52">
+                    <SelectTrigger className="bg-background">
                         <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
                     <SelectContent>
@@ -76,7 +75,7 @@ export function CredentialsSortControls({
                         <SelectItem value="updatedAt">Sort by Date Updated</SelectItem>
                     </SelectContent>
                 </Select>
-                <div className="flex flex-shrink-0 items-center space-x-2 whitespace-nowrap">
+                <div className="flex items-center space-x-2 whitespace-nowrap">
                     <Checkbox
                         id="hideExpired"
                         checked={hideExpired}

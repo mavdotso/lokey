@@ -27,7 +27,7 @@ const navItems: NavItem[] = [
 
 export default function Sidebar({ params, session, className, onToggleSidebar }: SidebarProps) {
     return (
-        <aside className={`w-64 h-full bg-card border-r border-muted flex flex-col p-4 ${className}`}>
+        <aside className={`w-64 h-full flex flex-col p-4 ${className}`}>
             <div className="flex justify-between items-center gap-2 font-semibold text-gray-700">
                 <SpacesDropdown userId={session!.user!.id!} />
             </div>
