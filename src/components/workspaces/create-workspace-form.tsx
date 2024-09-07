@@ -14,62 +14,67 @@ import { Button } from '../ui/button'
 
 
 export function CreateWorkspaceForm() {
-    const [name, setName] = useState('')
-    const [slug, setSlug] = useState('')
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isSlugUnique, setIsSlugUnique] = useState(true)
-    const [slugMessage, setSlugMessage] = useState('')
-    const [showSlugError, setShowSlugError] = useState(false)
-    const [newWorkspaceId, setNewWorkspaceId] = useState<Id<"workspaces"> | null>(null)
+    const [formState, setFormState] = useState({
+        name: '',
+        slug: '',
+        isSubmitting: false,
+        isSlugUnique: true,
+        slugMessage: '',
+        showSlugError: false,
+        newWorkspaceId: null as Id<"workspaces"> | null,
+    })
+    const [isRedirecting, setIsRedirecting] = useState(false); // New state to track redirecting
     const createWorkspace = useMutation(api.workspaces.createWorkspace)
-    const isUnique = useQuery(api.workspaces.isSlugUnique, { slug })
+    const isUnique = useQuery(api.workspaces.isSlugUnique, { slug: formState.slug })
     const router = useRouter()
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            if (slug) {
-                if (isUnique !== undefined) {
-                    setIsSlugUnique(isUnique)
-                    setSlugMessage(isUnique ? 'Slug is available' : 'Slug is already taken')
-                }
+            if (formState.slug) {
+                setFormState(prev => ({
+                    ...prev,
+                    isSlugUnique: isUnique !== undefined ? isUnique : prev.isSlugUnique,
+                    slugMessage: isUnique ? 'Slug is available' : 'Slug is already taken',
+                    showSlugError: !isUnique && prev.slug !== ''
+                }))
             } else {
-                setSlugMessage('')
+                setFormState(prev => ({ ...prev, slugMessage: '', showSlugError: false }))
             }
         }, 500)
 
         return () => {
             clearTimeout(handler)
         }
-    }, [slug, isUnique])
+    }, [formState.slug, isUnique])
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
 
-        if (isSubmitting || !isSlugUnique) {
-            setShowSlugError(!isSlugUnique)
+        if (formState.isSubmitting || !formState.isSlugUnique) {
+            setFormState(prev => ({ ...prev, showSlugError: !formState.isSlugUnique }))
             return
         }
 
-        setIsSubmitting(true)
-        setShowSlugError(false)
+        setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
 
         try {
-            const { workspaceId } = await createWorkspace({ name, slug, iconId: 'default' })
+            const { workspaceId } = await createWorkspace({ name: formState.name, slug: formState.slug, iconId: 'default' })
             toast.success('Workspace created successfully!')
-            setNewWorkspaceId(workspaceId)
+            setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))
+            setIsRedirecting(true);
         } catch (error) {
             toast.error('Failed to create workspace')
             console.error('Error creating workspace:', error)
         } finally {
-            setIsSubmitting(false)
+            setFormState(prev => ({ ...prev, isSubmitting: false }))
         }
     }
 
     useEffect(() => {
-        if (newWorkspaceId) {
-            router.push(`/dashboard/${slug}`)
+        if (formState.newWorkspaceId && isRedirecting) {
+            router.push(`/dashboard/${formState.slug}`)
         }
-    }, [newWorkspaceId, slug, router])
+    }, [formState.newWorkspaceId, formState.slug, router, isRedirecting])
 
     return (
         <form id="create-workspace-form" onSubmit={handleSubmit} className="space-y-4">
@@ -89,10 +94,10 @@ export function CreateWorkspaceForm() {
                     <Input
                         id="name"
                         placeholder="Acme inc."
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={formState.name}
+                        onChange={(e) => setFormState(prev => ({ ...prev, name: e.target.value }))}
                         required
-                        disabled={isSubmitting}
+                        disabled={formState.isSubmitting}
                         className='bg-primary-foreground'
                     />
                 </div>
@@ -115,18 +120,20 @@ export function CreateWorkspaceForm() {
                     </span>
                     <Input
                         id="slug"
-                        value={slug}
-                        onChange={(e) => setSlug(e.target.value)}
+                        value={formState.slug}
+                        onChange={(e) => setFormState(prev => ({ ...prev, slug: e.target.value }))}
                         required
-                        disabled={isSubmitting}
-                        className={`bg-primary-foreground rounded-l-none ${slug && !isSlugUnique && showSlugError ? 'focus-visible:ring-1 focus-visible:ring-destructive border-destructive' : ''}`}
+                        disabled={formState.isSubmitting}
+                        className={`bg-primary-foreground rounded-l-none ${formState.slug && !formState.isSlugUnique && formState.showSlugError && !formState.isSubmitting && !isRedirecting ? 'focus-visible:ring-1 focus-visible:ring-destructive border-destructive' : ''}`}
                         placeholder="acme"
-                        aria-invalid={!isSlugUnique}
+                        aria-invalid={!formState.isSlugUnique}
                         type="text"
                         name="slug"
                     />
                 </div>
-                {slug && !isSlugUnique && showSlugError && <p className="mt-1 text-center text-destructive text-sm">The slug &quot;{slug}&quot; is already in use.</p>}
+                {formState.slug && !formState.isSlugUnique && formState.showSlugError && !formState.isSubmitting && !isRedirecting && (
+                    <p className="mt-1 text-center text-destructive text-sm">The slug &quot;{formState.slug}&quot; is already in use.</p>
+                )}
             </div>
             <Button type="submit" size={"lg"} form="create-workspace-form" className="bg-primary w-full text-primary-foreground">
                 Create workspace
