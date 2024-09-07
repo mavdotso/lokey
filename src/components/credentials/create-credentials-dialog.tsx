@@ -12,15 +12,15 @@ import { Id } from '../../../convex/_generated/dataModel'
 import { PlusIcon } from 'lucide-react';
 import { CreateCredentialsForm } from './create-credentials-form';
 
-interface CreateCredentialDialogProps {
-    onCredentialCreated: (credentialId: Id<"credentials">) => void;
+interface CreateCredentialsDialogProps {
+    onCredentialsCreated: (credentialsId: Id<"credentials">) => void;
 }
 
-export function CreateCredentialDialog({ onCredentialCreated }: CreateCredentialDialogProps) {
+export function CreateCredentialsDialog({ onCredentialsCreated }: CreateCredentialsDialogProps) {
     const [isOpen, setIsOpen] = useState(false)
 
-    const handleCredentialCreated = (credentialId: Id<"credentials">) => {
-        onCredentialCreated(credentialId)
+    const handleCredentialsCreated = (credentialId: Id<"credentials">) => {
+        onCredentialsCreated(credentialId)
         setIsOpen(false)
     }
 
@@ -34,12 +34,12 @@ export function CreateCredentialDialog({ onCredentialCreated }: CreateCredential
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Create New Credential</DialogTitle>
+                    <DialogTitle>Create New Credentials</DialogTitle>
                     <DialogDescription>
-                        Fill in the details to create a new credential.
+                        Fill in the details to create a new credentials.
                     </DialogDescription>
                 </DialogHeader>
-                <CreateCredentialsForm onCredentialsCreated={handleCredentialCreated} />
+                <CreateCredentialsForm onCredentialsCreated={handleCredentialsCreated} />
             </DialogContent>
         </Dialog>
     )

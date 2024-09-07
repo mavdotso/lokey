@@ -2,7 +2,7 @@
 import { useQuery } from 'convex/react';
 import { useSession } from 'next-auth/react';
 import { api } from '../../../../../convex/_generated/api';
-import { CreateCredentialDialog } from '@/components/credentials/create-credentials-dialog';
+import { CreateCredentialsDialog } from '@/components/credentials/create-credentials-dialog';
 import { Id } from '../../../../../convex/_generated/dataModel';
 import LoadingScreen from '@/components/global/loading-screen';
 import { CredentialCard } from '@/components/credentials/credential-card';
@@ -55,34 +55,44 @@ export default function DashboardPage() {
             return a.name.localeCompare(b.name);
         });
 
+    const isFiltered = searchTerm || selectedTypes.length > 0 || hideExpired;
+
     return (
         <div className='relative bg-background p-8 w-full h-full'>
             <div className='flex justify-between items-center'>
                 <h1 className='font-bold text-2xl'>Your Credentials</h1>
-                <CreateCredentialDialog onCredentialCreated={handleCredentialCreated} />
+                <CreateCredentialsDialog onCredentialsCreated={handleCredentialCreated} />
             </div>
             <Separator className='my-6' />
-            <div className='flex justify-end w-full max-w-full'>
-                <CredentialsSortControls
-                    className='py-4 max-w-[60%]'
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
-                    sortOption={sortOption}
-                    onSortChange={(value: string) => setSortOption(value as CredentialsSortOption)}
-                    selectedTypes={selectedTypes}
-                    onTypeChange={handleTypeChange}
-                    hideExpired={hideExpired}
-                    onHideExpiredChange={setHideExpired}
-                />
-            </div>
-            {filteredCredentials.length === 0 ? (
-                <p>No credentials found.</p>
-            ) : (
-                <div className="grid grid-cols-1 border border-border rounded-md overflow-hidden">
-                    {filteredCredentials.map((cred) => (
-                        <CredentialCard key={cred._id} credentials={cred} />
-                    ))}
+
+            {credentials.length === 0 ? (
+                <div className='flex flex-col justify-center items-center gap-8 p-8 w-full h-full'>
+                    <p className='text-lg'>You don&apos;t have any credentials yet.</p>
+                    <CreateCredentialsDialog onCredentialsCreated={handleCredentialCreated} />
                 </div>
+            ) : filteredCredentials.length === 0 && isFiltered ? (
+                <p>No credentials matching the current filters.</p>
+            ) : (
+                <>
+                    <div className='flex justify-end w-full max-w-full'>
+                        <CredentialsSortControls
+                            className='py-4 max-w-[60%]'
+                            searchTerm={searchTerm}
+                            onSearchChange={setSearchTerm}
+                            sortOption={sortOption}
+                            onSortChange={(value: string) => setSortOption(value as CredentialsSortOption)}
+                            selectedTypes={selectedTypes}
+                            onTypeChange={handleTypeChange}
+                            hideExpired={hideExpired}
+                            onHideExpiredChange={setHideExpired}
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 border border-border rounded-md overflow-hidden">
+                        {filteredCredentials.map((cred) => (
+                            <CredentialCard key={cred._id} credentials={cred} />
+                        ))}
+                    </div>
+                </>
             )}
         </div>
     );

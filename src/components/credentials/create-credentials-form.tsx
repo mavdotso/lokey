@@ -1,17 +1,64 @@
 import { useState } from 'react'
 import { useMutation } from 'convex/react'
 import { useParams } from 'next/navigation'
-import { api } from '../../../convex/_generated/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Id } from '../../../convex/_generated/dataModel'
-import { Credentials, credentialsTypes } from '../../../convex/types'
 import { DatePicker } from '../global/date-picker'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { Id } from '@/convex/_generated/dataModel'
+import { Credentials, credentialsTypes } from '@/convex/types'
+import { api } from '@/convex/_generated/api'
+
+const credentialFields = {
+    password: [{ id: 'password', label: 'Password', type: 'password' }],
+    login_password: [
+        { id: 'username', label: 'Username', type: 'text' },
+        { id: 'password', label: 'Password', type: 'password' }
+    ],
+    api_key: [{ id: 'apiKey', label: 'API Key', type: 'text' }],
+    oauth_token: [{ id: 'oauthToken', label: 'OAuth Token', type: 'text' }],
+    ssh_key: [{ id: 'sshKey', label: 'SSH Key', type: 'text' }],
+    ssl_certificate: [
+        { id: 'certificate', label: 'Certificate', type: 'text' },
+        { id: 'privateKey', label: 'Private Key', type: 'text' }
+    ],
+    env_variable: [{ id: 'envVariable', label: 'Environment Variable', type: 'text' }],
+    database_credentials: [
+        { id: 'dbUsername', label: 'DB Username', type: 'text' },
+        { id: 'dbPassword', label: 'DB Password', type: 'password' }
+    ],
+    access_key: [{ id: 'accessKey', label: 'Access Key', type: 'text' }],
+    encryption_key: [{ id: 'encryptionKey', label: 'Encryption Key', type: 'text' }],
+    jwt_token: [{ id: 'jwtToken', label: 'JWT Token', type: 'text' }],
+    two_factor_secret: [{ id: 'twoFactorSecret', label: 'Two-Factor Secret', type: 'text' }],
+    webhook_secret: [{ id: 'webhookSecret', label: 'Webhook Secret', type: 'text' }],
+    smtp_credentials: [
+        { id: 'smtpUsername', label: 'SMTP Username', type: 'text' },
+        { id: 'smtpPassword', label: 'SMTP Password', type: 'password' }
+    ],
+    ftp_credentials: [
+        { id: 'ftpUsername', label: 'FTP Username', type: 'text' },
+        { id: 'ftpPassword', label: 'FTP Password', type: 'password' }
+    ],
+    vpn_credentials: [
+        { id: 'vpnUsername', label: 'VPN Username', type: 'text' },
+        { id: 'vpnPassword', label: 'VPN Password', type: 'password' }
+    ],
+    dns_credentials: [
+        { id: 'dnsUsername', label: 'DNS Username', type: 'text' },
+        { id: 'dnsPassword', label: 'DNS Password', type: 'password' }
+    ],
+    device_key: [{ id: 'deviceKey', label: 'Device Key', type: 'text' }],
+    key_value: [
+        { id: 'key', label: 'Key', type: 'text' },
+        { id: 'value', label: 'Value', type: 'text' }
+    ],
+    custom: [{ id: 'customField', label: 'Custom Field', type: 'text' }],
+    other: [{ id: 'otherField', label: 'Other Field', type: 'text' }]
+};
 
 interface CreateCredentialsFormProps {
     onCredentialsCreated: (credentialId: Id<"credentials">) => void;
@@ -21,10 +68,10 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [type, setType] = useState<Credentials['type']>('password')
-    const [data, setData] = useState('')
+    const [data, setData] = useState<{ [key: string]: string }>({})
     const [expiresAt, setExpiresAt] = useState<Date | undefined>()
     const [maxViews, setMaxViews] = useState<number>(1)
-    const [showData, setShowData] = useState(false)
+    const [showData, setShowData] = useState<{ [key: string]: boolean }>({});
 
     const params = useParams()
     const currentSpaceId = params.spaceId as Id<"workspaces">
@@ -39,7 +86,7 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
                 name,
                 description,
                 type,
-                data,
+                data: JSON.stringify(data),
                 expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
                 maxViews
             })
@@ -48,7 +95,7 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
             setName('')
             setDescription('')
             setType('password')
-            setData('')
+            setData({})
             setExpiresAt(undefined)
             setMaxViews(1)
         } catch (error) {
@@ -66,7 +113,7 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder='Credentialss name'
+                        placeholder='Credential name'
                     />
                 </div>
                 <div className='flex-1'>
@@ -94,28 +141,30 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
                     placeholder='Only for internal reference'
                 />
             </div>
-            <div>
-                <Label htmlFor="data">Credentialss</Label>
-                <div className="relative">
-                    <Input
-                        id="data"
-                        value={data}
-                        onChange={(e) => setData(e.target.value)}
-                        required
-                        type={showData ? "text" : "password"}
-                        placeholder='Put your sensitive data here'
-                    />
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="top-0 right-0 absolute h-full"
-                        onClick={() => setShowData(!showData)}
-                    >
-                        {showData ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
-                    </Button>
+            {credentialFields[type].map((field) => (
+                <div key={field.id}>
+                    <Label htmlFor={field.id}>{field.label}</Label>
+                    <div className="relative">
+                        <Input
+                            id={field.id}
+                            type={showData[field.id] ? 'text' : 'password'}
+                            value={data[field.id] || ''}
+                            onChange={(e) => setData({ ...data, [field.id]: e.target.value })}
+                            required
+                            placeholder={`Enter ${field.label}`}
+                        />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="top-0 right-0 absolute h-full"
+                            onClick={() => setShowData({ ...showData, [field.id]: !showData[field.id] })}
+                        >
+                            {showData[field.id] ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                        </Button>
+                    </div>
                 </div>
-            </div>
+            ))}
             <div className='flex gap-2'>
                 <div>
                     <Label htmlFor="expiresAt">Expiration</Label>

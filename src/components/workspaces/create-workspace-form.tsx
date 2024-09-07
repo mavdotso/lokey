@@ -12,6 +12,7 @@ import { Info, Lock } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { Button } from '../ui/button'
 
+
 export function CreateWorkspaceForm() {
     const [name, setName] = useState('')
     const [slug, setSlug] = useState('')
