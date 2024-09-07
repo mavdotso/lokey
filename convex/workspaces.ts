@@ -1,4 +1,4 @@
-import { mutation } from './_generated/server';
+import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
 
@@ -40,5 +40,23 @@ export const createWorkspace = mutation({
         });
 
         return { workspaceId };
+    },
+});
+
+export const getUserWorkspaces = query({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await getViewerId(ctx);
+
+        if (identity === null) {
+            throw new Error('User is not authenticated');
+        }
+
+        const workspaces = await ctx.db
+            .query('workspaces')
+            .filter((q) => q.eq(q.field('workspaceOwner'), identity))
+            .collect();
+
+        return workspaces.filter(Boolean);
     },
 });

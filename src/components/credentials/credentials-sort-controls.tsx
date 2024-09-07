@@ -7,16 +7,10 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { MultiSelect } from '../ui/multi-select';
+import { credentialsTypes } from '../../../convex/types';
 
-const credentialTypes = [
-    'password', 'login_password', 'api_key', 'oauth_token', 'ssh_key',
-    'ssl_certificate', 'env_variable', 'database_credential', 'access_key',
-    'encryption_key', 'jwt_token', 'two_factor_secret', 'webhook_secret',
-    'smtp_credential', 'ftp_credential', 'vpn_credential', 'dns_credential',
-    'device_key', 'key_value', 'custom', 'other'
-] as const;
 
-type CredentialType = typeof credentialTypes[number];
+type CredentialType = typeof credentialsTypes[number];
 
 interface CredentialsSortControlsProps {
     searchTerm: string;
@@ -42,7 +36,7 @@ export function CredentialsSortControls({
     className
 }: CredentialsSortControlsProps) {
 
-    const credentialTypeOptions = credentialTypes.map(type => ({
+    const credentialTypeOptions = credentialsTypes.map(type => ({
         value: type,
         label: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')
     }));

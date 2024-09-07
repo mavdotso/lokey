@@ -17,7 +17,7 @@ export const SignUpFormSchema = z
     });
 
 export const CreateSpaceFormSchema = z.object({
-    spaceName: z.string().describe('Space Name').min(1, 'Space name must be min of 1 character'),
+    spaceName: z.string().describe('Workspace Name').min(1, 'Workspace name must be min of 1 character'),
     logo: z.any(),
 });
 

@@ -3,6 +3,7 @@ import { v } from 'convex/values';
 import { mutation } from './_generated/server';
 import { getViewerId } from './auth';
 import { crypto } from '@/lib/utils';
+import { credentialsTypeValidator } from './types';
 
 export const getCredential = query({
     args: { id: v.string() },
@@ -38,29 +39,7 @@ export const createCredentials = mutation({
         workspaceId: v.optional(v.id('workspaces')),
         name: v.string(),
         description: v.optional(v.string()),
-        type: v.union(
-            v.literal('password'),
-            v.literal('login_password'),
-            v.literal('api_key'),
-            v.literal('oauth_token'),
-            v.literal('ssh_key'),
-            v.literal('ssl_certificate'),
-            v.literal('env_variable'),
-            v.literal('database_credential'),
-            v.literal('access_key'),
-            v.literal('encryption_key'),
-            v.literal('jwt_token'),
-            v.literal('two_factor_secret'),
-            v.literal('webhook_secret'),
-            v.literal('smtp_credential'),
-            v.literal('ftp_credential'),
-            v.literal('vpn_credential'),
-            v.literal('dns_credential'),
-            v.literal('device_key'),
-            v.literal('key_value'),
-            v.literal('custom'),
-            v.literal('other')
-        ),
+        type: credentialsTypeValidator,
         subtype: v.optional(v.string()),
         customTypeId: v.optional(v.id('customCredentialsTypes')),
         data: v.string(),

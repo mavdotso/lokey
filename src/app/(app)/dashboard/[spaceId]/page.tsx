@@ -9,20 +9,16 @@ import { CredentialCard } from '@/components/credentials/credential-card';
 import { useState } from 'react';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
 import { Separator } from '@/components/ui/separator';
-import { isCredentialActive } from '@/lib/utils';
+import { CredentialsType } from '../../../../../convex/types';
+import { isCredentialsActive } from '@/lib/utils';
 
-type CredentialSortOption = 'name' | 'createdAt' | 'updatedAt';
-type CredentialType = 'password' | 'login_password' | 'api_key' | 'oauth_token' | 'ssh_key' |
-    'ssl_certificate' | 'env_variable' | 'database_credential' | 'access_key' |
-    'encryption_key' | 'jwt_token' | 'two_factor_secret' | 'webhook_secret' |
-    'smtp_credential' | 'ftp_credential' | 'vpn_credential' | 'dns_credential' |
-    'device_key' | 'key_value' | 'custom' | 'other';
+type CredentialsSortOption = 'name' | 'createdAt' | 'updatedAt';
 
 export default function DashboardPage() {
     const session = useSession();
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortOption, setSortOption] = useState<CredentialSortOption>('name');
-    const [selectedTypes, setSelectedTypes] = useState<CredentialType[]>([]);
+    const [sortOption, setSortOption] = useState<CredentialsSortOption>('name');
+    const [selectedTypes, setSelectedTypes] = useState<CredentialsType[]>([]);
     const [hideExpired, setHideExpired] = useState(false);
 
     const credentials = useQuery(api.credentials.getUserCredentials, {
@@ -44,14 +40,14 @@ export default function DashboardPage() {
     }
 
     function handleTypeChange(types: string[]) {
-        setSelectedTypes(types as CredentialType[]);
+        setSelectedTypes(types as CredentialsType[]);
     }
 
     const filteredCredentials = credentials
         .filter(cred =>
             cred.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            (selectedTypes.length === 0 || selectedTypes.includes(cred.type as CredentialType)) &&
-            (!hideExpired || isCredentialActive(cred))
+            (selectedTypes.length === 0 || selectedTypes.includes(cred.type as CredentialsType)) &&
+            (!hideExpired || isCredentialsActive(cred))
         )
         .sort((a, b) => {
             if (sortOption === 'createdAt') return Number(a._creationTime) - Number(b._creationTime);
@@ -72,7 +68,7 @@ export default function DashboardPage() {
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
                     sortOption={sortOption}
-                    onSortChange={(value: string) => setSortOption(value as CredentialSortOption)}
+                    onSortChange={(value: string) => setSortOption(value as CredentialsSortOption)}
                     selectedTypes={selectedTypes}
                     onTypeChange={handleTypeChange}
                     hideExpired={hideExpired}

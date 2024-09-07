@@ -29,7 +29,7 @@ export default function Sidebar({ params, session, className, onToggleSidebar }:
     return (
         <aside className={`w-64 h-full flex flex-col p-4 ${className}`}>
             <div className="flex justify-between items-center gap-2 font-semibold text-gray-700">
-                <WorkspacesDropdown userId={session!.user!.id!} />
+                <WorkspacesDropdown />
             </div>
             <nav className="mt-4 text-sm overflow-y-auto">
                 {navItems.map((item) =>

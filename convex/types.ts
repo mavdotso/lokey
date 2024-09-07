@@ -1,6 +1,35 @@
+import { v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 
-export type Space = {
+export const credentialsTypes = [
+    'password',
+    'login_password',
+    'api_key',
+    'oauth_token',
+    'ssh_key',
+    'ssl_certificate',
+    'env_variable',
+    'database_credentials',
+    'access_key',
+    'encryption_key',
+    'jwt_token',
+    'two_factor_secret',
+    'webhook_secret',
+    'smtp_credentials',
+    'ftp_credentials',
+    'vpn_credentials',
+    'dns_credentials',
+    'device_key',
+    'key_value',
+    'custom',
+    'other',
+] as const;
+
+export type CredentialsType = (typeof credentialsTypes)[number];
+
+export const credentialsTypeValidator = v.union(...credentialsTypes.map(v.literal));
+
+export type Workspace = {
     _id?: Id<'workspaces'>;
     _creationTime?: number;
     spaceOwner: string;
@@ -9,18 +38,6 @@ export type Space = {
     data?: string;
     inTrash?: string;
     logo?: string;
-};
-
-export type User = {
-    _id?: Id<'users'>;
-    _creationTime?: number;
-    email: string;
-    name?: string;
-    emailVerified?: number;
-    image?: string;
-    billingAddress?: any;
-    paymentMethod?: any;
-    updatedAt?: string;
 };
 
 export type UserRole = {
@@ -55,28 +72,7 @@ export type Credentials = {
     name: string;
     description?: string;
     createdBy?: Id<'users'>;
-    type:
-        | 'password'
-        | 'login_password'
-        | 'api_key'
-        | 'oauth_token'
-        | 'ssh_key'
-        | 'ssl_certificate'
-        | 'env_variable'
-        | 'database_credential'
-        | 'access_key'
-        | 'encryption_key'
-        | 'jwt_token'
-        | 'two_factor_secret'
-        | 'webhook_secret'
-        | 'smtp_credential'
-        | 'ftp_credential'
-        | 'vpn_credential'
-        | 'dns_credential'
-        | 'device_key'
-        | 'key_value'
-        | 'custom'
-        | 'other';
+    type: CredentialsType;
     subtype?: string;
     customTypeId?: Id<'customCredentialsTypes'>;
     encryptedData: any;
@@ -87,9 +83,9 @@ export type Credentials = {
 };
 
 export type CredentialsAccessLog = {
-    _id?: Id<'credentialAccessLogs'>;
+    _id?: Id<'credentialsAccessLog'>;
     _creationTime?: number;
-    credentialId: Id<'credentials'>;
+    credentialsId: Id<'credentials'>;
     userId?: Id<'users'>;
     accessedAt: string;
 };
@@ -153,6 +149,28 @@ export type ActivityNotification = {
     readAt?: string;
 };
 
+/* NEXTAUTH TYPES */
+
+export type User = {
+    _id?: Id<'users'>;
+    _creationTime?: number;
+    email: string;
+    name?: string;
+    emailVerified?: number;
+    image?: string;
+    billingAddress?: any;
+    paymentMethod?: any;
+    updatedAt?: string;
+};
+
+export type Session = {
+    _id?: Id<'sessions'>;
+    _creationTime?: number;
+    userId: Id<'users'>;
+    expires: number;
+    sessionToken: string;
+};
+
 export type Account = {
     _id?: Id<'accounts'>;
     _creationTime?: number;
@@ -169,6 +187,14 @@ export type Account = {
     session_state?: string;
 };
 
+export type VerificationToken = {
+    _id?: Id<'verificationTokens'>;
+    _creationTime?: number;
+    identifier: string;
+    token: string;
+    expires: number;
+};
+
 export type Authenticator = {
     _id?: Id<'authenticators'>;
     _creationTime?: number;
@@ -180,20 +206,4 @@ export type Authenticator = {
     credentialDeviceType: string;
     credentialBackedUp: boolean;
     transports?: string;
-};
-
-export type Session = {
-    _id?: Id<'sessions'>;
-    _creationTime?: number;
-    userId: Id<'users'>;
-    expires: number;
-    sessionToken: string;
-};
-
-export type VerificationToken = {
-    _id?: Id<'verificationTokens'>;
-    _creationTime?: number;
-    identifier: string;
-    token: string;
-    expires: number;
 };

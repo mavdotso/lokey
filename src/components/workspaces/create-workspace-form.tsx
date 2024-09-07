@@ -34,7 +34,7 @@ export function CreateWorkspaceForm() {
         setIsSubmitting(true)
         try {
             const { workspaceId } = await createWorkspace({ title, iconId: 'default' })
-            toast.success('Space created successfully!')
+            toast.success('Workspace created successfully!')
             setNewWorkspaceId(workspaceId)
         } catch (error) {
             toast.error('Failed to create workspace')
@@ -53,7 +53,7 @@ export function CreateWorkspaceForm() {
     return (
         <Card className="w-full max-w-md">
             <CardHeader>
-                <CardTitle>Create New Space</CardTitle>
+                <CardTitle>Create New Workspace</CardTitle>
                 <CardDescription>Fill in the details to create a new workspace</CardDescription>
             </CardHeader>
             <CardContent>
@@ -81,7 +81,7 @@ export function CreateWorkspaceForm() {
             </CardContent>
             <CardFooter>
                 <Button type="submit" onClick={handleSubmit} disabled={isSubmitting}>
-                    {isSubmitting ? 'Creating...' : 'Create Space'}
+                    {isSubmitting ? 'Creating...' : 'Create Workspace'}
                 </Button>
             </CardFooter>
         </Card>

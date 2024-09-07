@@ -11,16 +11,12 @@ import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
 import LoadingScreen from '../global/loading-screen';
 import { CreateWorkspaceForm } from './create-workspace-form';
 
-interface WorkspacesDropdownProps {
-    userId: string;
-}
-
-export function WorkspacesDropdown({ userId }: WorkspacesDropdownProps) {
+export function WorkspacesDropdown() {
     const router = useRouter();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedSpaceId, setSelectedSpaceId] = useState<Id<"workspaces"> | null>(null);
 
-    const workspacesQuery = useQuery(api.queries.getSpacesByUserId, { userId });
+    const workspacesQuery = useQuery(api.workspaces.getUserWorkspaces);
 
     const workspaces = useMemo(() => workspacesQuery ?? [], [workspacesQuery]);
 
