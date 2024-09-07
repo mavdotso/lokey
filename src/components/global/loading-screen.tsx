@@ -1,4 +1,4 @@
-import LoadingSpinner from "./loading-spinner";
+import LoadingSpinner from "@/components/global/loading-spinner";
 
 export default function LoadingScreen({ loadingText }: { loadingText?: string }) {
     return (

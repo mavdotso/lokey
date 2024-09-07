@@ -1,13 +1,12 @@
 "use client"
 
-import React, { useState } from 'react';
-import { Input } from '../ui/input';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
+import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { Checkbox } from '../ui/checkbox';
-import { Label } from '../ui/label';
-import { MultiSelect } from '../ui/multi-select';
-import { CredentialsType, credentialsTypes } from '../../../convex/types';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { CredentialsType, credentialsTypes } from '@/convex/types';
 
 interface CredentialsSortControlsProps {
     searchTerm: string;

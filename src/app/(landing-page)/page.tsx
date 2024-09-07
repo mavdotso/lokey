@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useMutation } from 'convex/react';
 import { getURL } from '@/lib/utils';
-import { api } from '../../../convex/_generated/api';
+import { api } from '@/convex/_generated/api';
 
 export default function LandingPage() {
     const [password, setPassword] = useState('');

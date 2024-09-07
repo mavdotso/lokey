@@ -21,6 +21,7 @@
         "paths": {
             "@/*": ["./src/*"],
             "@/components/*": ["./src/components/*"],
+            "@/lib/*": ["./src/lib/*"],
             "@/global/*": ["./src/global/*"],
             "@/convex/*": ["./convex/*"]
         }

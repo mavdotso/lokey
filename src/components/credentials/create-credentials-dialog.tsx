@@ -8,22 +8,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Id } from '../../../convex/_generated/dataModel'
 import { PlusIcon } from 'lucide-react';
-import { CreateCredentialsForm } from './create-credentials-form';
+import { CreateCredentialsForm } from '@/components/credentials/create-credentials-form';
+import { Id } from '@/convex/_generated/dataModel';
 
 interface CreateCredentialsDialogProps {
     buttonText?: string,
     buttonSize?: "lg" | "default" | "sm" | "icon" | null,
     buttonVariant?: "default" | "link" | "destructive" | "outline" | "secondary" | "ghost" | null,
-    onCredentialsCreated: (credentialsId: Id<"credentials">) => void;
+    onCredentialsCreated?: (credentialsId: Id<"credentials">) => void;
 }
 
 export function CreateCredentialsDialog({ buttonText = "Create new credentials", buttonSize = "lg", buttonVariant = "default", onCredentialsCreated }: CreateCredentialsDialogProps) {
     const [isOpen, setIsOpen] = useState(false)
 
-    const handleCredentialsCreated = (credentialId: Id<"credentials">) => {
-        onCredentialsCreated(credentialId)
+    function handleCredentialsCreated(credentialId: Id<"credentials">) {
         setIsOpen(false)
     }
 

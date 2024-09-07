@@ -1,5 +1,4 @@
 import { auth } from '@/lib/auth';
-import React from 'react';
 import Sidebar from '@/components/sidebar/sidebar';
 
 interface DashboardLayoutProps {

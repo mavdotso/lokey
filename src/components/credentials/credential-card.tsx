@@ -1,13 +1,13 @@
 import { useQuery } from 'convex/react';
-import { Credentials } from '../../../convex/types';
-import { api } from '../../../convex/_generated/api';
-import UserAvatar from '../global/user-avatar';
 import { formatTimestamp, getURL, isCredentialsActive } from '@/lib/utils';
-import { CheckIcon, CopyIcon, EyeIcon, LinkIcon, ShareIcon, TimerIcon } from 'lucide-react';
+import { CheckIcon, CopyIcon, EyeIcon, ShareIcon, TimerIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '../ui/button';
 import { HashtagBadge } from './hashtag-badge';
 import { formatRelative, parseISO } from 'date-fns';
+import { Credentials } from '@/convex/types';
+import { api } from '@/convex/_generated/api';
+import { Button } from '@/components/ui/button';
+import UserAvatar from '@/components/global/user-avatar';
 
 
 interface CredentialCardProps {

@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { CreateWorkspaceForm } from './create-workspace-form'
+import { CreateWorkspaceForm } from '@/components/workspaces/create-workspace-form'
+import { CreateWorkspaceHeader } from '@/components/workspaces/create-workspace-header'
 import { cn } from '@/lib/utils'
-import CreateWorkspaceHeader from './create-workspace-header'
 
 type CreateWorkspaceCardProps = {
     className?: string;

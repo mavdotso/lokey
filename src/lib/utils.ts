@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import CryptoJS from 'crypto-js';
-import { Credentials } from '../../convex/types';
+import { Credentials } from '@/convex/types';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));

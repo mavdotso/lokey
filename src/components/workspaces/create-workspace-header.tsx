@@ -1,7 +1,7 @@
 import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CircleFadingPlus } from 'lucide-react';
 
-export default function CreateWorkspaceHeader() {
+export function CreateWorkspaceHeader() {
     return (
         <CardHeader className="text-center">
             <div className="flex justify-center mb-2">

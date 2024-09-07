@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Separator } from '@radix-ui/react-select';
 import UserCard from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
-import { WorkspacesDropdown } from '../workspaces/workspaces-dropdown';
+import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
 
 interface SidebarProps {
     params: { slug: string };

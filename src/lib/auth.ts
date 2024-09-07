@@ -1,7 +1,7 @@
 import { SignJWT, importPKCS8 } from 'jose';
 import NextAuth from 'next-auth';
 import Resend from 'next-auth/providers/resend';
-import { ConvexAdapter } from './convex-adapter';
+import { ConvexAdapter } from '@/lib/convex-adapter';
 import { html, text } from '@/components/emails/magic-link-email';
 
 if (process.env.CONVEX_AUTH_PRIVATE_KEY === undefined) {

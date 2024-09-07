@@ -5,12 +5,12 @@ import { Plus, RocketIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useQuery } from 'convex/react';
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { CardContent } from '@/components/ui/card';
 import { api } from '@/convex/_generated/api';
 import LoadingScreen from '@/components/global/loading-screen';
-import { CreateWorkspaceForm } from './create-workspace-form';
-import CreateWorkspaceHeader from './create-workspace-header';
+import { CreateWorkspaceForm } from '@/components/workspaces/create-workspace-form';
+import { CreateWorkspaceHeader } from '@/components/workspaces/create-workspace-header';
 
 export function WorkspacesDropdown() {
     const router = useRouter();

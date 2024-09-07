@@ -1,16 +1,15 @@
 "use client"
-import { useQuery } from 'convex/react';
-import { useSession } from 'next-auth/react';
-import { api } from '../../../../../convex/_generated/api';
-import { CreateCredentialsDialog } from '@/components/credentials/create-credentials-dialog';
-import { Id } from '../../../../../convex/_generated/dataModel';
 import LoadingScreen from '@/components/global/loading-screen';
-import { CredentialCard } from '@/components/credentials/credential-card';
 import { useState } from 'react';
-import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
+import { useSession } from 'next-auth/react';
+import { useQuery } from 'convex/react';
 import { Separator } from '@/components/ui/separator';
-import { CredentialsType } from '../../../../../convex/types';
 import { isCredentialsActive } from '@/lib/utils';
+import { CredentialsType } from '@/convex/types';
+import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
+import { CredentialCard } from '@/components/credentials/credential-card';
+import { CreateCredentialsDialog } from '@/components/credentials/create-credentials-dialog';
+import { api } from '@/convex/_generated/api';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
@@ -37,10 +36,6 @@ export default function DashboardPage() {
         return <LoadingScreen loadingText='Loading credentials...' />;
     }
 
-    function handleCredentialCreated(credentialId: Id<"credentials">) {
-        console.log('New credential created:', credentialId);
-    }
-
     function handleTypeChange(types: string[]) {
         setSelectedTypes(types as CredentialsType[]);
     }
@@ -64,14 +59,14 @@ export default function DashboardPage() {
         <>
             <div className='flex justify-between items-center p-8'>
                 <h1 className='font-bold text-2xl'>Shared credentials</h1>
-                <CreateCredentialsDialog buttonVariant={'outline'} onCredentialsCreated={handleCredentialCreated} />
+                <CreateCredentialsDialog buttonVariant={'outline'} />
             </div>
             <Separator />
 
             {credentials.length === 0 ? (
                 <div className='flex flex-col justify-center items-center gap-8 p-8 w-full h-full'>
                     <p className='text-lg'>You don&apos;t have any credentials yet</p>
-                    <CreateCredentialsDialog onCredentialsCreated={handleCredentialCreated} />
+                    <CreateCredentialsDialog />
                 </div>
             ) : (
                 <div className='p-8'>
