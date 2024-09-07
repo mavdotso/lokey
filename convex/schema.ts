@@ -39,8 +39,8 @@ const subscriptionStatus = v.union(
 );
 
 // Schemas
-const spaceSchema = {
-    spaceOwner: v.string(),
+const workspaceSchema = {
+    workspaceOwner: v.string(),
     title: v.string(),
     iconId: v.string(),
     data: v.optional(v.string()),
@@ -63,28 +63,28 @@ const userRoleSchema = {
     role: userRole,
 };
 
-const userSpaceSchema = {
+const userWorkspaceSchema = {
     userId: v.id('users'),
-    spaceId: v.id('spaces'),
+    workspaceId: v.id('workspaces'),
     role: userRole,
 };
 
-const customCredentialTypeSchema = {
-    spaceId: v.id('spaces'),
+const customCredentialsTypeSchema = {
+    workspaceId: v.id('workspaces'),
     name: v.string(),
     description: v.optional(v.string()),
     schema: v.any(),
     updatedAt: v.string(),
 };
 
-const credentialSchema = {
-    spaceId: v.optional(v.id('spaces')),
+const credentialsSchema = {
+    workspaceId: v.optional(v.id('workspaces')),
     name: v.string(),
     description: v.optional(v.string()),
     createdBy: v.optional(v.id('users')),
     type: credentialType,
     subtype: v.optional(v.string()),
-    customTypeId: v.optional(v.id('customCredentialTypes')),
+    customTypeId: v.optional(v.id('customCredentialsTypes')),
     encryptedData: v.any(),
     updatedAt: v.string(),
     expiresAt: v.optional(v.string()),
@@ -141,7 +141,7 @@ const subscriptionSchema = {
 };
 
 const activityNotificationSchema = {
-    spaceId: v.id('spaces'),
+    workspaceId: v.id('workspaces'),
     userId: v.id('users'),
     message: v.string(),
     readAt: v.optional(v.string()),
@@ -186,14 +186,14 @@ const verificationTokenSchema = {
 
 // Define tables
 const schema = defineSchema({
-    spaces: defineTable(spaceSchema),
+    workspaces: defineTable(workspaceSchema),
     users: defineTable(userSchema).index('email', ['email']),
     userRoles: defineTable(userRoleSchema).index('userId', ['userId']),
     sessions: defineTable(sessionSchema).index('sessionToken', ['sessionToken']).index('userId', ['userId']),
     accounts: defineTable(accountSchema).index('providerAndAccountId', ['provider', 'providerAccountId']).index('userId', ['userId']),
-    userSpaces: defineTable(userSpaceSchema),
-    customCredentialTypes: defineTable(customCredentialTypeSchema),
-    credentials: defineTable(credentialSchema),
+    userSpaces: defineTable(userWorkspaceSchema),
+    customCredentialsTypes: defineTable(customCredentialsTypeSchema),
+    credentials: defineTable(credentialsSchema),
     credentialAccessLogs: defineTable(credentialAccessLogSchema),
     customers: defineTable(customerSchema),
     products: defineTable(productSchema),

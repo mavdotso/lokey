@@ -1,10 +1,10 @@
 
 import { Search, Trash2Icon } from 'lucide-react';
 import Link from 'next/link';
-import { SpacesDropdown } from '../spaces/spaces-dropdown';
 import { Separator } from '@radix-ui/react-select';
 import UserCard from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
+import { WorkspacesDropdown } from '../workspaces/workspaces-dropdown';
 
 interface SidebarProps {
     params: { spaceId: string };
@@ -29,7 +29,7 @@ export default function Sidebar({ params, session, className, onToggleSidebar }:
     return (
         <aside className={`w-64 h-full flex flex-col p-4 ${className}`}>
             <div className="flex justify-between items-center gap-2 font-semibold text-gray-700">
-                <SpacesDropdown userId={session!.user!.id!} />
+                <WorkspacesDropdown userId={session!.user!.id!} />
             </div>
             <nav className="mt-4 text-sm overflow-y-auto">
                 {navItems.map((item) =>

@@ -5,12 +5,12 @@ import { getViewerId } from './auth';
 export const getSpacesByUserId = query({
     args: { userId: v.string() },
     handler: async (ctx, args) => {
-        const spaces = await ctx.db
-            .query('spaces')
-            .filter((q) => q.eq(q.field('spaceOwner'), args.userId))
+        const workspaces = await ctx.db
+            .query('workspaces')
+            .filter((q) => q.eq(q.field('workspaceOwner'), args.userId))
             .collect();
 
-        return spaces.filter(Boolean);
+        return workspaces.filter(Boolean);
     },
 });
 
@@ -23,31 +23,12 @@ export const getFirstUserSpace = query({
             throw new Error('User is not authenticated');
         }
 
-        const space = await ctx.db
-            .query('spaces')
-            .filter((q) => q.eq(q.field('spaceOwner'), identity))
+        const workspace = await ctx.db
+            .query('workspaces')
+            .filter((q) => q.eq(q.field('workspaceOwner'), identity))
             .first();
 
-        return space ? { data: space, error: null } : { data: null, error: 'No space found for user' };
-    },
-});
-
-export const getCredentialsByUserId = query({
-    args: { userId: v.string() },
-    handler: async (ctx, args) => {
-        const userSpaces = await ctx.db
-            .query('userSpaces')
-            .filter((q) => q.eq(q.field('userId'), args.userId))
-            .collect();
-
-        const spaceIds = userSpaces.map((space) => space.spaceId);
-
-        const credentials = await ctx.db
-            .query('credentials')
-            .filter((q) => q.or(...spaceIds.map((id) => q.eq(q.field('spaceId'), id))))
-            .collect();
-
-        return credentials;
+        return workspace ? { data: workspace, error: null } : { data: null, error: 'No workspace found for user' };
     },
 });
 
@@ -70,15 +51,5 @@ export const getUserSubscriptionStatus = query({
             console.log(error);
             return { data: null, error: 'Error' };
         }
-    },
-});
-
-export const getCredential = query({
-    args: { id: v.string() },
-    handler: async (ctx, args) => {
-        return await ctx.db
-            .query('credentials')
-            .filter((q) => q.eq(q.field('_id'), args.id))
-            .first();
     },
 });

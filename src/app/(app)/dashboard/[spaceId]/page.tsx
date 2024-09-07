@@ -25,7 +25,7 @@ export default function DashboardPage() {
     const [selectedTypes, setSelectedTypes] = useState<CredentialType[]>([]);
     const [hideExpired, setHideExpired] = useState(false);
 
-    const credentials = useQuery(api.queries.getCredentialsByUserId, {
+    const credentials = useQuery(api.credentials.getUserCredentials, {
         userId: session.data?.user?.id ?? ''
     });
 

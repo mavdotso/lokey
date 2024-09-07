@@ -19,12 +19,12 @@ import {
 import { useRouter } from 'next/navigation'
 import { Id } from '../../../convex/_generated/dataModel'
 
-export function CreateSpaceForm() {
+export function CreateWorkspaceForm() {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [newSpaceId, setNewSpaceId] = useState<Id<"spaces"> | null>(null)
-    const createSpace = useMutation(api.mutations.createSpace)
+    const [newWorkspaceId, setNewWorkspaceId] = useState<Id<"workspaces"> | null>(null)
+    const createWorkspace = useMutation(api.workspaces.createWorkspace)
     const router = useRouter()
 
     async function handleSubmit(e: React.FormEvent) {
@@ -33,31 +33,31 @@ export function CreateSpaceForm() {
 
         setIsSubmitting(true)
         try {
-            const { spaceId } = await createSpace({ title, iconId: 'default' })
+            const { workspaceId } = await createWorkspace({ title, iconId: 'default' })
             toast.success('Space created successfully!')
-            setNewSpaceId(spaceId)
+            setNewWorkspaceId(workspaceId)
         } catch (error) {
-            toast.error('Failed to create space')
-            console.error('Error creating space:', error)
+            toast.error('Failed to create workspace')
+            console.error('Error creating workspace:', error)
         } finally {
             setIsSubmitting(false)
         }
     }
 
     useEffect(() => {
-        if (newSpaceId) {
-            router.push(`/dashboard/${newSpaceId}`)
+        if (newWorkspaceId) {
+            router.push(`/dashboard/${newWorkspaceId}`)
         }
-    }, [newSpaceId, router])
+    }, [newWorkspaceId, router])
 
     return (
         <Card className="w-full max-w-md">
             <CardHeader>
                 <CardTitle>Create New Space</CardTitle>
-                <CardDescription>Fill in the details to create a new space</CardDescription>
+                <CardDescription>Fill in the details to create a new workspace</CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="workspace-y-4">
                     <div>
                         <Label htmlFor="title">Title</Label>
                         <Input

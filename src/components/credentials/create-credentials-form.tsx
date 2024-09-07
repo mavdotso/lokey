@@ -9,30 +9,30 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { Id } from '../../../convex/_generated/dataModel'
-import { Credential } from '../../../convex/types'
+import { Credentials } from '../../../convex/types'
 import { DatePicker } from '../global/date-picker'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
-interface CreateCredentialFormProps {
-    onCredentialCreated: (credentialId: Id<"credentials">) => void;
+interface CreateCredentialsFormProps {
+    onCredentialsCreated: (credentialId: Id<"credentials">) => void;
 }
 
-export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFormProps) {
+export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredentialsFormProps) {
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
-    const [type, setType] = useState<Credential['type']>('password')
+    const [type, setType] = useState<Credentials['type']>('password')
     const [data, setData] = useState('')
     const [expiresAt, setExpiresAt] = useState<Date | undefined>()
     const [maxViews, setMaxViews] = useState<number>(1)
     const [showData, setShowData] = useState(false)
 
     const params = useParams()
-    const currentSpaceId = params.spaceId as Id<"spaces">
+    const currentSpaceId = params.spaceId as Id<"workspaces">
 
-    const createCredential = useMutation(api.mutations.createCredential)
+    const createCredentials = useMutation(api.credentials.createCredentials)
 
-    // Define credential types based on the Credential type
-    const credentialTypes: Credential['type'][] = [
+    // Define credential types based on the Credentials type
+    const credentialTypes: Credentials['type'][] = [
         'password', 'login_password', 'api_key', 'oauth_token', 'ssh_key',
         'ssl_certificate', 'env_variable', 'database_credential', 'access_key',
         'encryption_key', 'jwt_token', 'two_factor_secret', 'webhook_secret',
@@ -43,8 +43,8 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         try {
-            const { credentialId } = await createCredential({
-                spaceId: currentSpaceId,
+            const { credentialId } = await createCredentials({
+                workspaceId: currentSpaceId,
                 name,
                 description,
                 type,
@@ -52,8 +52,8 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
                 expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
                 maxViews
             })
-            toast.success('Credential created successfully!')
-            onCredentialCreated(credentialId)
+            toast.success('Credentials created successfully!')
+            onCredentialsCreated(credentialId)
             setName('')
             setDescription('')
             setType('password')
@@ -75,12 +75,12 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder='Credentials name'
+                        placeholder='Credentialss name'
                     />
                 </div>
                 <div className='flex-1'>
-                    <Label htmlFor="type">Credential type</Label>
-                    <Select value={type} onValueChange={(value) => setType(value as Credential['type'])}>
+                    <Label htmlFor="type">Credentials type</Label>
+                    <Select value={type} onValueChange={(value) => setType(value as Credentials['type'])}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a type" />
                         </SelectTrigger>
@@ -104,7 +104,7 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
                 />
             </div>
             <div>
-                <Label htmlFor="data">Credentials</Label>
+                <Label htmlFor="data">Credentialss</Label>
                 <div className="relative">
                     <Input
                         id="data"
@@ -145,7 +145,7 @@ export function CreateCredentialForm({ onCredentialCreated }: CreateCredentialFo
                 </div>
             </div>
 
-            <Button type="submit">Create Credential</Button>
+            <Button type="submit">Create Credentials</Button>
         </form>
     )
 }

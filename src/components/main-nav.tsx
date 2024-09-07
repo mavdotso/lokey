@@ -1,4 +1,4 @@
-import { CreditCard, Box, Blocks } from 'lucide-react';
+import { CreditCard, Blocks } from 'lucide-react';
 import Link from 'next/link';
 
 const navItems = [

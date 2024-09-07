@@ -1,7 +1,6 @@
 import { mutation } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { crypto } from '@/lib/utils';
 
 export const createSpace = mutation({
     args: {
@@ -29,14 +28,14 @@ export const createSpace = mutation({
             throw new Error('User not found');
         }
 
-        const spaceId = await ctx.db.insert('spaces', {
+        const spaceId = await ctx.db.insert('workspaces', {
             ...args,
-            spaceOwner: identity,
+            workspaceOwner: identity,
         });
 
         await ctx.db.insert('userSpaces', {
             userId: user._id,
-            spaceId: spaceId,
+            workspaceId: spaceId,
             role: 'admin', // Set the space creator as admin
         });
 
@@ -83,123 +82,5 @@ export const assignUserRole = mutation({
         }
 
         return { success: true };
-    },
-});
-
-export const createCredential = mutation({
-    args: {
-        spaceId: v.optional(v.id('spaces')),
-        name: v.string(),
-        description: v.optional(v.string()),
-        type: v.union(
-            v.literal('password'),
-            v.literal('login_password'),
-            v.literal('api_key'),
-            v.literal('oauth_token'),
-            v.literal('ssh_key'),
-            v.literal('ssl_certificate'),
-            v.literal('env_variable'),
-            v.literal('database_credential'),
-            v.literal('access_key'),
-            v.literal('encryption_key'),
-            v.literal('jwt_token'),
-            v.literal('two_factor_secret'),
-            v.literal('webhook_secret'),
-            v.literal('smtp_credential'),
-            v.literal('ftp_credential'),
-            v.literal('vpn_credential'),
-            v.literal('dns_credential'),
-            v.literal('device_key'),
-            v.literal('key_value'),
-            v.literal('custom'),
-            v.literal('other')
-        ),
-        subtype: v.optional(v.string()),
-        customTypeId: v.optional(v.id('customCredentialTypes')),
-        data: v.string(),
-        expiresAt: v.optional(v.string()),
-        maxViews: v.optional(v.number()),
-    },
-    handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        const encryptedData = crypto.encrypt(args.data);
-
-        const credentialId = await ctx.db.insert('credentials', {
-            spaceId: args.spaceId,
-            name: args.name,
-            description: args.description,
-            type: args.type,
-            subtype: args.subtype,
-            customTypeId: args.customTypeId,
-            encryptedData,
-            updatedAt: new Date().toISOString(),
-            expiresAt: args.expiresAt,
-            maxViews: args.maxViews,
-            viewCount: 0,
-            createdBy: identity || undefined,
-        });
-        return { credentialId };
-    },
-});
-
-export const incrementViewCount = mutation({
-    args: { id: v.string() },
-    handler: async (ctx, args) => {
-        const credential = await ctx.db
-            .query('credentials')
-            .filter((q) => q.eq(q.field('_id'), args.id))
-            .first();
-
-        if (!credential) {
-            throw new Error('Credential not found');
-        }
-
-        const newViewCount = (credential.viewCount || 0) + 1;
-        const updates: any = {
-            viewCount: newViewCount,
-            updatedAt: new Date().toISOString(),
-        };
-
-        // Check if maxViews is set and has been exceeded
-        if (credential.maxViews && newViewCount > credential.maxViews) {
-            updates.expiresAt = new Date().toISOString();
-        }
-
-        await ctx.db.patch(credential._id, updates);
-    },
-});
-
-export const decryptPassword = mutation({
-    args: { _id: v.id('credentials') },
-    handler: async (ctx, args) => {
-        const credential = await ctx.db.get(args._id);
-
-        if (!credential) {
-            throw new Error('Credential not found');
-        }
-
-        const now = new Date();
-
-        const isExpired = (credential.expiresAt && new Date(credential.expiresAt) <= now) || (credential.maxViews && credential.viewCount >= credential.maxViews);
-
-        if (isExpired) {
-            return { isExpired: true };
-        }
-
-        try {
-            const decryptedData = crypto.decrypt(credential.encryptedData);
-
-            // Increment the view count
-            const newViewCount = credential.viewCount + 1;
-            await ctx.db.patch(args._id, {
-                viewCount: newViewCount,
-                updatedAt: new Date().toISOString(),
-            });
-
-            return { isExpired: false, data: decryptedData };
-        } catch (error: any) {
-            console.error('Decryption error:', error);
-            throw new Error(`Failed to decrypt data: ${error.message}`);
-        }
     },
 });

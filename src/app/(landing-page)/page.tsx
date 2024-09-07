@@ -20,7 +20,7 @@ export default function LandingPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
 
-    const createCredential = useMutation(api.mutations.createCredential);
+    const createCredential = useMutation(api.credentials.createCredentials);
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();

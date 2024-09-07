@@ -1,7 +1,7 @@
 import { Id } from './_generated/dataModel';
 
 export type Space = {
-    _id?: Id<'spaces'>;
+    _id?: Id<'workspaces'>;
     _creationTime?: number;
     spaceOwner: string;
     title: string;
@@ -34,24 +34,24 @@ export type UserSpace = {
     _id?: Id<'userSpaces'>;
     _creationTime?: number;
     userId: Id<'users'>;
-    spaceId: Id<'spaces'>;
+    workspaceId: Id<'workspaces'>;
     role: 'admin' | 'manager' | 'member';
 };
 
-export type CustomCredentialType = {
-    _id?: Id<'customCredentialTypes'>;
+export type CustomCredentialsType = {
+    _id?: Id<'customCredentialsTypes'>;
     _creationTime?: number;
-    spaceId: Id<'spaces'>;
+    workspaceId: Id<'workspaces'>;
     name: string;
     description?: string;
     schema: any;
     updatedAt: string;
 };
 
-export type Credential = {
+export type Credentials = {
     _id?: Id<'credentials'>;
     _creationTime?: number;
-    spaceId?: Id<'spaces'>;
+    workspaceId?: Id<'workspaces'>;
     name: string;
     description?: string;
     createdBy?: Id<'users'>;
@@ -78,7 +78,7 @@ export type Credential = {
         | 'custom'
         | 'other';
     subtype?: string;
-    customTypeId?: Id<'customCredentialTypes'>;
+    customTypeId?: Id<'customCredentialsTypes'>;
     encryptedData: any;
     updatedAt: string;
     expiresAt?: string;
@@ -86,7 +86,7 @@ export type Credential = {
     viewCount: number;
 };
 
-export type CredentialAccessLog = {
+export type CredentialsAccessLog = {
     _id?: Id<'credentialAccessLogs'>;
     _creationTime?: number;
     credentialId: Id<'credentials'>;
@@ -147,7 +147,7 @@ export type Subscription = {
 export type ActivityNotification = {
     _id?: Id<'activityNotifications'>;
     _creationTime?: number;
-    spaceId: Id<'spaces'>;
+    workspaceId: Id<'workspaces'>;
     userId: Id<'users'>;
     message: string;
     readAt?: string;
