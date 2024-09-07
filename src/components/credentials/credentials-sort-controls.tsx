@@ -1,29 +1,19 @@
 "use client"
 
-import React, { useState } from 'react';
-import { Input } from '../ui/input';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
+import { Input } from '@/components/ui/input';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { Checkbox } from '../ui/checkbox';
-import { Label } from '../ui/label';
-import { MultiSelect } from '../ui/multi-select';
-
-const credentialTypes = [
-    'password', 'login_password', 'api_key', 'oauth_token', 'ssh_key',
-    'ssl_certificate', 'env_variable', 'database_credential', 'access_key',
-    'encryption_key', 'jwt_token', 'two_factor_secret', 'webhook_secret',
-    'smtp_credential', 'ftp_credential', 'vpn_credential', 'dns_credential',
-    'device_key', 'key_value', 'custom', 'other'
-] as const;
-
-type CredentialType = typeof credentialTypes[number];
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { CredentialsType, credentialsTypes } from '@/convex/types';
 
 interface CredentialsSortControlsProps {
     searchTerm: string;
     onSearchChange: (value: string) => void;
     sortOption: string;
     onSortChange: (value: string) => void;
-    selectedTypes: CredentialType[];
+    selectedTypes: CredentialsType[];
     onTypeChange: (types: string[]) => void;
     hideExpired: boolean;
     onHideExpiredChange: (checked: boolean) => void;
@@ -42,7 +32,7 @@ export function CredentialsSortControls({
     className
 }: CredentialsSortControlsProps) {
 
-    const credentialTypeOptions = credentialTypes.map(type => ({
+    const credentialTypeOptions = credentialsTypes.map(type => ({
         value: type,
         label: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')
     }));
@@ -71,7 +61,8 @@ export function CredentialsSortControls({
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="name">Sort by Name</SelectItem>
-                        <SelectItem value="createdAt">Sort by Date Created</SelectItem>
+                        <SelectItem value="createdAtAsc">Sort by Date Created (Asc)</SelectItem>
+                        <SelectItem value="createdAtDesc">Sort by Date Created (Desc)</SelectItem>
                         <SelectItem value="updatedAt">Sort by Date Updated</SelectItem>
                     </SelectContent>
                 </Select>

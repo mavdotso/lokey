@@ -8,38 +8,40 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { Id } from '../../../convex/_generated/dataModel'
-import { CreateCredentialForm } from './create-credentials-form';
 import { PlusIcon } from 'lucide-react';
+import { CreateCredentialsForm } from '@/components/credentials/create-credentials-form';
+import { Id } from '@/convex/_generated/dataModel';
 
-interface CreateCredentialDialogProps {
-    onCredentialCreated: (credentialId: Id<"credentials">) => void;
+interface CreateCredentialsDialogProps {
+    buttonText?: string,
+    buttonSize?: "lg" | "default" | "sm" | "icon" | null,
+    buttonVariant?: "default" | "link" | "destructive" | "outline" | "secondary" | "ghost" | null,
+    onCredentialsCreated?: (credentialsId: Id<"credentials">) => void;
 }
 
-export function CreateCredentialDialog({ onCredentialCreated }: CreateCredentialDialogProps) {
+export function CreateCredentialsDialog({ buttonText = "Create new credentials", buttonSize = "lg", buttonVariant = "default", onCredentialsCreated }: CreateCredentialsDialogProps) {
     const [isOpen, setIsOpen] = useState(false)
 
-    const handleCredentialCreated = (credentialId: Id<"credentials">) => {
-        onCredentialCreated(credentialId)
+    function handleCredentialsCreated(credentialId: Id<"credentials">) {
         setIsOpen(false)
     }
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button className='gap-2'>
+                <Button className='gap-2' size={buttonSize} variant={buttonVariant}>
                     <PlusIcon className='w-5 h-5' />
-                    Create new credentials
+                    {buttonText}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Create New Credential</DialogTitle>
+                    <DialogTitle>Create New Credentials</DialogTitle>
                     <DialogDescription>
-                        Fill in the details to create a new credential.
+                        Fill in the details to create a new credentials.
                     </DialogDescription>
                 </DialogHeader>
-                <CreateCredentialForm onCredentialCreated={handleCredentialCreated} />
+                <CreateCredentialsForm onCredentialsCreated={handleCredentialsCreated} />
             </DialogContent>
         </Dialog>
     )

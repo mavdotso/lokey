@@ -1,29 +1,29 @@
 import { useQuery } from 'convex/react';
-import { Credential } from '../../../convex/types';
-import { api } from '../../../convex/_generated/api';
-import UserAvatar from '../global/user-avatar';
-import { formatTimestamp, getURL, isCredentialActive } from '@/lib/utils';
-import { CheckIcon, CopyIcon, EyeIcon, LinkIcon, ShareIcon, TimerIcon } from 'lucide-react';
+import { formatTimestamp, getURL, isCredentialsActive } from '@/lib/utils';
+import { CheckIcon, CopyIcon, EyeIcon, ShareIcon, TimerIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '../ui/button';
 import { HashtagBadge } from './hashtag-badge';
 import { formatRelative, parseISO } from 'date-fns';
+import { Credentials } from '@/convex/types';
+import { api } from '@/convex/_generated/api';
+import { Button } from '@/components/ui/button';
+import UserAvatar from '@/components/global/user-avatar';
 
 
 interface CredentialCardProps {
-    credential: Credential;
+    credentials: Credentials;
 }
 
-export function CredentialCard({ credential }: CredentialCardProps) {
+export function CredentialCard({ credentials }: CredentialCardProps) {
 
     const [isCopied, setIsCopied] = useState(false);
 
     const creator = useQuery(
         api.users.getUser,
-        credential.createdBy ? { _id: credential.createdBy } : "skip"
+        credentials.createdBy ? { _id: credentials.createdBy } : "skip"
     );
 
-    const isActive = isCredentialActive(credential);
+    const isActive = isCredentialsActive(credentials);
 
     function formatExpirationDate(expiresAt: string | undefined) {
         if (!expiresAt) return 'No expiration';
@@ -46,23 +46,23 @@ export function CredentialCard({ credential }: CredentialCardProps) {
     };
 
     function getCredentialTags() {
-        const tags: string[] = [credential.type];
-        if (credential.subtype) {
-            tags.push(credential.subtype);
+        const tags: string[] = [credentials.type];
+        if (credentials.subtype) {
+            tags.push(credentials.subtype);
         }
-        if (credential.type === 'custom' && credential.customTypeId) {
+        if (credentials.type === 'custom' && credentials.customTypeId) {
             tags.push('custom');
         }
         return tags;
     }
 
-    const shareLink = `${getURL()}/shared/${credential._id}`;
+    const shareLink = `${getURL()}/shared/${credentials._id}`;
 
     return (
         <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr,1fr] bg-card p-4 border-b border-border last:border-b-0 text-xs">
             <div className="flex flex-col overflow-hidden">
-                <span className="font-medium text-foreground text-sm truncate">{credential.name}</span>
-                <span className="text-muted-foreground text-sm truncate">{credential.description}</span>
+                <span className="font-medium text-foreground text-sm truncate">{credentials.name}</span>
+                <span className="text-muted-foreground text-sm truncate">{credentials.description}</span>
             </div>
             <div className="flex flex-col space-y-2">
                 <div className="flex items-center gap-2 pl-1 text-md">
@@ -73,11 +73,11 @@ export function CredentialCard({ credential }: CredentialCardProps) {
                     <div className="flex items-center gap-4 text-muted-foreground">
                         <div className='flex items-center gap-1'>
                             <TimerIcon className='w-4 h-4' />
-                            <span>{formatExpirationDate(credential.expiresAt)}</span>
+                            <span>{formatExpirationDate(credentials.expiresAt)}</span>
                         </div>
                         <div className='flex items-center gap-1'>
                             <EyeIcon className='w-4 h-4' />
-                            <span>{credential.viewCount || 0} / {credential.maxViews || '∞'}</span>
+                            <span>{credentials.viewCount || 0} / {credentials.maxViews || '∞'}</span>
                         </div>
                     </div>
                 )}
@@ -107,7 +107,7 @@ export function CredentialCard({ credential }: CredentialCardProps) {
             </div>
             <div className="flex justify-end items-center space-x-2 text-muted-foreground">
                 <div className="flex items-center gap-1 ml-auto">
-                    <span className="whitespace-nowrap">{formatTimestamp(credential.updatedAt)} </span>
+                    <span className="whitespace-nowrap">{formatTimestamp(credentials.updatedAt)} </span>
                     {creator && (
                         <div className='flex items-center gap-2'>
                             <span className="max-w-[100px] truncate">{" "} by {creator.name || creator.email.split('@')[0]}</span>

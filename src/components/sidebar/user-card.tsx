@@ -1,8 +1,8 @@
-import { LogOut, User } from 'lucide-react';
-import SignoutButton from '../auth/signout-button';
+import { LogOut } from 'lucide-react';
 import { Session } from 'next-auth';
-import ThemeToggle from '../global/theme-toggle';
-import UserAvatar from '../global/user-avatar';
+import SignoutButton from '@/components/auth/signout-button';
+import ThemeToggle from '@/components/global/theme-toggle';
+import UserAvatar from '@/components/global/user-avatar';
 
 export default function UserCard({ session }: { session: Session }) {
     return (

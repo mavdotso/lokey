@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import CryptoJS from 'crypto-js';
-import { Credential } from '../../convex/types';
+import { Credentials } from '@/convex/types';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -47,13 +47,13 @@ export function formatTimestamp(timestamp: string): string {
     }
 }
 
-export function isCredentialActive(credential: Credential): boolean {
+export function isCredentialsActive(credentials: Credentials): boolean {
     const now = new Date().getTime();
 
-    const expiresAtTimestamp = typeof credential.expiresAt === 'string' ? new Date(credential.expiresAt).getTime() : Number(credential.expiresAt);
+    const expiresAtTimestamp = typeof credentials.expiresAt === 'string' ? new Date(credentials.expiresAt).getTime() : Number(credentials.expiresAt);
 
-    const notExpired = !credential.expiresAt || (isFinite(expiresAtTimestamp) && expiresAtTimestamp > now);
-    const hasRemainingViews = !credential.maxViews || (credential.viewCount || 0) < credential.maxViews;
+    const notExpired = !credentials.expiresAt || (isFinite(expiresAtTimestamp) && expiresAtTimestamp > now);
+    const hasRemainingViews = !credentials.maxViews || (credentials.viewCount || 0) < credentials.maxViews;
 
     return notExpired && hasRemainingViews;
 }

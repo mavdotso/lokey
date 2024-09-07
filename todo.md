@@ -1,6 +1,9 @@
 ### Bugs
 
--   [ ] spaces-dropdown.tsx fix the dialog / space creation
+-   [x] spaces-dropdown.tsx fix the dialog / space creation
+-   [x] Fix the redirect on space creation
+-   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
+-   [ ] On shared/id page make sure to display the right amount of Inputs based on the credentials type
 
 ### ToDo
 

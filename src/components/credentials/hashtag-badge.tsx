@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '../ui/badge';
+import { Badge } from '@/components/ui/badge';
 
 interface HashtagBadgeProps {
     text: string;

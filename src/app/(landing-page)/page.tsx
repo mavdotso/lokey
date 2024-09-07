@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useMutation } from 'convex/react';
 import { getURL } from '@/lib/utils';
-import { api } from '../../../convex/_generated/api';
+import { api } from '@/convex/_generated/api';
 
 export default function LandingPage() {
     const [password, setPassword] = useState('');
@@ -20,7 +20,7 @@ export default function LandingPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
 
-    const createCredential = useMutation(api.mutations.createCredential);
+    const createCredential = useMutation(api.credentials.createCredentials);
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -29,7 +29,7 @@ export default function LandingPage() {
         setLink('');
 
         try {
-            const { credentialId } = await createCredential({
+            const { credentialsId } = await createCredential({
                 name: 'Shared Password',
                 description: 'One-time shared password',
                 type: 'password',
@@ -38,7 +38,7 @@ export default function LandingPage() {
                 maxViews: 1
             });
 
-            const shareLink = `${getURL()}/shared/${credentialId}`;
+            const shareLink = `${getURL()}/shared/${credentialsId}`;
             setLink(shareLink);
         } catch (err) {
             setError('An error occurred while creating the link. Please try again.');

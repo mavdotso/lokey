@@ -1,23 +1,22 @@
 "use client"
 import { useQuery } from 'convex/react';
 import { redirect } from 'next/navigation';
-import { api } from '../../../../convex/_generated/api';
-import { CreateSpaceForm } from '@/components/spaces/create-space-form';
 import LoadingScreen from '@/components/global/loading-screen';
-
+import { CreateWorkspaceCard } from '@/components/workspaces/create-workspace-card';
+import { api } from '@/convex/_generated/api';
 
 export default function Dashboard() {
-    const space = useQuery(api.queries.getFirstUserSpace);
+    const workspaces = useQuery(api.workspaces.getUserWorkspaces);
 
-    if (space === undefined) return <LoadingScreen />
+    if (workspaces === undefined) return <LoadingScreen />
 
-    if (!space || !space.data || space.error !== null) {
+    if (!workspaces || workspaces.length === 0) {
         return (
             <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-sm w-screen h-screen">
-                <CreateSpaceForm />
+                <CreateWorkspaceCard />
             </div>
         );
     } else {
-        redirect(`/dashboard/${space.data._id}`);
+        redirect(`/dashboard/${workspaces[0].slug}`);
     }
 }

@@ -6,6 +6,7 @@ import ConvexClientProvider from "@/lib/providers/convex-client-provider";
 import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/lib/providers/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,7 +31,9 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange>
           <ConvexClientProvider session={session}>
-            <main>{children}</main>
+            <TooltipProvider>
+              <main>{children}</main>
+            </TooltipProvider>
           </ConvexClientProvider>
           <Toaster />
         </ThemeProvider>
