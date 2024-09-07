@@ -50,7 +50,7 @@ export const createCredentials = mutation({
         const identity = await getViewerId(ctx);
         const encryptedData = crypto.encrypt(args.data);
 
-        const credentialId = await ctx.db.insert('credentials', {
+        const credentialsId = await ctx.db.insert('credentials', {
             workspaceId: args.workspaceId,
             name: args.name,
             description: args.description,
@@ -64,7 +64,7 @@ export const createCredentials = mutation({
             viewCount: 0,
             createdBy: identity || undefined,
         });
-        return { credentialId };
+        return { credentialsId };
     },
 });
 

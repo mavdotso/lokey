@@ -21,7 +21,7 @@ export default function SharePage() {
     const id = params.id as string
     const fetchAttempted = useRef(false)
 
-    const decryptPassword = useMutation(api.mutations.decryptPassword);
+    const decryptCredentials = useMutation(api.credentials.decryptCredentials);
 
     useEffect(() => {
         const fetchPassword = async () => {
@@ -30,7 +30,7 @@ export default function SharePage() {
 
             try {
                 setIsLoading(true);
-                const result = await decryptPassword({ _id: id as Id<"credentials"> });
+                const result = await decryptCredentials({ _id: id as Id<"credentials"> });
 
                 if (result.isExpired) {
                     setError('This password has expired and is no longer available.');
@@ -49,7 +49,7 @@ export default function SharePage() {
         };
 
         fetchPassword();
-    }, [id, decryptPassword]);
+    }, [id, decryptCredentials]);
 
     function copyToClipboard() {
         navigator.clipboard.writeText(password).then(() => {

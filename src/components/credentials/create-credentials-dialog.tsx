@@ -9,8 +9,8 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Id } from '../../../convex/_generated/dataModel'
-import { CreateCredentialForm } from './create-credentials-form';
 import { PlusIcon } from 'lucide-react';
+import { CreateCredentialsForm } from './create-credentials-form';
 
 interface CreateCredentialDialogProps {
     onCredentialCreated: (credentialId: Id<"credentials">) => void;
@@ -39,7 +39,7 @@ export function CreateCredentialDialog({ onCredentialCreated }: CreateCredential
                         Fill in the details to create a new credential.
                     </DialogDescription>
                 </DialogHeader>
-                <CreateCredentialForm onCredentialCreated={handleCredentialCreated} />
+                <CreateCredentialsForm onCredentialsCreated={handleCredentialCreated} />
             </DialogContent>
         </Dialog>
     )

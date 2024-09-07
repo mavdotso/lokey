@@ -7,17 +7,14 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { MultiSelect } from '../ui/multi-select';
-import { credentialsTypes } from '../../../convex/types';
-
-
-type CredentialType = typeof credentialsTypes[number];
+import { CredentialsType, credentialsTypes } from '../../../convex/types';
 
 interface CredentialsSortControlsProps {
     searchTerm: string;
     onSearchChange: (value: string) => void;
     sortOption: string;
     onSortChange: (value: string) => void;
-    selectedTypes: CredentialType[];
+    selectedTypes: CredentialsType[];
     onTypeChange: (types: string[]) => void;
     hideExpired: boolean;
     onHideExpiredChange: (checked: boolean) => void;

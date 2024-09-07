@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { Id } from '../../../convex/_generated/dataModel'
-import { Credentials } from '../../../convex/types'
+import { Credentials, credentialsTypes } from '../../../convex/types'
 import { DatePicker } from '../global/date-picker'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
@@ -31,19 +31,10 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
 
     const createCredentials = useMutation(api.credentials.createCredentials)
 
-    // Define credential types based on the Credentials type
-    const credentialTypes: Credentials['type'][] = [
-        'password', 'login_password', 'api_key', 'oauth_token', 'ssh_key',
-        'ssl_certificate', 'env_variable', 'database_credential', 'access_key',
-        'encryption_key', 'jwt_token', 'two_factor_secret', 'webhook_secret',
-        'smtp_credential', 'ftp_credential', 'vpn_credential', 'dns_credential',
-        'device_key', 'key_value', 'custom', 'other'
-    ]
-
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         try {
-            const { credentialId } = await createCredentials({
+            const { credentialsId } = await createCredentials({
                 workspaceId: currentSpaceId,
                 name,
                 description,
@@ -53,7 +44,7 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
                 maxViews
             })
             toast.success('Credentials created successfully!')
-            onCredentialsCreated(credentialId)
+            onCredentialsCreated(credentialsId)
             setName('')
             setDescription('')
             setType('password')
@@ -85,7 +76,7 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
                             <SelectValue placeholder="Select a type" />
                         </SelectTrigger>
                         <SelectContent>
-                            {credentialTypes.map((credType) => (
+                            {credentialsTypes.map((credType) => (
                                 <SelectItem key={credType} value={credType}>
                                     {credType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                 </SelectItem>
