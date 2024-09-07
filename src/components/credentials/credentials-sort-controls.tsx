@@ -17,7 +17,6 @@ interface CredentialsSortControlsProps {
     onTypeChange: (types: string[]) => void;
     hideExpired: boolean;
     onHideExpiredChange: (checked: boolean) => void;
-    className?: string
 }
 
 export function CredentialsSortControls({
@@ -29,7 +28,6 @@ export function CredentialsSortControls({
     onTypeChange,
     hideExpired,
     onHideExpiredChange,
-    className
 }: CredentialsSortControlsProps) {
 
     const credentialTypeOptions = credentialsTypes.map(type => ({
@@ -38,8 +36,8 @@ export function CredentialsSortControls({
     }));
 
     return (
-        <div className={cn(`flex flex-col gap-4 w-full max-w-full`, className)}>
-            <div className="flex items-center gap-2">
+        <>
+            <div className="flex items-center gap-6 w-full">
                 <Input
                     type="text"
                     placeholder="Search credentials..."
@@ -81,6 +79,6 @@ export function CredentialsSortControls({
                     </Label>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

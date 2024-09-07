@@ -1,10 +1,10 @@
 
-import { Search, Trash2Icon } from 'lucide-react';
+import { KeySquareIcon, UsersIcon, BoltIcon } from 'lucide-react';
 import Link from 'next/link';
-import { Separator } from '@radix-ui/react-select';
 import UserCard from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
+import { Separator } from '@/components/ui/separator';
 
 interface SidebarProps {
     params: { slug: string };
@@ -21,30 +21,30 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-    { href: '/', icon: Search, name: 'Search' },
-    { icon: Trash2Icon, name: 'Trash', onClick: () => { } },
+    { href: 'credentials', icon: KeySquareIcon, name: 'Credentials', onClick: () => { } },
+    { href: 'users', icon: UsersIcon, name: 'Users', onClick: () => { } },
+    { href: 'settings', icon: BoltIcon, name: 'Settings', onClick: () => { } },
 ];
 
 export default function Sidebar({ params, session, className, onToggleSidebar }: SidebarProps) {
     return (
         <aside className={`w-64 h-full flex flex-col p-4 ${className}`}>
-            <div className="flex justify-between items-center gap-2 font-semibold text-gray-700">
+            <div className="flex justify-start items-center gap-2 pt-4 font-semibold">
                 <WorkspacesDropdown />
             </div>
-            <nav className="mt-4 text-sm overflow-y-auto">
+            <Separator className='bg-primary-foreground/50 my-4' />
+            <nav className="flex flex-col gap-4 px-3 py-4 text-sm">
                 {navItems.map((item) =>
                     item.href && (
-                        <Link key={item.name} href={item.href} className="flex items-center hover:bg-muted px-2 py-1.5 rounded-md font-medium text-foreground/70 hover:text-foreground">
-                            <item.icon className="mr-2 w-4 h-4" />
+                        <Link key={item.name} href={`${params.slug}/${item.href}`} className="flex items-center gap-4 p-2 rounded-md font-medium text-md text-muted-foreground hover:text-primary">
+                            <item.icon className="w-6 h-6" />
                             {item.name}
                         </Link>
                     )
                 )}
             </nav>
             <div className="mt-auto">
-                <Separator />
                 {session && <UserCard session={session} />}
-                <Separator />
             </div>
         </aside>
     );

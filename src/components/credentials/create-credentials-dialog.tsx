@@ -36,7 +36,7 @@ export function CreateCredentialsDialog({ buttonText = "Create new credentials",
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Create New Credentials</DialogTitle>
+                    <DialogTitle>Create new credentials</DialogTitle>
                     <DialogDescription>
                         Fill in the details to create a new credentials.
                     </DialogDescription>

@@ -33,7 +33,7 @@
     "@types/crypto-js": "^4.2.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "cmdk": "1.0.0",
+    "cmdk": "^1.0.0",
     "convex": "^1.15.0",
     "convex-helpers": "^0.1.55",
     "crypto-js": "^4.2.0",
