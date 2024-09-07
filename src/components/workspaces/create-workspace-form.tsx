@@ -72,7 +72,7 @@ export function CreateWorkspaceForm() {
                 <Label htmlFor="name" className="flex items-center text-foreground">
                     Workspace Name
                     <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger tabIndex={-1}>
                             <Info className="ml-2 w-4 h-4 text-muted-foreground" />
                         </TooltipTrigger>
                         <TooltipContent>
@@ -96,7 +96,7 @@ export function CreateWorkspaceForm() {
                 <Label htmlFor="slug" className="flex items-center text-foreground">
                     Workspace Slug
                     <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger tabIndex={-1}>
                             <Info className="ml-2 w-4 h-4 text-muted-foreground" />
                         </TooltipTrigger>
                         <TooltipContent>
