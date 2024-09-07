@@ -1,4 +1,4 @@
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CircleFadingPlus } from 'lucide-react';
 
 export default function CreateWorkspaceHeader() {

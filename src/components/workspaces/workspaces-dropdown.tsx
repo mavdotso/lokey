@@ -5,10 +5,9 @@ import { Plus, RocketIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useQuery } from 'convex/react';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { CardContent } from '@/components/ui/card';
 import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
 import LoadingScreen from '@/components/global/loading-screen';
 import { CreateWorkspaceForm } from './create-workspace-form';
 import CreateWorkspaceHeader from './create-workspace-header';
@@ -24,9 +23,12 @@ export function WorkspacesDropdown() {
     const workspaces = useMemo(() => workspacesQuery ?? [], [workspacesQuery]);
 
     useEffect(() => {
-        if (workspaces.length > 0 && !selectedSpaceSlug) {
+        if (workspaces.length > 0) {
             setSelectedSpaceSlug(pathname.replace('/dashboard/', ''));
+        } else {
+            router.push('/dashboard')
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workspaces, selectedSpaceSlug, pathname]);
 
     if (workspaces === undefined) return <LoadingScreen />

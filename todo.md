@@ -1,7 +1,8 @@
 ### Bugs
 
 -   [x] spaces-dropdown.tsx fix the dialog / space creation
--   [ ] Fix the redirect on space creation
+-   [x] Fix the redirect on space creation
+-   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
 
 ### ToDo
 

@@ -47,8 +47,8 @@ export type UserRole = {
     role: 'admin' | 'manager' | 'member';
 };
 
-export type UserSpace = {
-    _id?: Id<'userSpaces'>;
+export type UserWorkspace = {
+    _id?: Id<'userWorkspaces'>;
     _creationTime?: number;
     userId: Id<'users'>;
     workspaceId: Id<'workspaces'>;

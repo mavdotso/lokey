@@ -11,6 +11,7 @@ import { CredentialsSortControls } from '@/components/credentials/credentials-so
 import { Separator } from '@/components/ui/separator';
 import { CredentialsType } from '../../../../../convex/types';
 import { isCredentialsActive } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 
 type CredentialsSortOption = 'name' | 'createdAt' | 'updatedAt';
 

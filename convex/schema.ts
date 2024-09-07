@@ -172,7 +172,7 @@ const schema = defineSchema({
     userRoles: defineTable(userRoleSchema).index('userId', ['userId']),
     sessions: defineTable(sessionSchema).index('sessionToken', ['sessionToken']).index('userId', ['userId']),
     accounts: defineTable(accountSchema).index('providerAndAccountId', ['provider', 'providerAccountId']).index('userId', ['userId']),
-    userSpaces: defineTable(userWorkspaceSchema),
+    userWorkspaces: defineTable(userWorkspaceSchema),
     customCredentialsTypes: defineTable(customCredentialsTypeSchema),
     credentials: defineTable(credentialsSchema),
     credentialsAccessLog: defineTable(credentialsAccessLogSchema),

@@ -38,7 +38,7 @@ export const createWorkspace = mutation({
             workspaceOwner: identity,
         });
 
-        await ctx.db.insert('userSpaces', {
+        await ctx.db.insert('userWorkspaces', {
             userId: user._id,
             workspaceId: workspaceId,
             role: 'admin',
