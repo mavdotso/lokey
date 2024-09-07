@@ -13,10 +13,13 @@ import { PlusIcon } from 'lucide-react';
 import { CreateCredentialsForm } from './create-credentials-form';
 
 interface CreateCredentialsDialogProps {
+    buttonText?: string,
+    buttonSize?: "lg" | "default" | "sm" | "icon" | null,
+    buttonVariant?: "default" | "link" | "destructive" | "outline" | "secondary" | "ghost" | null,
     onCredentialsCreated: (credentialsId: Id<"credentials">) => void;
 }
 
-export function CreateCredentialsDialog({ onCredentialsCreated }: CreateCredentialsDialogProps) {
+export function CreateCredentialsDialog({ buttonText = "Create new credentials", buttonSize = "lg", buttonVariant = "default", onCredentialsCreated }: CreateCredentialsDialogProps) {
     const [isOpen, setIsOpen] = useState(false)
 
     const handleCredentialsCreated = (credentialId: Id<"credentials">) => {
@@ -27,9 +30,9 @@ export function CreateCredentialsDialog({ onCredentialsCreated }: CreateCredenti
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button className='gap-2'>
+                <Button className='gap-2' size={buttonSize} variant={buttonVariant}>
                     <PlusIcon className='w-5 h-5' />
-                    Create new credentials
+                    {buttonText}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">

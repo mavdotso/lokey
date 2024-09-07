@@ -62,7 +62,8 @@ export function CredentialsSortControls({
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="name">Sort by Name</SelectItem>
-                        <SelectItem value="createdAt">Sort by Date Created</SelectItem>
+                        <SelectItem value="createdAtAsc">Sort by Date Created (Asc)</SelectItem>
+                        <SelectItem value="createdAtDesc">Sort by Date Created (Desc)</SelectItem>
                         <SelectItem value="updatedAt">Sort by Date Updated</SelectItem>
                     </SelectContent>
                 </Select>

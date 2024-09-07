@@ -78,3 +78,16 @@ export const isSlugUnique = query({
         return existingWorkspace === null;
     },
 });
+
+export const getWorkspaceIdBySlug = query({
+    args: {
+        slug: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const workspace = await ctx.db
+            .query('workspaces')
+            .filter((q) => q.eq(q.field('slug'), args.slug))
+            .first();
+        return workspace;
+    },
+});

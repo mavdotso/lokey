@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useMutation } from 'convex/react'
+import { useMutation, useQueries, useQuery } from 'convex/react'
 import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -74,15 +74,22 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
     const [showData, setShowData] = useState<{ [key: string]: boolean }>({});
 
     const params = useParams()
-    const currentSpaceId = params.spaceId as Id<"workspaces">
+
+    const currentWorkspaceSlug = params.slug
 
     const createCredentials = useMutation(api.credentials.createCredentials)
+    const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: currentWorkspaceSlug as string })
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         try {
+            if (!currentWorkspaceId) {
+                toast.error('Failed to create credential');
+                console.error('Error creating credential: Workspace id is undefined');
+                return;
+            }
             const { credentialsId } = await createCredentials({
-                workspaceId: currentSpaceId,
+                workspaceId: currentWorkspaceId._id,
                 name,
                 description,
                 type,
@@ -114,6 +121,7 @@ export function CreateCredentialsForm({ onCredentialsCreated }: CreateCredential
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder='Credential name'
+                        required
                     />
                 </div>
                 <div className='flex-1'>

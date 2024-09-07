@@ -17,7 +17,7 @@ export default async function DashboardLayout({ children, params }: DashboardLay
             <div className='flex rounded-md h-full'>
                 {session && <Sidebar session={session} params={params} />}
                 <div className="flex-1 p-2">
-                    <div className="border border-border rounded-lg h-full overflow-hidden">
+                    <div className='relative bg-background border border-border rounded-lg w-full h-full overflow-hidden'>
                         {children}
                     </div>
                 </div>

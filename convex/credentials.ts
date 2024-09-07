@@ -19,7 +19,7 @@ export const getUserCredentials = query({
     args: { userId: v.string() },
     handler: async (ctx, args) => {
         const userSpaces = await ctx.db
-            .query('userSpaces')
+            .query('userWorkspaces')
             .filter((q) => q.eq(q.field('userId'), args.userId))
             .collect();
 
