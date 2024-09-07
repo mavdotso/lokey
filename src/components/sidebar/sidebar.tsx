@@ -7,7 +7,7 @@ import { Session } from 'next-auth';
 import { WorkspacesDropdown } from '../workspaces/workspaces-dropdown';
 
 interface SidebarProps {
-    params: { spaceId: string };
+    params: { slug: string };
     session: Session;
     className?: string;
     onToggleSidebar?: () => void;

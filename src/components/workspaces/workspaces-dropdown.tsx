@@ -5,11 +5,13 @@ import { Plus, RocketIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useQuery } from 'convex/react';
-import { api } from '../../../convex/_generated/api';
-import { Id } from '../../../convex/_generated/dataModel';
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
-import LoadingScreen from '../global/loading-screen';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { CardContent } from '@/components/ui/card';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import LoadingScreen from '@/components/global/loading-screen';
 import { CreateWorkspaceForm } from './create-workspace-form';
+import CreateWorkspaceHeader from './create-workspace-header';
 
 export function WorkspacesDropdown() {
     const router = useRouter();
@@ -49,7 +51,7 @@ export function WorkspacesDropdown() {
                                 <div className='bg-accent p-1 rounded-[5px]'>
                                     <RocketIcon className='w-6 h-6 stroke-primary' />
                                 </div>
-                                <p className='text-md'>{workspace.title}</p>
+                                <p className='text-md'>{workspace.name}</p>
                             </div>
                         </SelectItem>
                     ))}
@@ -65,8 +67,11 @@ export function WorkspacesDropdown() {
                     </DialogTrigger>
                 </SelectContent>
             </Select>
-            <DialogContent>
-                <CreateWorkspaceForm />
+            <DialogContent className='p-0 overflow-hidden'>
+                <CreateWorkspaceHeader />
+                <CardContent className="bg-muted pt-8 border-t">
+                    <CreateWorkspaceForm />
+                </CardContent>
             </DialogContent>
         </Dialog>
     );

@@ -4,7 +4,7 @@ import Sidebar from '@/components/sidebar/sidebar';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
-    params: { spaceId: string };
+    params: { slug: string };
 }
 
 export default async function DashboardLayout({ children, params }: DashboardLayoutProps) {

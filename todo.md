@@ -1,6 +1,7 @@
 ### Bugs
 
--   [ ] spaces-dropdown.tsx fix the dialog / space creation
+-   [x] spaces-dropdown.tsx fix the dialog / space creation
+-   [ ] Fix the redirect on space creation
 
 ### ToDo
 

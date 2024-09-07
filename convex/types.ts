@@ -33,9 +33,9 @@ export type Workspace = {
     _id?: Id<'workspaces'>;
     _creationTime?: number;
     spaceOwner: string;
-    title: string;
+    name: string;
+    slug: string;
     iconId: string;
-    data?: string;
     inTrash?: string;
     logo?: string;
 };
