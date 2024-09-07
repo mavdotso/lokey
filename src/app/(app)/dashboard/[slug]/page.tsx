@@ -24,8 +24,6 @@ export default function DashboardPage() {
         userId: session.data?.user?.id ?? ''
     });
 
-    console.log(credentials)
-
     if (credentials === undefined) return <LoadingScreen />
 
     if (!session || !session.data || !session.data.user) {

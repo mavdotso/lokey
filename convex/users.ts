@@ -6,8 +6,6 @@ export const getUser = query({
     handler: async (ctx, args) => {
         const user = await ctx.db.get(args._id);
 
-        console.log(user);
-
         if (!user) {
             return null;
         }
