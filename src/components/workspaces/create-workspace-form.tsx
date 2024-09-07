@@ -23,7 +23,7 @@ export function CreateWorkspaceForm() {
         showSlugError: false,
         newWorkspaceId: null as Id<"workspaces"> | null,
     })
-    const [isRedirecting, setIsRedirecting] = useState(false); // New state to track redirecting
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const createWorkspace = useMutation(api.workspaces.createWorkspace)
     const isUnique = useQuery(api.workspaces.isSlugUnique, { slug: formState.slug })
     const router = useRouter()
@@ -55,18 +55,18 @@ export function CreateWorkspaceForm() {
             return
         }
 
-        setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
+        setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false })) // Reset showSlugError
 
         try {
             const { workspaceId } = await createWorkspace({ name: formState.name, slug: formState.slug, iconId: 'default' })
             toast.success('Workspace created successfully!')
             setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))
-            setIsRedirecting(true);
+            setIsRedirecting(true); // Set redirecting to true
         } catch (error) {
             toast.error('Failed to create workspace')
             console.error('Error creating workspace:', error)
         } finally {
-            setFormState(prev => ({ ...prev, isSubmitting: false }))
+            setFormState(prev => ({ ...prev, isSubmitting: false })) // Reset isSubmitting
         }
     }
 
@@ -121,7 +121,9 @@ export function CreateWorkspaceForm() {
                     <Input
                         id="slug"
                         value={formState.slug}
-                        onChange={(e) => setFormState(prev => ({ ...prev, slug: e.target.value }))}
+                        onChange={(e) => {
+                            setFormState(prev => ({ ...prev, slug: e.target.value, showSlugError: false })) // Reset showSlugError on input change
+                        }}
                         required
                         disabled={formState.isSubmitting}
                         className={`bg-primary-foreground rounded-l-none ${formState.slug && !formState.isSlugUnique && formState.showSlugError && !formState.isSubmitting && !isRedirecting ? 'focus-visible:ring-1 focus-visible:ring-destructive border-destructive' : ''}`}
@@ -135,7 +137,7 @@ export function CreateWorkspaceForm() {
                     <p className="mt-1 text-center text-destructive text-sm">The slug &quot;{formState.slug}&quot; is already in use.</p>
                 )}
             </div>
-            <Button type="submit" size={"lg"} form="create-workspace-form" className="bg-primary w-full text-primary-foreground">
+            <Button disabled={!formState.isSlugUnique} type="submit" size={"lg"} form="create-workspace-form" className="bg-primary w-full text-primary-foreground">
                 Create workspace
             </Button>
         </form>
