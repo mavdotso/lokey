@@ -19,6 +19,7 @@ export function CreateWorkspaceForm() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSlugUnique, setIsSlugUnique] = useState(true)
     const [slugMessage, setSlugMessage] = useState('')
+    const [showSlugError, setShowSlugError] = useState(false)
     const [newWorkspaceId, setNewWorkspaceId] = useState<Id<"workspaces"> | null>(null)
     const createWorkspace = useMutation(api.workspaces.createWorkspace)
     const isUnique = useQuery(api.workspaces.isSlugUnique, { slug })
@@ -44,9 +45,13 @@ export function CreateWorkspaceForm() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
 
-        if (isSubmitting || !isSlugUnique) return
+        if (isSubmitting || !isSlugUnique) {
+            setShowSlugError(!isSlugUnique)
+            return
+        }
 
         setIsSubmitting(true)
+        setShowSlugError(false)
 
         try {
             const { workspaceId } = await createWorkspace({ name, slug, iconId: 'default' })
@@ -114,16 +119,16 @@ export function CreateWorkspaceForm() {
                         onChange={(e) => setSlug(e.target.value)}
                         required
                         disabled={isSubmitting}
-                        className={`bg-primary-foreground rounded-l-none ${slug && !isSlugUnique ? 'focus-visible:ring-1 focus-visible:ring-destructive border-destructive' : ''}`}
+                        className={`bg-primary-foreground rounded-l-none ${slug && !isSlugUnique && showSlugError ? 'focus-visible:ring-1 focus-visible:ring-destructive border-destructive' : ''}`}
                         placeholder="acme"
                         aria-invalid={!isSlugUnique}
                         type="text"
                         name="slug"
                     />
                 </div>
-                {slug && !isSlugUnique && <p className="mt-1 text-center text-destructive text-sm">The slug &quot;{slug}&quot; is already in use.</p>}
+                {slug && !isSlugUnique && showSlugError && <p className="mt-1 text-center text-destructive text-sm">The slug &quot;{slug}&quot; is already in use.</p>}
             </div>
-            <Button type="submit" form="create-workspace-form" className="bg-primary w-full text-primary-foreground">
+            <Button type="submit" size={"lg"} form="create-workspace-form" className="bg-primary w-full text-primary-foreground">
                 Create workspace
             </Button>
         </form>
