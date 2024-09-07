@@ -6,17 +6,17 @@ import LoadingScreen from '@/components/global/loading-screen';
 import { CreateWorkspaceCard } from '@/components/workspaces/create-workspace-card';
 
 export default function Dashboard() {
-    const spaces = useQuery(api.workspaces.getUserWorkspaces);
+    const workspaces = useQuery(api.workspaces.getUserWorkspaces);
 
-    if (spaces === undefined) return <LoadingScreen />
+    if (workspaces === undefined) return <LoadingScreen />
 
-    if (!spaces || spaces.length === 0) {
+    if (!workspaces || workspaces.length === 0) {
         return (
             <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-sm w-screen h-screen">
                 <CreateWorkspaceCard />
             </div>
         );
     } else {
-        redirect(`/dashboard/${spaces[0].slug}`);
+        redirect(`/dashboard/${workspaces[0].slug}`);
     }
 }
