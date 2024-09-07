@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { Id } from '../../../convex/_generated/dataModel'
-import { Info, Lock } from 'lucide-react'
+import { Info } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { Button } from '../ui/button'
 
@@ -55,18 +55,18 @@ export function CreateWorkspaceForm() {
             return
         }
 
-        setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false })) // Reset showSlugError
+        setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
 
         try {
             const { workspaceId } = await createWorkspace({ name: formState.name, slug: formState.slug, iconId: 'default' })
             toast.success('Workspace created successfully!')
             setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))
-            setIsRedirecting(true); // Set redirecting to true
+            setIsRedirecting(true);
         } catch (error) {
             toast.error('Failed to create workspace')
             console.error('Error creating workspace:', error)
         } finally {
-            setFormState(prev => ({ ...prev, isSubmitting: false })) // Reset isSubmitting
+            setFormState(prev => ({ ...prev, isSubmitting: false }))
         }
     }
 
@@ -122,7 +122,7 @@ export function CreateWorkspaceForm() {
                         id="slug"
                         value={formState.slug}
                         onChange={(e) => {
-                            setFormState(prev => ({ ...prev, slug: e.target.value, showSlugError: false })) // Reset showSlugError on input change
+                            setFormState(prev => ({ ...prev, slug: e.target.value, showSlugError: false }))
                         }}
                         required
                         disabled={formState.isSubmitting}
