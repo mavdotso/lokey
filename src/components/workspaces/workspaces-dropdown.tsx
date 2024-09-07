@@ -37,7 +37,7 @@ export function WorkspacesDropdown() {
         const selectedWorkspace = workspaces.find(workspace => workspace.slug === slug);
         if (selectedWorkspace) {
             setSelectedSpaceSlug(selectedWorkspace.slug);
-            router.push(`/dashboard/${selectedWorkspace.slug}`);
+            router.push(`/dashboard/${selectedWorkspace.slug}/credentials`);
         }
     }
 
@@ -47,17 +47,20 @@ export function WorkspacesDropdown() {
                 value={selectedSpaceSlug}
                 onValueChange={handleSelect}
             >
-                <SelectTrigger className="shadow-none focus:outline-none border-none ring-0 focus:ring-0 w-full stroke-primary">
+                <SelectTrigger className="shadow-none focus:outline-none p-0 border-none ring-0 focus:ring-0 w-full text-primary/50 hover:text-primary transition-colors">
                     <SelectValue placeholder="Select workspace" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border border-border rounded-md text-primary">
                     {workspaces.map((workspace) => (
                         <SelectItem key={workspace.slug} value={workspace.slug} className='hover:bg-accent text-primary cursor-pointer'>
                             <div className='flex flex-row items-center gap-3'>
-                                <div className='bg-primary-foreground p-2 rounded-[5px]'>
+                                <div className='bg-primary-foreground p-2.5 rounded-sm'>
                                     <RocketIcon className='w-6 h-6 stroke-primary' />
                                 </div>
-                                <p className='text-md text-primary'>{workspace.name}</p>
+                                <div className='flex flex-col'>
+                                    <p className='text-md text-primary'>{workspace.name}</p>
+                                    <p className='font-light text-primary/50 text-xs'>/{workspace.slug}</p>
+                                </div>
                             </div>
                         </SelectItem>
                     ))}

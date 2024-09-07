@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import ConvexClientProvider from "@/lib/providers/convex-client-provider";
@@ -7,8 +7,6 @@ import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/lib/providers/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Lokey — Secure Password Sharing With Superpowers",
@@ -24,7 +22,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn('min-h-screen', inter.className)}>
+      <body className={cn('min-h-screen', GeistSans.className)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
