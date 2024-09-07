@@ -29,7 +29,7 @@ export default function LandingPage() {
         setLink('');
 
         try {
-            const { credentialId } = await createCredential({
+            const { credentialsId } = await createCredential({
                 name: 'Shared Password',
                 description: 'One-time shared password',
                 type: 'password',
@@ -38,7 +38,7 @@ export default function LandingPage() {
                 maxViews: 1
             });
 
-            const shareLink = `${getURL()}/shared/${credentialId}`;
+            const shareLink = `${getURL()}/shared/${credentialsId}`;
             setLink(shareLink);
         } catch (err) {
             setError('An error occurred while creating the link. Please try again.');
