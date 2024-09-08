@@ -12,6 +12,7 @@ import { Credentials, credentialsTypes } from '@/convex/types'
 import { api } from '@/convex/_generated/api'
 import { encryptData, generateShareLink } from '@/lib/utils'
 import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link'
+import { DialogFooter } from '../ui/dialog'
 
 export const credentialFields = {
     password: [{ id: 'password', label: 'Password', type: 'password' }],
@@ -63,7 +64,7 @@ export const credentialFields = {
 
 
 
-export function CreateCredentialsForm() {
+export function CreateCredentialsForm({ setIsOpen }: { setIsOpen: (isOpen: boolean) => void }) {
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
     const [type, setType] = useState<Credentials['type']>('password')
@@ -182,7 +183,7 @@ export function CreateCredentialsForm() {
                         </div>
                     </div>
                 ))}
-                <div className='flex gap-2'>
+                <div className='flex gap-2 w-full'>
                     <div>
                         <Label htmlFor="expiresAt">Expiration</Label>
                         <DatePicker
@@ -201,13 +202,18 @@ export function CreateCredentialsForm() {
                         />
                     </div>
                 </div>
-
-                <Button type="submit">Create Credentials</Button>
+                <DialogFooter className='flex justify-between'>
+                    <Button variant='secondary' onClick={() => setIsOpen(false)}>Close</Button>
+                    <Button type="submit">Create Credentials</Button>
+                </DialogFooter>
             </form>
         ) : (
             <>
                 <CopyCredentialsLink credentialsLink={sharedLink} />
-                <Button onClick={() => setShowPopup(false)}>Create Another</Button>
+                <DialogFooter >
+                    <Button variant='secondary' onClick={() => setIsOpen(false)}>Close</Button>
+                    <Button onClick={() => setShowPopup(false)}>Create another</Button>
+                </DialogFooter>
             </>
         )
     )

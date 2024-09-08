@@ -30,14 +30,16 @@ export function CreateCredentialsDialog({ buttonText = "Create new credentials",
                     {buttonText}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-md" onInteractOutside={(e) => {
+                e.preventDefault();
+            }}>
                 <DialogHeader>
                     <DialogTitle>Create new credentials</DialogTitle>
                     <DialogDescription>
                         Fill in the details to create a new credentials.
                     </DialogDescription>
                 </DialogHeader>
-                <CreateCredentialsForm />
+                <CreateCredentialsForm setIsOpen={setIsOpen} />
             </DialogContent>
         </Dialog>
     )

@@ -27,11 +27,11 @@ export default function DashboardPage() {
     if (credentials === undefined) return <LoadingScreen />
 
     if (!session || !session.data || !session.data.user) {
-        return <LoadingScreen loadingText='Loading session...' />;
+        return <LoadingScreen />;
     }
 
     if (credentials === undefined) {
-        return <LoadingScreen loadingText='Loading credentials...' />;
+        return <LoadingScreen />;
     }
 
     function handleTypeChange(types: string[]) {

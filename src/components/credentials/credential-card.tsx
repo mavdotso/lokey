@@ -48,7 +48,7 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
 
 
     return (
-        <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr,1fr] bg-card p-4 border-b border-border last:border-b-0 text-xs">
+        <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr] bg-card p-4 border-b border-border last:border-b-0 text-xs">
             <div className="flex flex-col overflow-hidden">
                 <span className="font-medium text-foreground text-sm truncate">{credentials.name}</span>
                 <span className="text-muted-foreground text-sm truncate">{credentials.description}</span>

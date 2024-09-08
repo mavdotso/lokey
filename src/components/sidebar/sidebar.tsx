@@ -1,5 +1,5 @@
 
-import { KeySquareIcon, UsersIcon, BoltIcon } from 'lucide-react';
+import { KeySquareIcon, UsersIcon, BoltIcon, FilesIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon } from 'lucide-react';
 import Link from 'next/link';
 import UserCard from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
@@ -21,7 +21,9 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-    { href: 'credentials', icon: KeySquareIcon, name: 'Credentials', onClick: () => { } },
+    { href: 'credentials', icon: KeyIcon, name: 'Credentials', onClick: () => { } },
+    { href: 'credentials', icon: FileLockIcon, name: 'Files', onClick: () => { } },
+    { href: 'credentials', icon: MessageSquareDashedIcon, name: 'Chats', onClick: () => { } },
     { href: 'users', icon: UsersIcon, name: 'Users', onClick: () => { } },
     { href: 'settings', icon: BoltIcon, name: 'Settings', onClick: () => { } },
 ];
