@@ -118,7 +118,7 @@ export default function DashboardPage() {
             )}
             <div className="mt-auto">
                 {totalPages > 1 && (
-                    <Pagination className="pb-4 text-primary/50">
+                    <Pagination className="pb-4 text-primary/70">
                         <PaginationContent>
                             <PaginationItem className="hover:text-primary">
                                 <PaginationPrevious href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
