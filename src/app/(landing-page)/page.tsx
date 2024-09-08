@@ -8,8 +8,9 @@ import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useMutation } from 'convex/react';
-import { getURL } from '@/lib/utils';
+import { encryptData, generateShareLink } from '@/lib/utils';
 import { api } from '@/convex/_generated/api';
+import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link';
 
 export default function LandingPage() {
     const [password, setPassword] = useState('');
@@ -20,7 +21,7 @@ export default function LandingPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
 
-    const createCredential = useMutation(api.credentials.createCredentials);
+    const createCredentials = useMutation(api.credentials.createCredentials);
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -29,16 +30,19 @@ export default function LandingPage() {
         setLink('');
 
         try {
-            const { credentialsId } = await createCredential({
+            const { publicKey, privateKey, encryptedData } = encryptData(password)
+
+            const { credentialsId } = await createCredentials({
                 name: 'Shared Password',
                 description: 'One-time shared password',
                 type: 'password',
-                data: password,
+                encryptedData: encryptedData,
+                privateKey: privateKey,
                 expiresAt: new Date(Date.now() + parseInt(expiration) * 24 * 60 * 60 * 1000).toISOString(),
                 maxViews: 1
             });
 
-            const shareLink = `${getURL()}/shared/${credentialsId}`;
+            const shareLink = generateShareLink(credentialsId, publicKey);
             setLink(shareLink);
         } catch (err) {
             setError('An error occurred while creating the link. Please try again.');
@@ -65,7 +69,7 @@ export default function LandingPage() {
                 </p>
             </div>
 
-            <div className='flex flex-col pt-8 max-w-xl'>
+            <div className='flex flex-col gap-4 pt-8 max-w-xl'>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex gap-4">
                         <div className="flex-grow">
@@ -116,31 +120,7 @@ export default function LandingPage() {
                 </form>
 
                 {link && (
-                    <div className="space-y-4 pt-6">
-                        <div className="flex items-center bg-muted p-3 rounded-md">
-                            <ScrollArea className="rounded-md w-full whitespace-nowrap">
-                                <div className="font-medium text-muted-foreground text-sm">{link}</div>
-                                <ScrollBar orientation="horizontal" className="pt-2" />
-                            </ScrollArea>
-                            <Button size="sm" variant="outline" onClick={handleCopyLink}>
-                                {isCopied ? (
-                                    <>
-                                        <CheckIcon className="pr-2 w-4 h-4" />
-                                        Copied
-                                    </>
-                                ) : (
-                                    <>
-                                        <CopyIcon className="pr-2 w-4 h-4" />
-                                        Copy Link
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                        <p className="text-muted-foreground text-sm">
-                            <span className="pr-2">⏳</span>
-                            One-time use link
-                        </p>
-                    </div>
+                    <CopyCredentialsLink credentialsLink={link} />
                 )}
 
                 {error && <p className="mt-4 text-destructive text-sm">{error}</p>}

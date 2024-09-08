@@ -1,12 +1,10 @@
 import { useQuery } from 'convex/react';
-import { formatTimestamp, getURL, isCredentialsActive } from '@/lib/utils';
-import { CheckIcon, CopyIcon, EyeIcon, ShareIcon, TimerIcon } from 'lucide-react';
-import { useState } from 'react';
+import { formatTimestamp, isCredentialsActive } from '@/lib/utils';
+import { EyeIcon, TimerIcon } from 'lucide-react';
 import { HashtagBadge } from './hashtag-badge';
 import { formatRelative, parseISO } from 'date-fns';
 import { Credentials } from '@/convex/types';
 import { api } from '@/convex/_generated/api';
-import { Button } from '@/components/ui/button';
 import UserAvatar from '@/components/global/user-avatar';
 
 
@@ -15,8 +13,6 @@ interface CredentialCardProps {
 }
 
 export function CredentialCard({ credentials }: CredentialCardProps) {
-
-    const [isCopied, setIsCopied] = useState(false);
 
     const creator = useQuery(
         api.users.getUser,
@@ -38,12 +34,6 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
         }
     };
 
-    function copyToClipboard() {
-        navigator.clipboard.writeText(shareLink).then(() => {
-            setIsCopied(true);
-            setTimeout(() => setIsCopied(false), 2000);
-        });
-    };
 
     function getCredentialTags() {
         const tags: string[] = [credentials.type];
@@ -56,7 +46,6 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
         return tags;
     }
 
-    const shareLink = `${getURL()}/shared/${credentials._id}`;
 
     return (
         <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr,1fr] bg-card p-4 border-b border-border last:border-b-0 text-xs">
@@ -86,24 +75,6 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
                 {getCredentialTags().map((tag, index) => (
                     <HashtagBadge key={index} text={tag} />
                 ))}
-            </div>
-            <div className="flex justify-center items-center">
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={copyToClipboard}
-                >
-                    {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
-                </Button>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => console.log("share")}
-                >
-                    <ShareIcon className="w-4 h-4" />
-                </Button>
             </div>
             <div className="flex justify-end items-center space-x-2 text-muted-foreground">
                 <div className="flex items-center gap-1 ml-auto">

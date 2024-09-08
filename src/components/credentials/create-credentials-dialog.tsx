@@ -22,10 +22,6 @@ interface CreateCredentialsDialogProps {
 export function CreateCredentialsDialog({ buttonText = "Create new credentials", buttonSize = "lg", buttonVariant = "default", onCredentialsCreated }: CreateCredentialsDialogProps) {
     const [isOpen, setIsOpen] = useState(false)
 
-    function handleCredentialsCreated(credentialId: Id<"credentials">) {
-        setIsOpen(false)
-    }
-
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
@@ -41,7 +37,7 @@ export function CreateCredentialsDialog({ buttonText = "Create new credentials",
                         Fill in the details to create a new credentials.
                     </DialogDescription>
                 </DialogHeader>
-                <CreateCredentialsForm onCredentialsCreated={handleCredentialsCreated} />
+                <CreateCredentialsForm />
             </DialogContent>
         </Dialog>
     )

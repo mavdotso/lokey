@@ -6,11 +6,11 @@ import { crypto } from '@/lib/utils';
 import { credentialsTypeValidator } from './types';
 
 export const getCredential = query({
-    args: { id: v.string() },
+    args: { _id: v.string() },
     handler: async (ctx, args) => {
         return await ctx.db
             .query('credentials')
-            .filter((q) => q.eq(q.field('_id'), args.id))
+            .filter((q) => q.eq(q.field('_id'), args._id))
             .first();
     },
 });
@@ -42,13 +42,13 @@ export const createCredentials = mutation({
         type: credentialsTypeValidator,
         subtype: v.optional(v.string()),
         customTypeId: v.optional(v.id('customCredentialsTypes')),
-        data: v.string(),
+        encryptedData: v.string(),
+        privateKey: v.string(),
         expiresAt: v.optional(v.string()),
         maxViews: v.optional(v.number()),
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-        const encryptedData = crypto.encrypt(args.data);
 
         const credentialsId = await ctx.db.insert('credentials', {
             workspaceId: args.workspaceId,
@@ -57,7 +57,8 @@ export const createCredentials = mutation({
             type: args.type,
             subtype: args.subtype,
             customTypeId: args.customTypeId,
-            encryptedData,
+            encryptedData: args.encryptedData,
+            privateKey: args.privateKey,
             updatedAt: new Date().toISOString(),
             expiresAt: args.expiresAt,
             maxViews: args.maxViews,
@@ -95,9 +96,14 @@ export const incrementCredentialsViewCount = mutation({
     },
 });
 
-export const decryptCredentials = mutation({
-    args: { _id: v.id('credentials') },
-    handler: async (ctx, args) => {
+export type RetrieveCredentialsResult = { isExpired: true } | { isExpired: false; encryptedData: string; privateKey: string };
+
+export const retrieveCredentials = query({
+    args: {
+        _id: v.id('credentials'),
+        publicKey: v.string(),
+    },
+    handler: async (ctx, args): Promise<RetrieveCredentialsResult> => {
         const credential = await ctx.db.get(args._id);
 
         if (!credential) {
@@ -106,22 +112,20 @@ export const decryptCredentials = mutation({
 
         const now = new Date();
 
-        const isExpired = (credential.expiresAt && new Date(credential.expiresAt) <= now) || (credential.maxViews && credential.viewCount >= credential.maxViews);
+        const isExpired = (credential.expiresAt && new Date(credential.expiresAt) <= now) || (credential.maxViews !== undefined && credential.viewCount >= credential.maxViews);
 
         if (isExpired) {
             return { isExpired: true };
         }
 
-        try {
-            const decryptedData = crypto.decrypt(credential.encryptedData);
+        console.log('encryptedData', credential.encryptedData);
+        console.log('privateKey', credential.privateKey);
 
-            // TODO: Separate the functions fom each other
-            await incrementCredentialsViewCount(ctx, { id: args._id });
-
-            return { isExpired: false, data: decryptedData };
-        } catch (error: any) {
-            console.error('Decryption error:', error);
-            throw new Error(`Failed to decrypt data: ${error.message}`);
-        }
+        // Return the encrypted data and private key
+        return {
+            isExpired: false,
+            encryptedData: credential.encryptedData,
+            privateKey: credential.privateKey,
+        };
     },
 });

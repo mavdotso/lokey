@@ -75,7 +75,8 @@ export type Credentials = {
     type: CredentialsType;
     subtype?: string;
     customTypeId?: Id<'customCredentialsTypes'>;
-    encryptedData: any;
+    encryptedData: string;
+    privateKey: string;
     updatedAt: string;
     expiresAt?: string;
     maxViews?: number;

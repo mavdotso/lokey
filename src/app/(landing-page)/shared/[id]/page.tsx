@@ -1,55 +1,60 @@
 'use client'
 import { toast } from "sonner"
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import React, { useState, useEffect, useRef } from 'react';
 import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { crypto, decryptData } from "@/lib/utils";
 
 export default function SharePage() {
-    const [password, setPassword] = useState('')
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
-    const [error, setError] = useState('')
-    const [isLoading, setIsLoading] = useState(true)
-    const params = useParams()
-    const id = params.id as string
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
     const fetchAttempted = useRef(false)
 
-    const decryptCredentials = useMutation(api.credentials.decryptCredentials);
+    const { id } = useParams();
+    const searchParams = useSearchParams();
+    const publicKey = searchParams.get('publicKey') || '';
+
+    const credentials = useQuery(api.credentials.retrieveCredentials, { _id: id as Id<"credentials">, publicKey: publicKey })
+    const incrementCredentialsViewCount = useMutation(api.credentials.incrementCredentialsViewCount)
 
     useEffect(() => {
-        const fetchPassword = async () => {
-            if (!id || fetchAttempted.current) return;
+        async function fetchAndDecryptPassword() {
+            if (!id || !publicKey || fetchAttempted.current || !credentials) return
+
             fetchAttempted.current = true;
 
             try {
                 setIsLoading(true);
-                const result = await decryptCredentials({ _id: id as Id<"credentials"> });
-
-                if (result.isExpired) {
+                if (credentials.isExpired) {
                     setError('This password has expired and is no longer available.');
-                    setPassword('');
+                } else if (credentials.encryptedData && credentials.privateKey) {
+                    console.log(credentials.encryptedData, credentials.privateKey)
+                    const decryptedPassword = decryptData(credentials.encryptedData, publicKey, credentials.privateKey);
+                    await incrementCredentialsViewCount({ id: id as string })
+                    setPassword(decryptedPassword);
                 } else {
-                    setPassword(result.data ?? '');
-                    setError('');
+                    throw new Error('Failed to retrieve encrypted data');
                 }
             } catch (err) {
                 console.error('Error fetching password:', err);
                 setError('Failed to decrypt password. This link may have expired or is invalid.');
-                setPassword('');
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchPassword();
-    }, [id, decryptCredentials]);
+        fetchAndDecryptPassword();
+    }, [id, publicKey, credentials, incrementCredentialsViewCount]);
 
     function copyToClipboard() {
         navigator.clipboard.writeText(password).then(() => {
@@ -57,6 +62,10 @@ export default function SharePage() {
             toast.success("Password copied to clipboard");
             setTimeout(() => setIsCopied(false), 2000);
         });
+    };
+
+    function handleShowPassword() {
+        setShowPassword(prev => !prev);
     };
 
     return (
@@ -97,7 +106,7 @@ export default function SharePage() {
                                         variant="ghost"
                                         size="icon"
                                         className="top-0 right-10 absolute h-full"
-                                        onClick={() => setShowPassword(!showPassword)}
+                                        onClick={handleShowPassword}
                                     >
                                         {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
                                     </Button>
