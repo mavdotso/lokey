@@ -15,7 +15,7 @@ import { crypto, encryptData, generateShareLink } from '@/lib/utils'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { CopyCredentialsLink } from './copy-credentials-link'
 
-const credentialFields = {
+export const credentialFields = {
     password: [{ id: 'password', label: 'Password', type: 'password' }],
     login_password: [
         { id: 'username', label: 'Username', type: 'text' },
@@ -75,7 +75,6 @@ export function CreateCredentialsForm() {
     const [showData, setShowData] = useState<{ [key: string]: boolean }>({});
     const [showPopup, setShowPopup] = useState(false);
     const [sharedLink, setSharedLink] = useState('');
-    const [isCopied, setIsCopied] = useState(false);
 
     const { slug } = useParams()
 
@@ -120,13 +119,6 @@ export function CreateCredentialsForm() {
             console.error('Error creating credential:', error)
         }
     }
-
-    function copyToClipboard() {
-        navigator.clipboard.writeText(sharedLink).then(() => {
-            setIsCopied(true);
-            setTimeout(() => setIsCopied(false), 2000);
-        });
-    };
 
 
     return (

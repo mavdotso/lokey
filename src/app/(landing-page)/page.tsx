@@ -2,9 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { toast } from "sonner"
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useMutation } from 'convex/react';
@@ -19,7 +17,7 @@ export default function LandingPage() {
     const [link, setLink] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [isCopied, setIsCopied] = useState(false);
+
 
     const createCredentials = useMutation(api.credentials.createCredentials);
 
@@ -30,7 +28,7 @@ export default function LandingPage() {
         setLink('');
 
         try {
-            const { publicKey, privateKey, encryptedData } = encryptData(password)
+            const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify({ password: password }))
 
             const { credentialsId } = await createCredentials({
                 name: 'Shared Password',
@@ -50,13 +48,6 @@ export default function LandingPage() {
             setIsLoading(false);
         }
     }
-
-    function handleCopyLink() {
-        navigator.clipboard.writeText(link);
-        setIsCopied(true);
-        toast.success('Link copied to clipboard');
-        setTimeout(() => setIsCopied(false), 2000);
-    };
 
     return (
         <>

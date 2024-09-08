@@ -22,7 +22,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn('min-h-screen', GeistSans.className)}>
+      <body className={cn('min-h-screen text-balance', GeistSans.className)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -11,13 +11,16 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { crypto, decryptData } from "@/lib/utils";
+import { credentialFields } from "@/components/credentials/create-credentials-form";
 
 export default function SharePage() {
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [isCopied, setIsCopied] = useState(false);
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
+
+    const [credentialsData, setCredentialsData] = useState<any>(null)
+    const [error, setError] = useState<string | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const [showCredentials, setShowCredentials] = useState<{ [key: string]: boolean }>({});
+    const [isCopied, setIsCopied] = useState<{ [key: string]: boolean }>({});
+
     const fetchAttempted = useRef(false)
 
     const { id } = useParams();
@@ -28,7 +31,7 @@ export default function SharePage() {
     const incrementCredentialsViewCount = useMutation(api.credentials.incrementCredentialsViewCount)
 
     useEffect(() => {
-        async function fetchAndDecryptPassword() {
+        async function fetchAndDecryptCredentials() {
             if (!id || !publicKey || fetchAttempted.current || !credentials) return
 
             fetchAttempted.current = true;
@@ -36,100 +39,120 @@ export default function SharePage() {
             try {
                 setIsLoading(true);
                 if (credentials.isExpired) {
-                    setError('This password has expired and is no longer available.');
+                    setError('The credentials have expired and are no longer available.');
                 } else if (credentials.encryptedData && credentials.privateKey) {
-                    const decryptedPassword = decryptData(credentials.encryptedData, publicKey, credentials.privateKey);
+                    const decryptedData = decryptData(credentials.encryptedData, publicKey, credentials.privateKey);
+
+                    const parsedData = JSON.parse(decryptedData)
+
                     await incrementCredentialsViewCount({ id: id as string })
-                    setPassword(decryptedPassword);
+                    setCredentialsData(parsedData);
                 } else {
                     throw new Error('Failed to retrieve encrypted data');
                 }
             } catch (err) {
-                console.error('Error fetching password:', err);
-                setError('Failed to decrypt password. This link may have expired or is invalid.');
+                console.error('Error fetching credentials:', err);
+                setError('Failed to decrypt credentials. This link may have expired or is invalid.');
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchAndDecryptPassword();
+        fetchAndDecryptCredentials();
     }, [id, publicKey, credentials, incrementCredentialsViewCount]);
 
-    function copyToClipboard() {
-        navigator.clipboard.writeText(password).then(() => {
-            setIsCopied(true);
-            toast.success("Password copied to clipboard");
-            setTimeout(() => setIsCopied(false), 2000);
-        });
-    };
 
-    function handleShowPassword() {
-        setShowPassword(prev => !prev);
-    };
+    function copyToClipboard(key: string, value: string) {
+        navigator.clipboard.writeText(value).then(() => {
+            setIsCopied(prev => ({ ...prev, [key]: true }));
+            toast.success("Credentials copied to clipboard");
+            setTimeout(() => setIsCopied(prev => ({ ...prev, [key]: false })), 2000);
+        });
+    }
+
+    function handleshowCredentials(key: string) {
+        setShowCredentials(prev => ({ ...prev, [key]: !prev[key] }));
+    }
+
+    function renderFields(data: any) {
+        if (typeof data !== 'object' || data === null) {
+            return null;
+        }
+
+        return (
+            <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+                {Object.entries(data).map(([key, value]) => (
+                    <div key={key} className="space-y-4">
+                        <div>
+                            <Label htmlFor={key}>{key.charAt(0).toUpperCase() + key.slice(1)}</Label>
+                            <div className="relative">
+                                <Input
+                                    id={key}
+                                    type={showCredentials[key] ? "text" : "password"}
+                                    value={String(value || '')}
+                                    readOnly
+                                    className="pr-20 w-full"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="top-0 right-10 absolute h-full"
+                                    onClick={() => handleshowCredentials(key)}
+                                >
+                                    {showCredentials[key] ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="top-0 right-0 absolute h-full"
+                                    onClick={() => copyToClipboard(key, String(value))}
+                                >
+                                    {isCopied[key] ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
 
     return (
         <>
             <div className="pt-10">
                 <h2 className="pb-4 font-bold text-5xl">
-                    A password has been securely shared with you
+                    Credentials have been securely shared with you
                 </h2>
                 <p className="text-lg text-muted-foreground">
-                    This password will be deleted after you close this page. <br /> Make sure to copy and store it securely.
+                    These credentials will be deleted after you close this page. <br /> Make sure to copy and store them securely.
                 </p>
             </div>
 
-            <div className='flex flex-col pt-8 max-w-md'>
+            <div className='flex flex-col pt-8'>
                 {error ? (
                     <div className="text-destructive">{error}</div>
                 ) : isLoading ? (
                     <div className="space-y-4">
                         <div>
-                            <Label>Shared Password</Label>
+                            <Label>Loading...</Label>
                             <Skeleton className="rounded-md w-full h-10" />
                         </div>
                     </div>
                 ) : (
                     <>
-                        <div className="space-y-4">
-                            <div>
-                                <Label>Shared Password</Label>
-                                <div className="relative">
-                                    <Input
-                                        type={showPassword ? "text" : "password"}
-                                        value={password}
-                                        readOnly
-                                        className="pr-20 w-full"
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="top-0 right-10 absolute h-full"
-                                        onClick={handleShowPassword}
-                                    >
-                                        {showPassword ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="top-0 right-0 absolute h-full"
-                                        onClick={copyToClipboard}
-                                    >
-                                        {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                        <p className="py-4 text-muted-foreground text-sm">
+                        {renderFields(credentialsData)}
+                        <p className="py-4 max-w-md text-muted-foreground text-sm">
                             <span className="pr-2">⏳</span>
-                            This is a one-time use password. <br />It will be deleted after you close this page.
+                            You can view these credentials only once. They will be deleted after you leave this page, so make sure to copy and store them in a secure place.
                         </p>
                     </>
                 )}
             </div>
             <p className="pt-4 text-muted-foreground text-xs">
-                Want to share your own passwords securely? <br />
+                Want to share your own credentials securely? <br />
                 <a href="/sign-in" className="text-primary hover:underline">Create a free account</a> to get started.
             </p>
         </>
