@@ -51,7 +51,7 @@ export default function LandingPage() {
 
     return (
         <>
-            <div className="pt-12">
+            <div className="pt-20">
                 <h1 className="pb-4 font-bold text-5xl">
                     Secure Password Sharing <br /> With Superpowers
                 </h1>

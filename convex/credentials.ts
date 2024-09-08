@@ -125,3 +125,65 @@ export const retrieveCredentials = query({
         };
     },
 });
+
+export const removeCredentials = mutation({
+    args: { _id: v.id('credentials') },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+
+        if (!identity) {
+            throw new Error('Log in to remove credentials');
+        }
+
+        const credential = await ctx.db.get(args._id);
+
+        if (!credential) {
+            throw new Error('Credential not found');
+        }
+
+        if (credential.createdBy !== identity) {
+            throw new Error('Unauthorized: You are not the owner of this credential');
+        }
+
+        await ctx.db.delete(args._id);
+    },
+});
+
+export const editCredentials = mutation({
+    args: {
+        _id: v.id('credentials'),
+        updates: v.object({
+            name: v.optional(v.string()),
+            description: v.optional(v.string()),
+            type: v.optional(credentialsTypeValidator),
+            subtype: v.optional(v.string()),
+            customTypeId: v.optional(v.id('customCredentialsTypes')),
+            encryptedData: v.optional(v.string()),
+            privateKey: v.optional(v.string()),
+            expiresAt: v.optional(v.string()),
+            maxViews: v.optional(v.number()),
+        }),
+    },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+
+        if (!identity) {
+            throw new Error('Log in to edit credentials');
+        }
+
+        const credential = await ctx.db.get(args._id);
+
+        if (!credential) {
+            throw new Error('Credential not found');
+        }
+
+        if (credential.createdBy !== identity) {
+            throw new Error('Unauthorized: You are not the owner of this credential');
+        }
+
+        await ctx.db.patch(args._id, {
+            ...args.updates,
+            updatedAt: new Date().toISOString(),
+        });
+    },
+});

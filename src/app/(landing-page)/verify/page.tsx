@@ -9,7 +9,7 @@ export default function Verify() {
     const router = useRouter()
     return (
         <>
-            <div className="pt-12">
+            <div className="pt-20">
                 <h1 className="pb-4 font-bold text-5xl">
                     Magic Link Sent. <br /> Check Your Email!
                 </h1>

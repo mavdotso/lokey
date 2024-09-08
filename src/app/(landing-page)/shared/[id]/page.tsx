@@ -121,7 +121,7 @@ export default function SharePage() {
 
     return (
         <>
-            <div className="pt-10">
+            <div className="pt-20">
                 <h2 className="pb-4 font-bold text-5xl">
                     Credentials have been securely shared with you
                 </h2>

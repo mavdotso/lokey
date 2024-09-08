@@ -1,3 +1,4 @@
+
 import { useQuery } from 'convex/react';
 import { formatTimestamp, isCredentialsActive } from '@/lib/utils';
 import { EyeIcon, TimerIcon } from 'lucide-react';
@@ -58,18 +59,16 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
                     <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
                     <span className='text-md'>{isActive ? 'Active' : 'Expired'}</span>
                 </div>
-                {isActive && (
-                    <div className="flex items-center gap-4 text-muted-foreground">
-                        <div className='flex items-center gap-1'>
-                            <TimerIcon className='w-4 h-4' />
-                            <span>{formatExpirationDate(credentials.expiresAt)}</span>
-                        </div>
-                        <div className='flex items-center gap-1'>
-                            <EyeIcon className='w-4 h-4' />
-                            <span>{credentials.viewCount || 0} / {credentials.maxViews || '∞'}</span>
-                        </div>
+                <div className="flex items-center gap-4 text-muted-foreground">
+                    <div className='flex items-center gap-1'>
+                        <TimerIcon className='w-4 h-4' />
+                        <span>{formatExpirationDate(credentials.expiresAt)}</span>
                     </div>
-                )}
+                    <div className='flex items-center gap-1'>
+                        <EyeIcon className='w-4 h-4' />
+                        <span>{credentials.viewCount || 0} / {credentials.maxViews || '∞'}</span>
+                    </div>
+                </div>
             </div>
             <div className="flex flex-wrap gap-1">
                 {getCredentialTags().map((tag, index) => (
