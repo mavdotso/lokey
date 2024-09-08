@@ -10,8 +10,7 @@ import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { crypto, decryptData } from "@/lib/utils";
-import { credentialFields } from "@/components/credentials/create-credentials-form";
+import { decryptData } from "@/lib/utils";
 
 export default function SharePage() {
 

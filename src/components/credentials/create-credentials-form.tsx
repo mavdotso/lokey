@@ -7,13 +7,11 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { DatePicker } from '@/components/global/date-picker'
-import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon, ShareIcon } from 'lucide-react'
-import { Id } from '@/convex/_generated/dataModel'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { Credentials, credentialsTypes } from '@/convex/types'
 import { api } from '@/convex/_generated/api'
-import { crypto, encryptData, generateShareLink } from '@/lib/utils'
-import { ScrollArea, ScrollBar } from '../ui/scroll-area'
-import { CopyCredentialsLink } from './copy-credentials-link'
+import { encryptData, generateShareLink } from '@/lib/utils'
+import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link'
 
 export const credentialFields = {
     password: [{ id: 'password', label: 'Password', type: 'password' }],
