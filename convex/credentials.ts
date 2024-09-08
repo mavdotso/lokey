@@ -118,10 +118,6 @@ export const retrieveCredentials = query({
             return { isExpired: true };
         }
 
-        console.log('encryptedData', credential.encryptedData);
-        console.log('privateKey', credential.privateKey);
-
-        // Return the encrypted data and private key
         return {
             isExpired: false,
             encryptedData: credential.encryptedData,

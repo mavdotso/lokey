@@ -17,7 +17,6 @@ export const getUserSubscriptionStatus = query({
                 return { data: null, error: null };
             }
         } catch (error) {
-            console.log(error);
             return { data: null, error: 'Error' };
         }
     },

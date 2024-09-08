@@ -13,8 +13,6 @@ export function getURL() {
     return url;
 }
 
-const SECRET_KEY = process.env.ENCRYPTION_KEY || 'default-secret-key';
-
 export const crypto = {
     generateRandomString: (length: number): string => {
         return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Hex);
@@ -26,9 +24,7 @@ export const crypto = {
 
     decrypt: (encryptedData: string, key: string): string => {
         const bytes = CryptoJS.AES.decrypt(encryptedData, key);
-        console.log(bytes);
         const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-        console.log(decryptedText);
         return bytes.toString(CryptoJS.enc.Utf8);
     },
 
@@ -42,27 +38,14 @@ export function encryptData(data: string) {
     const privateKey = crypto.generateRandomString(18);
     const encryptionKey = publicKey + privateKey;
 
-    console.log('encryptionKey', encryptionKey);
-    console.log('data', data);
-
     const encryptedData = crypto.encrypt(data, encryptionKey);
-
-    console.log('encryptedData', encryptedData);
 
     return { publicKey, privateKey, encryptedData };
 }
 
 export function decryptData(encryptedData: string, publicKey: string, privateKey: string) {
     const decryptionKey = publicKey + privateKey;
-    console.log('decryptionKey', decryptionKey);
     const decryptedText = crypto.decrypt(encryptedData, decryptionKey);
-
-    if (decryptedText) {
-        console.log('decryptedText', decryptedText);
-    } else {
-        console.error('Decryption failed.');
-    }
-
     return decryptedText;
 }
 

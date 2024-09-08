@@ -38,7 +38,6 @@ export default function SharePage() {
                 if (credentials.isExpired) {
                     setError('This password has expired and is no longer available.');
                 } else if (credentials.encryptedData && credentials.privateKey) {
-                    console.log(credentials.encryptedData, credentials.privateKey)
                     const decryptedPassword = decryptData(credentials.encryptedData, publicKey, credentials.privateKey);
                     await incrementCredentialsViewCount({ id: id as string })
                     setPassword(decryptedPassword);
