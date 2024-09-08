@@ -64,7 +64,7 @@ export default function DashboardPage() {
 
     const isFiltered = searchTerm || selectedTypes.length > 0 || hideExpired;
 
-    const itemsPerPage = 8;
+    const itemsPerPage = 9;
     const totalPages = Math.ceil(filteredCredentials.length / itemsPerPage);
 
     const paginatedCredentials = filteredCredentials.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -82,7 +82,7 @@ export default function DashboardPage() {
                     <CreateCredentialsDialog />
                 </div>
             ) : (
-                <div className='flex flex-col flex-grow gap-4 p-8'> {/* Added flex-grow to take available space */}
+                <div className='flex flex-col flex-grow gap-4 p-8'>
                     <CredentialsSortControls
                         searchTerm={searchTerm}
                         onSearchChange={setSearchTerm}
@@ -118,20 +118,20 @@ export default function DashboardPage() {
             )}
             <div className="mt-auto">
                 {totalPages > 1 && (
-                    <Pagination className="pb-4">
+                    <Pagination className="pb-4 text-primary/50">
                         <PaginationContent>
-                            <PaginationItem>
+                            <PaginationItem className="hover:text-primary">
                                 <PaginationPrevious href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
                             </PaginationItem>
                             {[...Array(totalPages)].map((_, index) => (
-                                <PaginationItem key={index}>
+                                <PaginationItem key={index} className="hover:text-primary">
                                     <PaginationLink href="#" onClick={() => setCurrentPage(index + 1)}>{index + 1}</PaginationLink>
                                 </PaginationItem>
                             ))}
-                            <PaginationItem>
+                            <PaginationItem className="hover:text-primary">
                                 <PaginationEllipsis />
                             </PaginationItem>
-                            <PaginationItem>
+                            <PaginationItem className="hover:text-primary">
                                 <PaginationNext href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
                             </PaginationItem>
                         </PaginationContent>
