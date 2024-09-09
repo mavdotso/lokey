@@ -114,7 +114,7 @@ interface CreateNewCredentialsDialogProps {
 
 function CreateNewCredentialsDialog({ isOpen, setIsOpen }: CreateNewCredentialsDialogProps) {
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <CRUDCredentialsDialog isOpen={isOpen} setIsOpen={setIsOpen}>
                 <Button className='gap-2' variant={"outline"} >
                     <PlusIcon className='w-5 h-5' />

@@ -68,10 +68,11 @@ interface CRUDCredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;
     editId?: Id<"credentials">;
     existingData?: Credentials;
+    onCredentialsCreated?: (credentialsId: Id<"credentials">) => void;
     onCredentialsUpdated?: (credentialsId: Id<"credentials">) => void;
 }
 
-export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredentialsUpdated }: CRUDCredentialsFormProps) {
+export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredentialsCreated, onCredentialsUpdated }: CRUDCredentialsFormProps) {
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState<Credentials['type']>('password');
@@ -108,7 +109,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
             }
 
             if (editId) {
-                await editCredentials({
+                const response = await editCredentials({
                     _id: editId,
                     updates: {
                         name,
@@ -117,8 +118,13 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                         maxViews
                     }
                 });
-                if (onCredentialsUpdated) {
-                    onCredentialsUpdated(editId);
+                if (response.success) {
+                    toast.success('Credentials were edited successfully');
+                    if (onCredentialsUpdated) {
+                        onCredentialsUpdated(editId);
+                    }
+                } else {
+                    toast.error('Error: something went wrong: ' + response.message);
                 }
             } else {
                 const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data));
@@ -218,6 +224,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                                 size="icon"
                                 className="top-0 right-0 absolute h-full"
                                 onClick={() => setShowData({ ...showData, [field.id]: !showData[field.id] })}
+                                disabled={editId != undefined}
                             >
                                 {showData[field.id] ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
                             </Button>

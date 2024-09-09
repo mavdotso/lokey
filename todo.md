@@ -1,26 +1,31 @@
 ### Bugs
 
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
--   [x] User credentials -> Workspace credentials
--   [x] spaces-dropdown.tsx fix the dialog / space creation
--   [x] Fix the redirect on space creation
--   [x] On shared/id page make sure to display the right amount of Inputs based on the credentials type
 
 ### ToDo
 
--   [ ] Request passwords
+-   [ ] Workspace
+
+    -   [ ] Invite users
+    -   [ ] Remove users
+    -   [ ] Change workspace owner
+    -   [ ] Change credentials owner
+    -   [ ] User roles (access?)
+        -   [ ] CRUD
+            -   [ ] only what they own
+            -   [ ] all
+            -   [ ] nothing (read only)
+
+-   [ ] Request passwords from clients
+
     -   [ ] Add instructions on where to get the passwords from
--   [ ] Onboarding flow
 
-    -   [x] Create a workspace
-    -   [ ] Share first creadentials form (?)
-            — might not need this as for the agencies, they will likely 'request' rather than 'share'
-
--   [x] Unify the credential types from one place
 -   [ ] Share link via email / text
--   [ ] Send the link to a client to share the password with you (vice-versa process)
+
 -   [ ] Insert the website you're providing the password for
+
     -   [ ] Fetch the website icon
+
 -   [ ] Email templates
 
 -   [ ] Sidebar menu
@@ -41,6 +46,7 @@
     -   [ ] Upgrade
 
 -   [ ] User settings
+
     -   General:
     -   [ ] Change name
     -   [ ] Change email
@@ -49,6 +55,9 @@
     -   Security:
     -   [ ] Create password
     -   [ ] 2FA
+
+-   [ ] Stripe
+-   [ ] User / workspace limits
 
 ### Potentially:
 

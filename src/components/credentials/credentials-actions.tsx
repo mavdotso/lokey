@@ -79,6 +79,7 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
                                 editId={credentials._id}
                                 existingData={credentials}
                                 onCredentialsUpdated={() => {
+                                    setMenuOpen(false);
                                     setEditDialogOpen(false);
                                 }}
                             >

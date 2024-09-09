@@ -31,6 +31,7 @@ export function CRUDCredentialsDialog({ children, isOpen, setIsOpen, onCredentia
                     setIsOpen={setIsOpen}
                     editId={editId}
                     existingData={existingData}
+                    onCredentialsCreated={onCredentialsCreated}
                     onCredentialsUpdated={onCredentialsUpdated}
                 />
             </DialogContent>
