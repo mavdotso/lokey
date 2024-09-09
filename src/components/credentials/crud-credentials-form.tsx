@@ -119,7 +119,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                     }
                 });
                 if (response.success) {
-                    toast.success('Credentials were edited successfully');
+                    toast.success('Credentials were updated successfully');
                     if (onCredentialsUpdated) {
                         onCredentialsUpdated(editId);
                     }
@@ -251,7 +251,14 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                     </div>
                 </div>
                 <DialogFooter className='flex justify-between'>
-                    <Button variant='secondary' onClick={() => setIsOpen(false)}>Close</Button>
+                    <Button variant='secondary' type="button" onClick={
+                        () => {
+                            setIsOpen(false)
+                            if (onCredentialsUpdated && editId) {
+                                onCredentialsUpdated(editId);
+                            }
+                        }
+                    }>Close</Button>
                     <Button type="submit">{editId != undefined ? 'Update Credentials' : 'Create Credentials'}</Button>
                 </DialogFooter>
             </form>
@@ -259,7 +266,13 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
             <>
                 <CopyCredentialsLink credentialsLink={sharedLink} />
                 <DialogFooter>
-                    <Button variant='secondary' onClick={() => setIsOpen(false)}>Close</Button>
+                    <Button variant='secondary' type="button" onClick={
+                        () => {
+                            setIsOpen(false)
+                            if (onCredentialsUpdated && editId) {
+                                onCredentialsUpdated(editId);
+                            }
+                        }}>Close</Button>
                     <Button onClick={() => setShowPopup(false)}>Create another</Button>
                 </DialogFooter>
             </>
