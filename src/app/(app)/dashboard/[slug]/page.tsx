@@ -51,7 +51,7 @@ export default function DashboardPage({ params }: DashboardProps) {
         });
 
     const isFiltered = searchTerm || selectedTypes.length > 0 || hideExpired;
-    const itemsPerPage = 15;
+    const itemsPerPage = 14;
     const totalPages = Math.ceil(filteredCredentials.length / itemsPerPage);
     const paginatedCredentials = filteredCredentials.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -68,7 +68,7 @@ export default function DashboardPage({ params }: DashboardProps) {
                 <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
             </div>
             <Separator />
-            <div className="pb-10 overflow-auto">
+            <div className={`${totalPages > 1 && 'pb-10'}  overflow-auto`}>
                 {credentials.length === 0 ? (
                     <div className='flex flex-col justify-center items-center gap-4 px-8 py-4 w-full h-full'>
                         <p className='text-lg'>You don&apos;t have any credentials yet</p>
@@ -94,15 +94,15 @@ export default function DashboardPage({ params }: DashboardProps) {
                     </div >
                 )}
             </div>
-            <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-primary-foreground to-transparent mx-auto pt-10">
-                {totalPages > 1 && (
+            {totalPages > 1 && (
+                <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-primary-foreground to-transparent mx-auto pt-10">
                     <PagePagination
                         currentPage={currentPage}
                         totalPages={totalPages}
                         setCurrentPage={setCurrentPage}
                     />
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
