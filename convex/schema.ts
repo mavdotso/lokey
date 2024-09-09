@@ -1,9 +1,9 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v, Validator } from 'convex/values';
-import { credentialsTypeValidator } from './types';
+import { credentialsTypeValidator, roleTypeValidator } from './types';
 
 // Enums
-const userRole = v.union(v.literal('admin'), v.literal('manager'), v.literal('member'));
+const userRole = roleTypeValidator;
 const credentialsType = credentialsTypeValidator;
 const pricingType = v.union(v.literal('recurring'), v.literal('one_time'));
 const pricingPlanInterval = v.union(v.literal('year'), v.literal('month'), v.literal('week'), v.literal('day'));

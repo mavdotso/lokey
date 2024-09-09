@@ -24,10 +24,12 @@ export const credentialsTypes = [
     'custom',
     'other',
 ] as const;
-
 export type CredentialsType = (typeof credentialsTypes)[number];
-
 export const credentialsTypeValidator = v.union(...credentialsTypes.map(v.literal));
+
+export const roleTypes = ['admin', 'manager', 'member'] as const;
+export type RoleType = (typeof roleTypes)[number];
+export const roleTypeValidator = v.union(...roleTypes.map(v.literal));
 
 export type Workspace = {
     _id?: Id<'workspaces'>;
@@ -43,7 +45,7 @@ export type UserRole = {
     _id?: Id<'userRoles'>;
     _creationTime?: number;
     userId: Id<'users'>;
-    role: 'admin' | 'manager' | 'member';
+    role: RoleType;
 };
 
 export type UserWorkspace = {
@@ -51,7 +53,7 @@ export type UserWorkspace = {
     _creationTime?: number;
     userId: Id<'users'>;
     workspaceId: Id<'workspaces'>;
-    role: 'admin' | 'manager' | 'member';
+    role: RoleType;
 };
 
 export type CustomCredentialsType = {

@@ -1,16 +1,18 @@
+
+import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
 import { Trash, Plus } from "lucide-react";
+import { RoleType } from "@/convex/types";
 
 export function InviteEmailDialog() {
-    const [emails, setEmails] = useState([{ id: 1, value: '' }]);
+    const [emails, setEmails] = useState([{ id: 1, value: '', role: 'member' as RoleType }]);
 
     function addEmailField() {
         const newId = emails.length > 0 ? Math.max(...emails.map(e => e.id)) + 1 : 1;
-        setEmails([...emails, { id: newId, value: '' }]);
+        setEmails([...emails, { id: newId, value: '', role: 'member' }]);
     };
 
     function removeEmailField(id: number) {
@@ -62,7 +64,7 @@ export function InviteEmailDialog() {
                     </Button>
                 </div>
                 <DialogFooter className="sm:justify-between py-2">
-                    <Button type="button" className="w-full">
+                    <Button type="button" size={"lg"} className="w-full">
                         Send invites
                     </Button>
                 </DialogFooter>

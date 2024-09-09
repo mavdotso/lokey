@@ -95,7 +95,7 @@ export default function DashboardPage({ params }: DashboardProps) {
                 )}
             </div>
             {totalPages > 1 && (
-                <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-primary-foreground to-transparent mx-auto pt-10">
+                <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10">
                     <PagePagination
                         currentPage={currentPage}
                         totalPages={totalPages}

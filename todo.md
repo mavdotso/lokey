@@ -43,7 +43,7 @@
             -   [x] ws slug
             -   [ ] ws logo
             -   [ ] delete
-        -   Tags
+        -   Tags (+ apply tag instead of label)
         -   Billing
         -   People / team
     -   [ ] Upgrade
