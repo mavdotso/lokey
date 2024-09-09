@@ -5,6 +5,7 @@ import UserCard from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 
 interface SidebarProps {
     params: { slug: string };
@@ -17,15 +18,15 @@ interface NavItem {
     href?: string;
     icon: React.ElementType;
     name: string;
-    onClick?: () => void;
+    badge?: string;
 }
 
 const navItems: NavItem[] = [
-    { href: 'credentials', icon: KeyIcon, name: 'Credentials', onClick: () => { } },
-    { href: 'credentials', icon: FileLockIcon, name: 'Files', onClick: () => { } },
-    { href: 'credentials', icon: MessageSquareDashedIcon, name: 'Chats', onClick: () => { } },
-    { href: 'users', icon: UsersIcon, name: 'Users', onClick: () => { } },
-    { href: 'settings', icon: BoltIcon, name: 'Settings', onClick: () => { } },
+    { href: 'credentials', icon: KeyIcon, name: 'Credentials' },
+    { href: 'credentials', icon: FileLockIcon, name: 'Files', badge: 'soon' }, // Added badge
+    { href: 'credentials', icon: MessageSquareDashedIcon, name: 'Chats', badge: 'soon' }, // Added badge
+    { href: 'users', icon: UsersIcon, name: 'Users' },
+    { href: 'settings', icon: BoltIcon, name: 'Settings' },
 ];
 
 export default function Sidebar({ params, session, className, onToggleSidebar }: SidebarProps) {
@@ -38,9 +39,14 @@ export default function Sidebar({ params, session, className, onToggleSidebar }:
             <nav className="flex flex-col gap-2 py-4">
                 {navItems.map((item) =>
                     item.href && (
-                        <Link key={item.name} href={`${params.slug}/${item.href}`} className="flex items-center gap-2 hover:bg-card hover:shadow-sm px-3 py-2.5 border border-transparent hover:border-border rounded-sm font-medium text-muted-foreground text-sm hover:text-primary transition-all">
-                            <item.icon className="w-4 h-4" />
-                            {item.name}
+                        <Link href={`${params.slug}/${item.href}`} className={`${item.badge ? 'pointer-events-none' : ''}`} key={item.name}>
+                            <div className={`flex items-center justify-between hover:bg-card hover:shadow-sm px-3 py-2.5 border border-transparent rounded-sm font-medium text-muted-foreground text-sm transition-all ${item.badge ? 'cursor-not-allowed opacity-50' : 'hover:border-border hover:text-primary'}`}>
+                                <div className="flex items-center gap-2">
+                                    <item.icon className="w-4 h-4" />
+                                    {item.name}
+                                </div>
+                                {item.badge && <Badge variant={"outline"} className="ml-2 text-xs">{item.badge}</Badge>}
+                            </div>
                         </Link>
                     )
                 )}
