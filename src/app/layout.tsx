@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import ConvexClientProvider from "@/lib/providers/convex-client-provider";
+import ConvexClientProvider from "@/components/providers/convex-client-provider";
 import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/lib/providers/theme-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {

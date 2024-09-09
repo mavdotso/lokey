@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { Logo } from '@/components/logo';
-import { MainNav } from '@/components/main-nav';
+import { Logo } from '@/components/global/logo';
+import { MainNav } from '@/components/nav/main-nav';
 import Link from 'next/link';
 import ThemeToggle from '@/components/global/theme-toggle';
 import { auth } from '@/lib/auth';

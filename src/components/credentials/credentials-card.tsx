@@ -7,12 +7,13 @@ import { formatRelative, parseISO } from 'date-fns';
 import { Credentials } from '@/convex/types';
 import { api } from '@/convex/_generated/api';
 import UserAvatar from '@/components/global/user-avatar';
+import { CredentialsActions } from './credentials-actions';
 
 interface CredentialCardProps {
     credentials: Credentials;
 }
 
-export function CredentialCard({ credentials }: CredentialCardProps) {
+export function CredentialsCard({ credentials }: CredentialCardProps) {
 
     const creator = useQuery(
         api.users.getUser,
@@ -48,7 +49,7 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
 
 
     return (
-        <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr] bg-card hover:bg-muted p-4 border-b border-border last:border-b-0 text-xs transition-colors">
+        <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr] bg-card hover:bg-muted/50 p-4 border-b border-border last:border-b-0 text-xs transition-colors">
             <div className="flex flex-col overflow-hidden">
                 <span className="font-medium text-foreground text-sm runcate t">{credentials.name}</span>
                 <span className="text-muted-foreground text-sm truncate">{credentials.description}</span>
@@ -75,14 +76,14 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
                 ))}
             </div>
             <div className="flex justify-end items-center space-x-2 text-muted-foreground">
-                <div className="flex items-center gap-1 ml-auto">
-                    <span className="whitespace-nowrap">{formatTimestamp(credentials.updatedAt)} </span>
+                <div className="flex items-center gap-4 ml-auto">
                     {creator && (
                         <div className='flex items-center gap-2'>
-                            <span className="max-w-[100px] truncate">{" "} by {creator.name || creator.email.split('@')[0]}</span>
+                            <span className="truncate whitespace-nowrap">{formatTimestamp(credentials.updatedAt)} {" "} by {creator.name || creator.email.split('@')[0]}</span>
                             <UserAvatar user={creator} />
                         </div>
                     )}
+                    <CredentialsActions credentials={credentials} />
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-import { CredentialCard } from '@/components/credentials/credential-card';
+import { CredentialsCard } from '@/components/credentials/credentials-card';
 import { Credentials } from '@/convex/types';
 
 interface CredentialsListProps {
@@ -9,7 +9,7 @@ export function CredentialsList({ credentials }: CredentialsListProps) {
     return (
         <div className="grid grid-cols-1 border border-border rounded-md overflow-hidden">
             {credentials.map((cred) => (
-                <CredentialCard key={cred._id} credentials={cred} />
+                <CredentialsCard key={cred._id} credentials={cred} />
             ))}
         </div>
     );
