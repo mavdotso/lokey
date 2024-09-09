@@ -49,17 +49,17 @@ export function CredentialsCard({ credentials }: CredentialCardProps) {
 
 
     return (
-        <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr] bg-card hover:bg-muted/50 p-4 border-b border-border last:border-b-0 text-xs transition-colors">
+        <div className="items-center gap-4 grid grid-cols-[repeat(4,minmax(0,1fr))] bg-card hover:bg-muted/50 p-4 border-b border-border last:border-b-0 text-xs transition-colors overflow-hidden">
             <div className="flex flex-col overflow-hidden">
-                <span className="font-medium text-foreground text-sm runcate t">{credentials.name}</span>
+                <span className="font-medium text-foreground text-sm truncate">{credentials.name}</span>
                 <span className="text-muted-foreground text-sm truncate">{credentials.description}</span>
             </div>
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col justify-start space-y-2">
                 <div className="flex items-center gap-2 pl-1 text-md">
                     <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
                     <span className='text-md'>{isActive ? 'Active' : 'Expired'}</span>
                 </div>
-                <div className="flex items-center gap-4 text-muted-foreground">
+                <div className="flex justify-start items-start gap-4 text-muted-foreground">
                     <div className='flex items-center gap-1'>
                         <TimerIcon className='w-4 h-4' />
                         <span>{formatExpirationDate(credentials.expiresAt)}</span>
@@ -70,7 +70,7 @@ export function CredentialsCard({ credentials }: CredentialCardProps) {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex justify-start gap-1">
                 {getCredentialTags().map((tag, index) => (
                     <HashtagBadge key={index} text={tag} />
                 ))}
@@ -87,5 +87,6 @@ export function CredentialsCard({ credentials }: CredentialCardProps) {
                 </div>
             </div>
         </div>
+
     );
 }

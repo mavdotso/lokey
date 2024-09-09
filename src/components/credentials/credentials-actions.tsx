@@ -86,8 +86,8 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
                                     Edit
                                 </DropdownMenuItem>
                             </CRUDCredentialsDialog>
-                            <DropdownMenuItem>Assign to...</DropdownMenuItem>
                             <DropdownMenuItem onClick={handleSetExpired}>Set as expired</DropdownMenuItem>
+                            <DropdownMenuItem>Assign to...</DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger>Apply label</DropdownMenuSubTrigger>
@@ -136,6 +136,7 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
                 onAction={handleRemove}
+                actionButtonVariant={"destructive"}
             />
         </>
     );
