@@ -78,10 +78,12 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
                                 setIsOpen={setEditDialogOpen}
                                 editId={credentials._id}
                                 existingData={credentials}
-                                onCredentialsUpdated={() => {
-                                    setMenuOpen(false);
-                                    setEditDialogOpen(false);
-                                }}
+                                onDialogClose={
+                                    () => {
+                                        setMenuOpen(false);
+                                        setEditDialogOpen(false);
+                                    }
+                                }
                             >
                                 <DropdownMenuItem onSelect={(e) => e.preventDefault()} >
                                     Edit

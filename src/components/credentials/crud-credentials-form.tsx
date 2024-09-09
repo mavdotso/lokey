@@ -68,11 +68,12 @@ interface CRUDCredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;
     editId?: Id<"credentials">;
     existingData?: Credentials;
-    onCredentialsCreated?: (credentialsId: Id<"credentials">) => void;
-    onCredentialsUpdated?: (credentialsId: Id<"credentials">) => void;
+    onCredentialsCreated?: () => void;
+    onCredentialsUpdated?: () => void;
+    onDialogClose?: () => void;
 }
 
-export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredentialsCreated, onCredentialsUpdated }: CRUDCredentialsFormProps) {
+export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredentialsCreated, onCredentialsUpdated, onDialogClose }: CRUDCredentialsFormProps) {
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState<Credentials['type']>('password');
@@ -120,9 +121,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                 });
                 if (response.success) {
                     toast.success('Credentials were updated successfully');
-                    if (onCredentialsUpdated) {
-                        onCredentialsUpdated(editId);
-                    }
+                    onDialogClose && onDialogClose();
                 } else {
                     toast.error('Error: something went wrong: ' + response.message);
                 }
@@ -253,10 +252,8 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                 <DialogFooter className='flex justify-between'>
                     <Button variant='secondary' type="button" onClick={
                         () => {
-                            setIsOpen(false)
-                            if (onCredentialsUpdated && editId) {
-                                onCredentialsUpdated(editId);
-                            }
+                            setIsOpen(false);
+                            onDialogClose && onDialogClose();
                         }
                     }>Close</Button>
                     <Button type="submit">{editId != undefined ? 'Update Credentials' : 'Create Credentials'}</Button>
@@ -268,10 +265,8 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                 <DialogFooter>
                     <Button variant='secondary' type="button" onClick={
                         () => {
-                            setIsOpen(false)
-                            if (onCredentialsUpdated && editId) {
-                                onCredentialsUpdated(editId);
-                            }
+                            setIsOpen(false);
+                            onDialogClose && onDialogClose();
                         }}>Close</Button>
                     <Button onClick={() => setShowPopup(false)}>Create another</Button>
                 </DialogFooter>

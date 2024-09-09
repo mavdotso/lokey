@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CRUDCredentialsForm } from '@/components/credentials/crud-credentials-form';
 import { Id } from '@/convex/_generated/dataModel';
 import { Credentials } from '@/convex/types';
@@ -7,14 +7,15 @@ import { Credentials } from '@/convex/types';
 interface CRUDCredentialsDialogProps {
     isOpen: boolean,
     setIsOpen: Dispatch<SetStateAction<boolean>>,
-    onCredentialsCreated?: (credentialsId: Id<"credentials">) => void;
-    onCredentialsUpdated?: (credentialsId: Id<"credentials">) => void;
+    onCredentialsCreated?: () => void;
+    onCredentialsUpdated?: () => void;
+    onDialogClose?: () => void;
     editId?: Id<"credentials">;
     existingData?: Credentials;
     children?: React.ReactNode;
 }
 
-export function CRUDCredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCreated, onCredentialsUpdated, editId, existingData }: CRUDCredentialsDialogProps) {
+export function CRUDCredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCreated, onCredentialsUpdated, onDialogClose, editId, existingData }: CRUDCredentialsDialogProps) {
     return (
         <>
             <DialogTrigger asChild>
@@ -33,6 +34,7 @@ export function CRUDCredentialsDialog({ children, isOpen, setIsOpen, onCredentia
                     existingData={existingData}
                     onCredentialsCreated={onCredentialsCreated}
                     onCredentialsUpdated={onCredentialsUpdated}
+                    onDialogClose={onDialogClose}
                 />
             </DialogContent>
         </>
