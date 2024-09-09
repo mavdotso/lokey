@@ -17,7 +17,6 @@ import type * as auth from "../auth.js";
 import type * as authAdapter from "../authAdapter.js";
 import type * as credentials from "../credentials.js";
 import type * as http from "../http.js";
-import type * as mutations from "../mutations.js";
 import type * as queries from "../queries.js";
 import type * as types from "../types.js";
 import type * as users from "../users.js";
@@ -36,7 +35,6 @@ declare const fullApi: ApiFromModules<{
   authAdapter: typeof authAdapter;
   credentials: typeof credentials;
   http: typeof http;
-  mutations: typeof mutations;
   queries: typeof queries;
   types: typeof types;
   users: typeof users;

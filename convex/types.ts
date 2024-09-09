@@ -32,11 +32,10 @@ export const credentialsTypeValidator = v.union(...credentialsTypes.map(v.litera
 export type Workspace = {
     _id?: Id<'workspaces'>;
     _creationTime?: number;
-    spaceOwner: string;
+    workspaceOwner: Id<'users'>;
     name: string;
     slug: string;
     iconId: string;
-    inTrash?: string;
     logo?: string;
 };
 

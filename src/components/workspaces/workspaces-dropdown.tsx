@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState, useMemo } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Plus, RocketIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
@@ -14,7 +14,7 @@ import { CreateWorkspaceHeader } from '@/components/workspaces/create-workspace-
 
 export function WorkspacesDropdown() {
     const router = useRouter();
-    const pathname = usePathname();
+    const { slug } = useParams();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedSpaceSlug, setSelectedSpaceSlug] = useState<string>('');
 
@@ -23,13 +23,8 @@ export function WorkspacesDropdown() {
     const workspaces = useMemo(() => workspacesQuery ?? [], [workspacesQuery]);
 
     useEffect(() => {
-        if (workspaces.length > 0) {
-            setSelectedSpaceSlug(pathname.replace('/dashboard/', ''));
-        } else {
-            router.push('/dashboard')
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workspaces, selectedSpaceSlug, pathname]);
+        setSelectedSpaceSlug(slug as string);
+    }, [slug]);
 
     if (workspaces === undefined) return <LoadingScreen />
 

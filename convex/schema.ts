@@ -23,7 +23,6 @@ const workspaceSchema = {
     name: v.string(),
     slug: v.string(),
     iconId: v.string(),
-    inTrash: v.optional(v.string()),
     logo: v.optional(v.string()),
 };
 
