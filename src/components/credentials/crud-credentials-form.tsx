@@ -102,7 +102,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
         e.preventDefault();
         try {
             if (!currentWorkspaceId) {
-                toast.error(`Failed to ${editId != '' ? `update` : `create`}  credentials`);
+                toast.error(`Failed to ${editId != undefined ? `update` : `create`}  credentials`);
                 console.error('Error: Workspace id is undefined');
                 return;
             }
@@ -119,7 +119,6 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                 });
                 if (onCredentialsUpdated) {
                     onCredentialsUpdated(editId);
-                    // TODO: exit the popup
                 }
             } else {
                 const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data));
@@ -147,7 +146,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
 
             resetForm()
         } catch (error) {
-            toast.error(`Failed to ${editId != '' ? `update` : `create`}  credentials`);
+            toast.error(`Failed to ${editId ? `update` : `create`}  credentials`);
             console.error('Error:', error);
         }
     }
@@ -177,7 +176,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                     </div>
                     <div className='flex-1'>
                         <Label htmlFor="type">Credentials type</Label>
-                        <Select value={type} onValueChange={(value) => setType(value as Credentials['type'])} disabled={editId != ''}>
+                        <Select value={type} onValueChange={(value) => setType(value as Credentials['type'])} disabled={editId != undefined}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select a type" />
                             </SelectTrigger>
@@ -211,7 +210,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                                 onChange={(e) => setData({ ...data, [field.id]: e.target.value })}
                                 required
                                 placeholder={`Enter ${field.label}`}
-                                disabled={editId != ''}
+                                disabled={editId != undefined}
                             />
                             <Button
                                 type="button"
@@ -246,7 +245,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                 </div>
                 <DialogFooter className='flex justify-between'>
                     <Button variant='secondary' onClick={() => setIsOpen(false)}>Close</Button>
-                    <Button type="submit">{editId ? 'Update Credentials' : 'Create Credentials'}</Button>
+                    <Button type="submit">{editId != undefined ? 'Update Credentials' : 'Create Credentials'}</Button>
                 </DialogFooter>
             </form>
         ) : (
