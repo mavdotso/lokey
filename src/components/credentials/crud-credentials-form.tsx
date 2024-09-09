@@ -1,4 +1,5 @@
-import { useState } from 'react'
+'use client'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -13,6 +14,7 @@ import { api } from '@/convex/_generated/api'
 import { encryptData, generateShareLink } from '@/lib/utils'
 import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link'
 import { DialogFooter } from '@/components/ui/dialog'
+import { Id } from '@/convex/_generated/dataModel'
 
 export const credentialFields = {
     password: [{ id: 'password', label: 'Password', type: 'password' }],
@@ -62,63 +64,102 @@ export const credentialFields = {
     other: [{ id: 'otherField', label: 'Other Field', type: 'text' }]
 };
 
+interface CRUDCredentialsFormProps {
+    setIsOpen: (isOpen: boolean) => void;
+    editId?: Id<"credentials">;
+    existingData?: Credentials;
+    onCredentialsUpdated?: (credentialsId: Id<"credentials">) => void;
+}
 
-
-export function CreateCredentialsForm({ setIsOpen }: { setIsOpen: (isOpen: boolean) => void }) {
-    const [name, setName] = useState('')
-    const [description, setDescription] = useState('')
-    const [type, setType] = useState<Credentials['type']>('password')
-    const [data, setData] = useState<{ [key: string]: string }>({})
-    const [expiresAt, setExpiresAt] = useState<Date | undefined>()
-    const [maxViews, setMaxViews] = useState<number>(1)
+export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredentialsUpdated }: CRUDCredentialsFormProps) {
+    const [name, setName] = useState<string>('');
+    const [description, setDescription] = useState('');
+    const [type, setType] = useState<Credentials['type']>('password');
+    const [data, setData] = useState<{ [key: string]: string }>({});
+    const [expiresAt, setExpiresAt] = useState<Date | undefined>();
+    const [maxViews, setMaxViews] = useState<number>(1);
     const [showData, setShowData] = useState<{ [key: string]: boolean }>({});
     const [showPopup, setShowPopup] = useState(false);
     const [sharedLink, setSharedLink] = useState('');
 
-    const { slug } = useParams()
+    const { slug } = useParams();
 
-    const createCredentials = useMutation(api.credentials.createCredentials)
-    const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: slug as string })
+    const createCredentials = useMutation(api.credentials.createCredentials);
+    const editCredentials = useMutation(api.credentials.editCredentials);
+    const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: slug as string });
+
+    useEffect(() => {
+        if (existingData) {
+            setName(existingData.name);
+            setDescription(existingData.description || '');
+            setType(existingData.type);
+            setExpiresAt(existingData.expiresAt ? new Date(existingData.expiresAt) : undefined);
+            setMaxViews(existingData.maxViews ? existingData.maxViews : 1);
+        }
+    }, [existingData]);
 
     async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault()
+        e.preventDefault();
         try {
-
             if (!currentWorkspaceId) {
-                toast.error('Failed to create credential');
-                console.error('Error creating credential: Workspace id is undefined');
+                toast.error(`Failed to ${editId != '' ? `update` : `create`}  credentials`);
+                console.error('Error: Workspace id is undefined');
                 return;
             }
 
-            const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data))
+            if (editId) {
+                await editCredentials({
+                    _id: editId,
+                    updates: {
+                        name,
+                        description,
+                        expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
+                        maxViews
+                    }
+                });
+                if (onCredentialsUpdated) {
+                    onCredentialsUpdated(editId);
+                    // TODO: exit the popup
+                }
+            } else {
+                const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data));
 
-            const { credentialsId } = await createCredentials({
-                workspaceId: currentWorkspaceId._id,
-                name,
-                description,
-                type,
-                encryptedData: encryptedData,
-                privateKey: privateKey,
-                expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
-                maxViews
-            })
+                const { credentialsId } = await createCredentials({
+                    workspaceId: currentWorkspaceId._id,
+                    name,
+                    description,
+                    type,
+                    encryptedData,
+                    privateKey,
+                    expiresAt: expiresAt ? expiresAt.toISOString() : undefined,
+                    maxViews
+                });
 
-            toast.success('Credentials created successfully!')
-            setName('')
-            setDescription('')
-            setType('password')
-            setData({})
-            setExpiresAt(undefined)
-            setMaxViews(1)
-            const shareLink = generateShareLink(credentialsId, publicKey);
-            setSharedLink(shareLink);
-            setShowPopup(true);
+                if (credentialsId) {
+                    toast.success('Credentials created successfully!');
+                    const shareLink = generateShareLink(credentialsId, publicKey);
+                    setSharedLink(shareLink);
+                    setShowPopup(true);
+                } else {
+                    toast.error('Something went wrong.');
+                }
+            }
+
+            resetForm()
         } catch (error) {
-            toast.error('Failed to create credential')
-            console.error('Error creating credential:', error)
+            toast.error(`Failed to ${editId != '' ? `update` : `create`}  credentials`);
+            console.error('Error:', error);
         }
     }
 
+    function resetForm() {
+        setName('');
+        setDescription('');
+        setType('password');
+        setData({});
+        setExpiresAt(undefined);
+        setMaxViews(1);
+    }
 
     return (
         !showPopup ? (
@@ -136,7 +177,7 @@ export function CreateCredentialsForm({ setIsOpen }: { setIsOpen: (isOpen: boole
                     </div>
                     <div className='flex-1'>
                         <Label htmlFor="type">Credentials type</Label>
-                        <Select value={type} onValueChange={(value) => setType(value as Credentials['type'])}>
+                        <Select value={type} onValueChange={(value) => setType(value as Credentials['type'])} disabled={editId != ''}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select a type" />
                             </SelectTrigger>
@@ -170,6 +211,7 @@ export function CreateCredentialsForm({ setIsOpen }: { setIsOpen: (isOpen: boole
                                 onChange={(e) => setData({ ...data, [field.id]: e.target.value })}
                                 required
                                 placeholder={`Enter ${field.label}`}
+                                disabled={editId != ''}
                             />
                             <Button
                                 type="button"
@@ -204,13 +246,13 @@ export function CreateCredentialsForm({ setIsOpen }: { setIsOpen: (isOpen: boole
                 </div>
                 <DialogFooter className='flex justify-between'>
                     <Button variant='secondary' onClick={() => setIsOpen(false)}>Close</Button>
-                    <Button type="submit">Create Credentials</Button>
+                    <Button type="submit">{editId ? 'Update Credentials' : 'Create Credentials'}</Button>
                 </DialogFooter>
             </form>
         ) : (
             <>
                 <CopyCredentialsLink credentialsLink={sharedLink} />
-                <DialogFooter >
+                <DialogFooter>
                     <Button variant='secondary' onClick={() => setIsOpen(false)}>Close</Button>
                     <Button onClick={() => setShowPopup(false)}>Create another</Button>
                 </DialogFooter>

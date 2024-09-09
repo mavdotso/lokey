@@ -1,17 +1,20 @@
 'use client'
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
 import { api } from '@/convex/_generated/api';
 import { Separator } from '@/components/ui/separator';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
-import { CreateCredentialsDialog } from '@/components/credentials/create-credentials-dialog';
+import { CRUDCredentialsDialog } from '@/components/credentials/crud-credentials-dialog';
 import { PagePagination } from '@/components/global/page-pagination';
 import { isCredentialsActive } from '@/lib/utils';
 import { CredentialsType } from '@/convex/types';
 import { EmptySearch } from '@/components/credentials/empty-search';
 import { CredentialsList } from '@/components/credentials/credentials-list';
+import { Button } from '@/components/ui/button';
+import { PlusIcon } from 'lucide-react';
+import { Dialog } from '@/components/ui/dialog';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
@@ -26,6 +29,7 @@ export default function DashboardPage({ params }: DashboardProps) {
     const [selectedTypes, setSelectedTypes] = useState<CredentialsType[]>([]);
     const [hideExpired, setHideExpired] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
 
     const workspace = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
@@ -61,13 +65,13 @@ export default function DashboardPage({ params }: DashboardProps) {
         <div className="flex flex-col h-full">
             <div className='flex justify-between items-center px-8 py-4'>
                 <h1 className='font-bold text-2xl'>Credentials</h1>
-                <CreateCredentialsDialog buttonVariant={'outline'} buttonText='New credentials' />
+                <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
             </div>
             <Separator />
             {credentials.length === 0 ? (
                 <div className='flex flex-col justify-center items-center gap-8 px-8 py-4 w-full h-full'>
                     <p className='text-lg'>You don&apos;t have any credentials yet</p>
-                    <CreateCredentialsDialog />
+                    <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
                 </div>
             ) : (
                 <div className='flex flex-col flex-grow gap-4 p-8 pt-10'>
@@ -99,4 +103,22 @@ export default function DashboardPage({ params }: DashboardProps) {
             </div>
         </div>
     );
+}
+
+interface CreateNewCredentialsDialogProps {
+    isOpen: boolean,
+    setIsOpen: Dispatch<SetStateAction<boolean>>,
+}
+
+function CreateNewCredentialsDialog({ isOpen, setIsOpen }: CreateNewCredentialsDialogProps) {
+    return (
+        <Dialog>
+            <CRUDCredentialsDialog isOpen={isOpen} setIsOpen={setIsOpen}>
+                <Button className='gap-2' variant={"outline"} >
+                    <PlusIcon className='w-5 h-5' />
+                    New credentials
+                </Button>
+            </CRUDCredentialsDialog>
+        </Dialog>
+    )
 }

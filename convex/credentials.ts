@@ -166,11 +166,6 @@ export const editCredentials = mutation({
         updates: v.object({
             name: v.optional(v.string()),
             description: v.optional(v.string()),
-            type: v.optional(credentialsTypeValidator),
-            subtype: v.optional(v.string()),
-            customTypeId: v.optional(v.id('customCredentialsTypes')),
-            encryptedData: v.optional(v.string()),
-            privateKey: v.optional(v.string()),
             expiresAt: v.optional(v.string()),
             maxViews: v.optional(v.number()),
         }),
