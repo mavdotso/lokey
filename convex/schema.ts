@@ -19,7 +19,7 @@ const subscriptionStatus = v.union(
 
 // Schemas
 const workspaceSchema = {
-    workspaceOwner: v.string(),
+    workspaceOwner: v.id('users'),
     name: v.string(),
     slug: v.string(),
     iconId: v.string(),

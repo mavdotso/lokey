@@ -64,3 +64,20 @@ export const assignUserRole = mutation({
         }
     },
 });
+
+export const getUserRole = query({
+    args: { userId: v.id('users'), workspaceId: v.id('workspaces') },
+    handler: async (ctx, args) => {
+        const user = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), args.userId))
+            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+            .first();
+
+        if (!user) {
+            return null;
+        }
+
+        return user.role;
+    },
+});

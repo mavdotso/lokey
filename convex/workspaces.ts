@@ -1,6 +1,7 @@
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
+import { User } from './types';
 
 export const createWorkspace = mutation({
     args: {
@@ -254,6 +255,46 @@ export const editWorkspace = mutation({
             return { success: true, message: 'Workspace updated successfully' };
         } catch (error: any) {
             return { success: false, message: `An unexpected error occurred: ${error.message}` };
+        }
+    },
+});
+
+export const getWorkspaceUsers = query({
+    args: {
+        _id: v.id('workspaces'),
+    },
+    handler: async (ctx, args) => {
+        try {
+            const workspace = await ctx.db.get(args._id);
+
+            if (!workspace) {
+                return { success: false, message: 'Workspace not found' };
+            }
+
+            // Get all user roles associated with the workspace
+            const associatedUsers = await ctx.db
+                .query('userWorkspaces')
+                .filter((q) => q.eq(q.field('workspaceId'), args._id))
+                .collect();
+
+            if (!associatedUsers || associatedUsers.length === 0) {
+                return { success: false, message: 'No users are associated with this workspace' };
+            }
+
+            const users = await Promise.all(
+                associatedUsers.map(async (associatedUser) => {
+                    const user = await ctx.db.get(associatedUser.userId);
+                    return user;
+                })
+            );
+
+            if (!users) {
+                return { success: false, message: 'No users found' };
+            }
+
+            return { success: true, users: users };
+        } catch (error: any) {
+            return { success: false, message: `An error occurred: ${error.message}` };
         }
     },
 });

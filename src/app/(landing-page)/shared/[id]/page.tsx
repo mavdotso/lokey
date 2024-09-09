@@ -10,7 +10,7 @@ import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { decryptData } from "@/lib/utils";
+import { capitalizeFirstLetter, decryptData } from "@/lib/utils";
 
 export default function SharePage() {
 
@@ -83,7 +83,7 @@ export default function SharePage() {
                 {Object.entries(data).map(([key, value]) => (
                     <div key={key} className="space-y-4">
                         <div>
-                            <Label htmlFor={key}>{key.charAt(0).toUpperCase() + key.slice(1)}</Label>
+                            <Label htmlFor={key}>{capitalizeFirstLetter(key)}</Label>
                             <div className="relative">
                                 <Input
                                     id={key}

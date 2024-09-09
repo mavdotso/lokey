@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { CredentialsType, credentialsTypes } from '@/convex/types';
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 interface CredentialsSortControlsProps {
     searchTerm: string;
@@ -31,7 +32,7 @@ export function CredentialsSortControls({
 
     const credentialTypeOptions = credentialsTypes.map(type => ({
         value: type,
-        label: type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')
+        label: capitalizeFirstLetter(type).replace('_', ' ')
     }));
 
     return (

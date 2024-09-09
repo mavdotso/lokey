@@ -9,6 +9,9 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { LoadingScreen } from "@/components/global/loading-screen";
 import { toast } from "sonner";
+import { UserSettingsCard } from "@/components/dashboard/settings/user-settings-card";
+import { User } from "@/convex/types";
+
 
 const settingsItems = [
     { tabName: 'general', icon: CogIcon, name: 'General' },
@@ -19,10 +22,14 @@ const settingsItems = [
 export default function SettingsPage() {
     const router = useRouter();
     const { slug } = useParams();
+
     const [workspaceName, setWorkspaceName] = useState('');
     const [workspaceSlug, setWorkspaceSlug] = useState('');
+    const [workspaceUsers, setWorkspaceUsers] = useState<User[]>([])
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string })
+    const users = useQuery(api.workspaces.getWorkspaceUsers, workspace ? { _id: workspace._id } : 'skip')
+
     const editWorkspace = useMutation(api.workspaces.editWorkspace);
 
     useEffect(() => {
@@ -31,14 +38,21 @@ export default function SettingsPage() {
             setWorkspaceSlug(workspace.slug)
         }
 
-    }, [workspace])
+        if (users && users.users) {
+            // Filter out the null's
+            const filteredUsers = users.users.filter(
+                (user): user is Exclude<typeof user, null> => user !== null && user._id !== undefined
+            );
+            setWorkspaceUsers(filteredUsers);
+        }
+
+    }, [workspace, users])
 
     if (!workspace) return <LoadingScreen />
 
     const generalSettings: SettingsCardProps[] = [
         { title: 'Workspace name', description: 'This is the name of your workspace on Lokey.', inputValue: workspaceName, setInputValue: setWorkspaceName, inputPlaceholder: workspaceName, isInputRequired: false, onSave: handleEdit, },
         { title: 'Workspace slug', description: 'This is the slug of your workspace on Lokey.', inputValue: workspaceSlug, setInputValue: setWorkspaceSlug, inputPlaceholder: workspaceSlug, isInputRequired: false, onSave: handleEdit, },
-        { title: 'Delete Workspace', description: 'Permanently delete your workspace, custom domain, and all associated credentials and users. This action cannot be undone - please proceed with caution.', inputValue: workspaceSlug, setInputValue: setWorkspaceSlug, inputPlaceholder: workspaceSlug, isInputRequired: false, onSave: handleEdit },
     ]
 
     async function handleEdit() {
@@ -68,7 +82,6 @@ export default function SettingsPage() {
             <Separator />
             <div className="flex gap-4 px-8 py-4 w-full h-full">
                 <Tabs defaultValue="general" orientation="horizontal" className="flex gap-6 w-full h-full">
-                    {/* Sidebar for Tabs */}
                     <TabsList className="flex flex-col justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">
                         <p className="text-left text-muted-foreground text-sm">Workspace settings</p>
                         {settingsItems.map((item) => (
@@ -78,8 +91,6 @@ export default function SettingsPage() {
                             </TabsTrigger>
                         ))}
                     </TabsList>
-
-                    {/* Content Area */}
                     <div className="w-4/5">
                         <TabsContent value="general" className="space-y-8">
                             {generalSettings.map((item, index) => (
@@ -87,8 +98,7 @@ export default function SettingsPage() {
                             ))}
                         </TabsContent>
                         <TabsContent value="users">
-                            <h2 className="font-bold text-lg">User Management</h2>
-                            <p>Manage the users for your workspace here.</p>
+                            <UserSettingsCard users={workspaceUsers} workspace={workspace} />
                         </TabsContent>
                         <TabsContent value="billing">
                             <h2 className="font-bold text-lg">Billing</h2>

@@ -42,6 +42,5 @@ export function SettingsCard({ title, description, inputValue, setInputValue, in
                 </Button>
             </CardFooter>
         </Card>
-
     );
 }
