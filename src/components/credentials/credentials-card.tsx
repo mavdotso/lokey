@@ -23,7 +23,7 @@ export function CredentialsCard({ credentials }: CredentialCardProps) {
     const isActive = isCredentialsActive(credentials);
 
     function formatExpirationDate(expiresAt: string | undefined) {
-        if (!expiresAt) return '∞';
+        if (!expiresAt) return 'No expiration';
         const date = parseISO(expiresAt);
         if (isNaN(date.getTime())) return 'Invalid date';
 

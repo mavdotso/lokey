@@ -4,9 +4,13 @@
 
 ### ToDo
 
--   [ ] Workspace
+-   [ ] Workspace settings
 
     -   [ ] Invite users
+        -   [ ] Via email
+            -   [ ] New user
+            -   [ ] Refistered user
+        -   [ ] Via userId
     -   [ ] Remove users
     -   [ ] Change workspace owner
     -   [ ] Change credentials owner
@@ -33,13 +37,12 @@
     -   [ ] Search
     -   [ ] Shared credentials
     -   [ ] Requested credentials
-    -   [ ] Users
     -   [ ] Workspace settings
         -   General:
-        -   [ ] ws name
-        -   [ ] ws slug
-        -   [ ] ws logo
-        -   [ ] delete
+            -   [x] ws name
+            -   [x] ws slug
+            -   [ ] ws logo
+            -   [ ] delete
         -   Tags
         -   Billing
         -   People / team
@@ -48,8 +51,9 @@
 -   [ ] User settings
 
     -   General:
-    -   [ ] Change name
-    -   [ ] Change email
+    -   [ ] name
+    -   [ ] picture
+    -   [ ] email
     -   [ ] Default workspace
     -   [ ] Delete account
     -   Security:
@@ -61,7 +65,7 @@
 
 ### Potentially:
 
--   [ ] Secure chats (p-2-p)
+-   [ ] Secure chats (p2p)
 -   [ ] Secure file sharing
 -   [ ] Custom SMTP
 -   [ ] Custom URL

@@ -1,10 +1,10 @@
 import { User, Workspace } from "@/convex/types";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { LinkIcon } from "lucide-react";
 import { WorkspaceMemberCard } from "./workspace-member-card";
 import { Separator } from "@/components/ui/separator";
+import { InviteLinkDialog } from "./invite/invite-link-dialog";
+import { InviteEmailDialog } from "./invite/invite-email-dialog";
 
 interface UserSettingsCardProps {
     users: User[],
@@ -20,12 +20,8 @@ export function UserSettingsCard({ users, workspace }: UserSettingsCardProps) {
                     <CardDescription>Teammates that have access to this workspace.</CardDescription>
                 </div>
                 <div className="flex gap-2">
-                    <Button onClick={() => { }}>
-                        Invite
-                    </Button>
-                    <Button size={"icon"} variant={"outline"} onClick={() => { }}>
-                        <LinkIcon className="w-4 h-4" />
-                    </Button>
+                    <InviteEmailDialog />
+                    <InviteLinkDialog inviteLink="/" />
                 </div>
             </CardHeader>
             <Separator />
