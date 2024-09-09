@@ -1,6 +1,6 @@
 import { User, Workspace } from "@/convex/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { LinkIcon } from "lucide-react";
 import { WorkspaceMemberCard } from "./workspace-member-card";
