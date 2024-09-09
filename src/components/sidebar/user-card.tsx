@@ -1,6 +1,4 @@
-import { LogOut } from 'lucide-react';
 import { Session } from 'next-auth';
-import SignoutButton from '@/components/auth/signout-button';
 import ThemeToggle from '@/components/global/theme-toggle';
 import UserAvatar from '@/components/global/user-avatar';
 
@@ -14,9 +12,6 @@ export default function UserCard({ session }: { session: Session }) {
                 </div>
             </aside>
             <div className="flex flex-shrink-0 justify-center items-center gap-2">
-                <SignoutButton>
-                    <LogOut className="w-4 h-4" />
-                </SignoutButton>
                 <ThemeToggle />
             </div>
         </div>
