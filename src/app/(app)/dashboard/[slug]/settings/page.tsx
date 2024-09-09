@@ -1,6 +1,14 @@
+"use client"
 import { Separator } from "@/components/ui/separator";
 import { CogIcon, UsersIcon, WalletIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { SettingsCard, SettingsCardProps } from "@/components/dashboard/settings/settings-card";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { LoadingScreen } from "@/components/global/loading-screen";
+import { toast } from "sonner";
 
 const settingsItems = [
     { tabName: 'general', icon: CogIcon, name: 'General' },
@@ -9,6 +17,49 @@ const settingsItems = [
 ];
 
 export default function SettingsPage() {
+    const router = useRouter();
+    const { slug } = useParams();
+    const [workspaceName, setWorkspaceName] = useState('');
+    const [workspaceSlug, setWorkspaceSlug] = useState('');
+
+    const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string })
+    const editWorkspace = useMutation(api.workspaces.editWorkspace);
+
+    useEffect(() => {
+        if (workspace) {
+            setWorkspaceName(workspace.name)
+            setWorkspaceSlug(workspace.slug)
+        }
+
+    }, [workspace])
+
+    if (!workspace) return <LoadingScreen />
+
+    const generalSettings: SettingsCardProps[] = [
+        { title: 'Workspace name', description: 'This is the name of your workspace on Lokey.', inputValue: workspaceName, setInputValue: setWorkspaceName, inputPlaceholder: workspaceName, isInputRequired: false, onSave: handleEdit, },
+        { title: 'Workspace slug', description: 'This is the slug of your workspace on Lokey.', inputValue: workspaceSlug, setInputValue: setWorkspaceSlug, inputPlaceholder: workspaceSlug, isInputRequired: false, onSave: handleEdit, },
+        { title: 'Delete Workspace', description: 'Permanently delete your workspace, custom domain, and all associated credentials and users. This action cannot be undone - please proceed with caution.', inputValue: workspaceSlug, setInputValue: setWorkspaceSlug, inputPlaceholder: workspaceSlug, isInputRequired: false, onSave: handleEdit },
+    ]
+
+    async function handleEdit() {
+        if (workspace) {
+            const response = await editWorkspace({
+                _id: workspace._id, updates: {
+                    name: workspaceName,
+                    slug: workspaceSlug
+                }
+            });
+
+            if (response.success) {
+                toast.success('Successfully updated the workspace')
+                // TODO: push only if the slug is new
+                router.push('/dashboard/' + workspaceSlug + '/settings')
+            } else {
+                toast.error('Something went wrong: ' + response.message)
+            }
+        }
+    }
+
     return (
         <div className="flex flex-col h-full">
             <div className="flex justify-between items-center px-8 py-6">
@@ -30,9 +81,10 @@ export default function SettingsPage() {
 
                     {/* Content Area */}
                     <div className="w-4/5">
-                        <TabsContent value="general">
-                            <h2 className="font-bold text-lg">General Settings</h2>
-                            <p>Here you can adjust general settings for your workspace.</p>
+                        <TabsContent value="general" className="space-y-8">
+                            {generalSettings.map((item, index) => (
+                                <SettingsCard key={index} {...item} />
+                            ))}
                         </TabsContent>
                         <TabsContent value="users">
                             <h2 className="font-bold text-lg">User Management</h2>

@@ -42,10 +42,10 @@ export function WorkspacesDropdown() {
                 value={selectedSpaceSlug}
                 onValueChange={handleSelect}
             >
-                <SelectTrigger className="shadow-none focus:outline-none p-0 border-none ring-0 focus:ring-0 w-full text-primary/50 hover:text-primary transition-colors">
+                <SelectTrigger className="shadow-none focus:outline-none p-0 border-none ring-0 focus:ring-0 w-full text-left text-primary/50 hover:text-primary transition-colors">
                     <SelectValue placeholder="Select workspace" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border border-border rounded-md text-primary">
+                <SelectContent className="bg-popover border border-border rounded-md text-left text-primary">
                     {workspaces.map((workspace) => (
                         <SelectItem key={workspace.slug} value={workspace.slug} className='hover:bg-accent text-primary cursor-pointer'>
                             <div className='flex flex-row items-center gap-3'>

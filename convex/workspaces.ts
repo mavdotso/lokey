@@ -90,6 +90,19 @@ export const getWorkspaceIdBySlug = query({
     },
 });
 
+export const getWorkspaceBySlug = query({
+    args: {
+        slug: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const workspace = await ctx.db
+            .query('workspaces')
+            .filter((q) => q.eq(q.field('slug'), args.slug))
+            .first();
+        return workspace;
+    },
+});
+
 export const inviteUserToWorkspace = mutation({
     args: {
         workspaceId: v.id('workspaces'),
