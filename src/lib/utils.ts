@@ -24,7 +24,6 @@ export const crypto = {
 
     decrypt: (encryptedData: string, key: string): string => {
         const bytes = CryptoJS.AES.decrypt(encryptedData, key);
-        const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
         return bytes.toString(CryptoJS.enc.Utf8);
     },
 
@@ -74,9 +73,7 @@ export function formatTimestamp(timestamp: string): string {
 
 export function isCredentialsActive(credentials: Credentials): boolean {
     const now = new Date().getTime();
-
     const expiresAtTimestamp = typeof credentials.expiresAt === 'string' ? new Date(credentials.expiresAt).getTime() : Number(credentials.expiresAt);
-
     const notExpired = !credentials.expiresAt || (isFinite(expiresAtTimestamp) && expiresAtTimestamp > now);
     const hasRemainingViews = !credentials.maxViews || (credentials.viewCount || 0) < credentials.maxViews;
 

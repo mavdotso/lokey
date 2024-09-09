@@ -2,7 +2,6 @@ import { query } from './_generated/server';
 import { v } from 'convex/values';
 import { mutation } from './_generated/server';
 import { getViewerId } from './auth';
-import { crypto } from '@/lib/utils';
 import { credentialsTypeValidator } from './types';
 
 export const getCredential = query({

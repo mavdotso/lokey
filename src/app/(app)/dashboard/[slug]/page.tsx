@@ -1,16 +1,17 @@
-"use client"
+'use client'
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
 import { api } from '@/convex/_generated/api';
 import { Separator } from '@/components/ui/separator';
-import { CredentialsType } from '@/convex/types';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
-import { CredentialCard } from '@/components/credentials/credential-card';
 import { CreateCredentialsDialog } from '@/components/credentials/create-credentials-dialog';
-import { useSession } from 'next-auth/react';
-import { isCredentialsActive } from '@/lib/utils';
 import { PagePagination } from '@/components/global/page-pagination';
+import { isCredentialsActive } from '@/lib/utils';
+import { CredentialsType } from '@/convex/types';
+import { EmptySearch } from '@/components/credentials/empty-search';
+import { CredentialsList } from '@/components/credentials/credentials-list';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
@@ -50,6 +51,12 @@ export default function DashboardPage({ params }: DashboardProps) {
     const totalPages = Math.ceil(filteredCredentials.length / itemsPerPage);
     const paginatedCredentials = filteredCredentials.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+    function resetFilters() {
+        setSearchTerm('');
+        setSelectedTypes([]);
+        setHideExpired(false);
+    };
+
     return (
         <div className="flex flex-col h-full">
             <div className='flex justify-between items-center px-8 py-4'>
@@ -75,25 +82,9 @@ export default function DashboardPage({ params }: DashboardProps) {
                         onHideExpiredChange={setHideExpired}
                     />
                     {paginatedCredentials.length === 0 && isFiltered ? (
-                        <div className='flex flex-col flex-grow justify-center items-center gap-8 p-8 w-full h-full'>
-                            <p className='text-lg'>No credentials matching the current filters</p>
-                            <span
-                                className='underline cursor-pointer'
-                                onClick={() => {
-                                    setSearchTerm('');
-                                    setSelectedTypes([]);
-                                    setHideExpired(false);
-                                }}
-                            >
-                                Reset Filters
-                            </span>
-                        </div>
+                        <EmptySearch onResetFilters={resetFilters} />
                     ) : (
-                        <div className="grid grid-cols-1 border border-border rounded-md overflow-hidden">
-                            {paginatedCredentials.map((cred) => (
-                                <CredentialCard key={cred._id} credentials={cred} />
-                            ))}
-                        </div>
+                        <CredentialsList credentials={paginatedCredentials} />
                     )}
                 </div >
             )}

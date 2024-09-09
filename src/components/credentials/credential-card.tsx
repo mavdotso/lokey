@@ -2,12 +2,11 @@
 import { useQuery } from 'convex/react';
 import { formatTimestamp, isCredentialsActive } from '@/lib/utils';
 import { EyeIcon, TimerIcon } from 'lucide-react';
-import { HashtagBadge } from './hashtag-badge';
+import { HashtagBadge } from '@/components/credentials/hashtag-badge';
 import { formatRelative, parseISO } from 'date-fns';
 import { Credentials } from '@/convex/types';
 import { api } from '@/convex/_generated/api';
 import UserAvatar from '@/components/global/user-avatar';
-
 
 interface CredentialCardProps {
     credentials: Credentials;

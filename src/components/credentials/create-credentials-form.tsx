@@ -12,7 +12,7 @@ import { Credentials, credentialsTypes } from '@/convex/types'
 import { api } from '@/convex/_generated/api'
 import { encryptData, generateShareLink } from '@/lib/utils'
 import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link'
-import { DialogFooter } from '../ui/dialog'
+import { DialogFooter } from '@/components/ui/dialog'
 
 export const credentialFields = {
     password: [{ id: 'password', label: 'Password', type: 'password' }],

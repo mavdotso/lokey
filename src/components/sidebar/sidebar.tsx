@@ -4,8 +4,8 @@ import UserCard from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
 import { Separator } from '@/components/ui/separator';
-import { UpgradeBox } from './upgrade-box';
-import { NavigationItem } from './nav-item';
+import { UpgradeBox } from '@/components/sidebar/upgrade-box';
+import { NavigationItem } from '@/components/sidebar/nav-item';
 
 interface SidebarProps {
     params: { slug: string };
