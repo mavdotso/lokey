@@ -56,7 +56,7 @@ export function CredentialsCard({ credentials }: CredentialCardProps) {
             </div>
             <div className="flex flex-col justify-start space-y-2">
                 <div className="flex items-center gap-2 pl-1 text-md">
-                    <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500 shadow-[0px_0px_5px_3px_rgba(34,197,_94,_0.15)]' : 'bg-red-500 shadow-[0px_0px_5px_3px_rgba(239,68,_68,_0.15)]'}`}></div>
                     <span className='text-md'>{isActive ? 'Active' : 'Expired'}</span>
                 </div>
                 <div className="flex justify-start items-start gap-4 text-muted-foreground">
