@@ -31,22 +31,35 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false)
 
-    const removeCredentials = useMutation(api.credentials.removeCredentials);
+    const removeCredentials = useMutation(api.credentials.removeCredentials)
+    const setExpired = useMutation(api.credentials.setExpired)
 
-    async function confirmRemove() {
+    function confirmRemove() {
         setDialogOpen(true);
     }
 
     async function handleRemove() {
         if (credentials._id) {
             const response = await removeCredentials({ _id: credentials._id });
-            if (response) {
-                toast.success('The credentials have been removed successfully');
+            if (response.success) {
+                toast.success('Credentials have been removed successfully');
             } else {
-                toast.error('Error: something went wrong');
+                toast.error('Error: something went wrong: ' + response.message);
             }
         }
     }
+
+    async function handleSetExpired() {
+        if (credentials._id) {
+            const response = await setExpired({ _id: credentials._id });
+            if (response.success) {
+                toast.success('Credentials were successfully set as expired.');
+            } else {
+                toast.error('Error: something went wrong: ' + response.message);
+            }
+        }
+    }
+
 
     return (
         <>
@@ -74,7 +87,7 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
                                 </DropdownMenuItem>
                             </CRUDCredentialsDialog>
                             <DropdownMenuItem>Assign to...</DropdownMenuItem>
-                            <DropdownMenuItem>Set due date...</DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleSetExpired}>Set as expired</DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger>Apply label</DropdownMenuSubTrigger>

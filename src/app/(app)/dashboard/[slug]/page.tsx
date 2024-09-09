@@ -63,14 +63,14 @@ export default function DashboardPage({ params }: DashboardProps) {
 
     return (
         <div className="flex flex-col h-full">
-            <div className='flex justify-between items-center px-8 py-4'>
+            <div className='flex justify-between items-center px-8 py-6'>
                 <h1 className='font-bold text-2xl'>Credentials</h1>
                 <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
             </div>
             <Separator />
             <div className="pb-10 overflow-auto">
                 {credentials.length === 0 ? (
-                    <div className='flex flex-col justify-center items-center gap-8 px-8 py-4 w-full h-full'>
+                    <div className='flex flex-col justify-center items-center gap-4 px-8 py-4 w-full h-full'>
                         <p className='text-lg'>You don&apos;t have any credentials yet</p>
                         <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
                     </div>

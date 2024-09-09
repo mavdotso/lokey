@@ -8,7 +8,6 @@
 
 ### ToDo
 
--   [ ] regenerate link for the password
 -   [ ] Request passwords
     -   [ ] Add instructions on where to get the passwords from
 -   [ ] Onboarding flow
@@ -66,9 +65,6 @@
 
 ###
 
-**Unique one-time link generation process**
-When creating a new one-time link for a secret, two 18-character long random strings are generated in the browser as public and private encryption key parts. The secret is encrypted using these key parts, with the encrypted secret and the private part sent to our backend. This process ensures that full encryption data is never fully accessible, requiring both the link and database information to decrypt the secret.
+### UI
 
-We perform all encryption and decryption processes in the browser and store half of the encryption key within the link itself. This ensures that the data is fully encrypted before our service sees it, rendering anyone incapable of decrypting it without the original link. Even in the unlikely event of a breach, your information remains unreadable to us and potential attackers.
-
-Once you access the information, the link deactivates, ensuring that the data cannot be retrieved again.
+-   [ ] Fix the Separator alignment with the content

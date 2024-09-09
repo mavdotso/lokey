@@ -36,7 +36,7 @@ const helpItems: NavItemProps[] = [
 export default function Sidebar({ params, session, className, onToggleSidebar }: SidebarProps) {
     return (
         <aside className={`w-60 h-full flex flex-col p-4 gap-4 ${className}`}>
-            <div className="flex justify-start items-center gap-2 py-2 font-semibold">
+            <div className="flex justify-start items-center gap-2 py-3 font-semibold">
                 <WorkspacesDropdown />
             </div>
             <Separator />
