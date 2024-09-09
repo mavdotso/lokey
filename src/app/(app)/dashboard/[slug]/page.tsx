@@ -1,25 +1,16 @@
 "use client"
-import LoadingScreen from '@/components/global/loading-screen';
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
+import { LoadingScreen } from '@/components/global/loading-screen';
+import { api } from '@/convex/_generated/api';
 import { Separator } from '@/components/ui/separator';
-import { isCredentialsActive } from '@/lib/utils';
 import { CredentialsType } from '@/convex/types';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
 import { CredentialCard } from '@/components/credentials/credential-card';
 import { CreateCredentialsDialog } from '@/components/credentials/create-credentials-dialog';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
-
-import { api } from '@/convex/_generated/api';
+import { useSession } from 'next-auth/react';
+import { isCredentialsActive } from '@/lib/utils';
+import { PagePagination } from '@/components/global/page-pagination';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
@@ -35,22 +26,11 @@ export default function DashboardPage({ params }: DashboardProps) {
     const [hideExpired, setHideExpired] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const workspace = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: params.slug })
+    const workspace = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
 
-    if (credentials === undefined) return <LoadingScreen />
-
-    if (!session || !session.data || !session.data.user) {
-        return <LoadingScreen />;
-    }
-
-    if (credentials === undefined) {
-        return <LoadingScreen />;
-    }
-
-    function handleTypeChange(types: string[]) {
-        setSelectedTypes(types as CredentialsType[]);
-    }
+    if (credentials === undefined) return <LoadingScreen />;
+    if (!session || !session.data || !session.data.user) return <LoadingScreen />;
 
     const filteredCredentials = credentials
         .filter(cred =>
@@ -66,10 +46,8 @@ export default function DashboardPage({ params }: DashboardProps) {
         });
 
     const isFiltered = searchTerm || selectedTypes.length > 0 || hideExpired;
-
     const itemsPerPage = 9;
     const totalPages = Math.ceil(filteredCredentials.length / itemsPerPage);
-
     const paginatedCredentials = filteredCredentials.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
@@ -92,7 +70,7 @@ export default function DashboardPage({ params }: DashboardProps) {
                         sortOption={sortOption}
                         onSortChange={(value: string) => setSortOption(value as CredentialsSortOption)}
                         selectedTypes={selectedTypes}
-                        onTypeChange={handleTypeChange}
+                        onTypeChange={types => setSelectedTypes(types as CredentialsType[])}
                         hideExpired={hideExpired}
                         onHideExpiredChange={setHideExpired}
                     />
@@ -121,26 +99,13 @@ export default function DashboardPage({ params }: DashboardProps) {
             )}
             <div className="mt-auto">
                 {totalPages > 1 && (
-                    <Pagination className="pb-4 text-primary/70">
-                        <PaginationContent>
-                            <PaginationItem className="hover:text-primary">
-                                <PaginationPrevious href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
-                            </PaginationItem>
-                            {[...Array(totalPages)].map((_, index) => (
-                                <PaginationItem key={index} className="hover:text-primary">
-                                    <PaginationLink href="#" onClick={() => setCurrentPage(index + 1)}>{index + 1}</PaginationLink>
-                                </PaginationItem>
-                            ))}
-                            <PaginationItem className="hover:text-primary">
-                                <PaginationEllipsis />
-                            </PaginationItem>
-                            <PaginationItem className="hover:text-primary">
-                                <PaginationNext href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
-                            </PaginationItem>
-                        </PaginationContent>
-                    </Pagination>
+                    <PagePagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        setCurrentPage={setCurrentPage}
+                    />
                 )}
             </div>
         </div>
-    )
+    );
 }

@@ -1,6 +1,6 @@
-import LoadingSpinner from "@/components/global/loading-spinner";
+import { LoadingSpinner } from "@/components/global/loading-spinner";
 
-export default function LoadingScreen() {
+export function LoadingScreen() {
     return (
         <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-sm w-screen h-screen">
             <LoadingSpinner />

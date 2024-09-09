@@ -1,12 +1,11 @@
 
-import { UsersIcon, BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon, LogOutIcon } from 'lucide-react';
+import { BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon, LogOutIcon } from 'lucide-react';
 import UserCard from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
 import { Separator } from '@/components/ui/separator';
 import { UpgradeBox } from './upgrade-box';
 import { NavigationItem } from './nav-item';
-import { signOut } from '@/lib/auth';
 
 interface SidebarProps {
     params: { slug: string };
@@ -27,13 +26,11 @@ const navItems: NavItemProps[] = [
     { href: 'credentials', icon: KeyIcon, name: 'Credentials' },
     { href: 'credentials', icon: FileLockIcon, name: 'Files', badge: 'soon' },
     { href: 'credentials', icon: MessageSquareDashedIcon, name: 'Chats', badge: 'soon' },
-    { href: 'users', icon: UsersIcon, name: 'Users' },
-    { href: 'settings', icon: BoltIcon, name: 'Settings' },
 ];
 
 const helpItems: NavItemProps[] = [
+    { href: 'settings', icon: BoltIcon, name: 'Settings' },
     { href: 'help', icon: MessageCircleQuestionIcon, name: 'Help & Support' },
-    { href: '', icon: LogOutIcon, name: 'Sign out', onClick: signOut },
 ]
 
 export default function Sidebar({ params, session, className, onToggleSidebar }: SidebarProps) {
@@ -51,15 +48,13 @@ export default function Sidebar({ params, session, className, onToggleSidebar }:
                 )}
             </nav>
             <UpgradeBox />
-            <div className='space-y-4'>
-                <div className='flex flex-col gap-2'>
-                    {helpItems.map((item) =>
-                        <NavigationItem key={item.name} params={params} item={item} />
-                    )}
-                </div>
-                <Separator />
-                <UserCard session={session} />
+            <div className='flex flex-col gap-1'>
+                {helpItems.map((item) =>
+                    <NavigationItem key={item.name} params={params} item={item} />
+                )}
             </div>
+            <Separator />
+            <UserCard session={session} />
         </aside>
     );
 }

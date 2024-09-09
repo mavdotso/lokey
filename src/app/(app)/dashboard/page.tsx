@@ -1,7 +1,7 @@
 "use client"
 import { useQuery } from 'convex/react';
 import { redirect } from 'next/navigation';
-import LoadingScreen from '@/components/global/loading-screen';
+import { LoadingScreen } from '@/components/global/loading-screen';
 import { CreateWorkspaceCard } from '@/components/workspaces/create-workspace-card';
 import { api } from '@/convex/_generated/api';
 

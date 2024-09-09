@@ -8,7 +8,7 @@ import { useQuery } from 'convex/react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { CardContent } from '@/components/ui/card';
 import { api } from '@/convex/_generated/api';
-import LoadingScreen from '@/components/global/loading-screen';
+import { LoadingScreen } from '@/components/global/loading-screen';
 import { CreateWorkspaceForm } from '@/components/workspaces/create-workspace-form';
 import { CreateWorkspaceHeader } from '@/components/workspaces/create-workspace-header';
 

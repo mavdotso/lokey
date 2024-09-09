@@ -1,5 +1,5 @@
 import { LoaderCircle } from "lucide-react";
 
-export default function LoadingSpinner() {
+export function LoadingSpinner() {
     return <LoaderCircle className="animate-spin" />
 }

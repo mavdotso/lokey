@@ -9,7 +9,7 @@ interface SignoutButtonProps {
 export default function SignoutButton({ children }: SignoutButtonProps) {
     return (
         <form action={signout}>
-            <Button variant="outline" size="icon" className="p-0" type="submit">
+            <Button variant="secondary" size="icon" className="p-0" type="submit">
                 {children}
             </Button>
         </form>
