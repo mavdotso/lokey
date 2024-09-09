@@ -72,7 +72,7 @@ export function CreateWorkspaceForm() {
 
     useEffect(() => {
         if (formState.newWorkspaceId && isRedirecting) {
-            router.push(`/dashboard/${formState.slug}/credentials`)
+            router.push(`/dashboard/${formState.slug}`)
         }
     }, [formState.newWorkspaceId, formState.slug, router, isRedirecting])
 

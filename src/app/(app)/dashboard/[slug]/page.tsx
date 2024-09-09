@@ -20,10 +20,15 @@ import {
 } from "@/components/ui/pagination"
 
 import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
-export default function DashboardPage() {
+interface DashboardProps {
+    params: { slug: string };
+}
+
+export default function DashboardPage({ params }: DashboardProps) {
     const session = useSession();
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState<CredentialsSortOption>('name');
@@ -31,9 +36,8 @@ export default function DashboardPage() {
     const [hideExpired, setHideExpired] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
 
-    const credentials = useQuery(api.credentials.getUserCredentials, {
-        userId: session.data?.user?.id ?? ''
-    });
+    const workspace = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: params.slug })
+    const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
 
     if (credentials === undefined) return <LoadingScreen />
 
@@ -82,7 +86,7 @@ export default function DashboardPage() {
                     <CreateCredentialsDialog />
                 </div>
             ) : (
-                <div className='flex flex-col flex-grow gap-4 p-8'>
+                <div className='flex flex-col flex-grow gap-4 p-8 pt-10'>
                     <CredentialsSortControls
                         searchTerm={searchTerm}
                         onSearchChange={setSearchTerm}

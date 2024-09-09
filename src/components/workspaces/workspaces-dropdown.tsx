@@ -37,7 +37,7 @@ export function WorkspacesDropdown() {
         const selectedWorkspace = workspaces.find(workspace => workspace.slug === slug);
         if (selectedWorkspace) {
             setSelectedSpaceSlug(selectedWorkspace.slug);
-            router.push(`/dashboard/${selectedWorkspace.slug}/credentials`);
+            router.push(`/dashboard/${selectedWorkspace.slug}`);
         }
     }
 

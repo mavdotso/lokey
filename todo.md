@@ -1,13 +1,14 @@
 ### Bugs
 
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
--   [ ] User credentials -> Workspace credentials
+-   [x] User credentials -> Workspace credentials
 -   [x] spaces-dropdown.tsx fix the dialog / space creation
 -   [x] Fix the redirect on space creation
 -   [x] On shared/id page make sure to display the right amount of Inputs based on the credentials type
 
 ### ToDo
 
+-   [ ] regenerate link for the password
 -   [ ] Request passwords
     -   [ ] Add instructions on where to get the passwords from
 -   [ ] Onboarding flow
@@ -53,14 +54,12 @@
 ### Potentially:
 
 -   [ ] Secure chats (p-2-p)
--   [ ] Access management
+-   [ ] Secure file sharing
 -   [ ] Custom SMTP
 -   [ ] Custom URL
--   [ ] Secure file sharing
 -   [ ] IP tracking
 -   [ ] Geoblocking
 -   [ ] Whitelisting
--   [ ] Reveal with a private key
 -   [ ] Generate a QR code
 -   [ ] Notifications / webhooks
 -   [ ] Add to password manager button

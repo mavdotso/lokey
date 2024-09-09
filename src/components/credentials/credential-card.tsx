@@ -23,7 +23,7 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
     const isActive = isCredentialsActive(credentials);
 
     function formatExpirationDate(expiresAt: string | undefined) {
-        if (!expiresAt) return 'No expiration';
+        if (!expiresAt) return '∞';
         const date = parseISO(expiresAt);
         if (isNaN(date.getTime())) return 'Invalid date';
 
@@ -49,9 +49,9 @@ export function CredentialCard({ credentials }: CredentialCardProps) {
 
 
     return (
-        <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr] bg-card p-4 border-b border-border last:border-b-0 text-xs">
+        <div className="items-center gap-4 grid grid-cols-[2fr,2fr,1fr,1fr] bg-card hover:bg-muted p-4 border-b border-border last:border-b-0 text-xs transition-colors">
             <div className="flex flex-col overflow-hidden">
-                <span className="font-medium text-foreground text-sm truncate">{credentials.name}</span>
+                <span className="font-medium text-foreground text-sm runcate t">{credentials.name}</span>
                 <span className="text-muted-foreground text-sm truncate">{credentials.description}</span>
             </div>
             <div className="flex flex-col space-y-2">

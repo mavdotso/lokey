@@ -34,6 +34,18 @@ export const getUserCredentials = query({
     },
 });
 
+export const getWorkspaceCredentials = query({
+    args: { workspaceId: v.id('workspaces') },
+    handler: async (ctx, args) => {
+        const credentials = await ctx.db
+            .query('credentials')
+            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+            .collect();
+
+        return credentials;
+    },
+});
+
 export const createCredentials = mutation({
     args: {
         workspaceId: v.optional(v.id('workspaces')),
