@@ -43,13 +43,13 @@ export function CredentialsSortControls({
                     placeholder="Search credentials..."
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className='bg-background'
+                    className='flex bg-background'
                 />
                 <MultiSelect
                     options={credentialTypeOptions}
                     onValueChange={onTypeChange}
                     defaultValue={selectedTypes}
-                    placeholder="Select types"
+                    placeholder="Search types"
                     variant="default"
                     maxCount={1}
                 />

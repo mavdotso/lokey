@@ -15,6 +15,8 @@ import { CredentialsList } from '@/components/credentials/credentials-list';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { Dialog } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
@@ -68,31 +70,40 @@ export default function DashboardPage({ params }: DashboardProps) {
                 <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
             </div>
             <Separator />
-            <div className={`${totalPages > 1 && 'pb-10'}  overflow-auto`}>
-                {credentials.length === 0 ? (
-                    <div className='flex flex-col justify-center items-center gap-4 px-8 py-4 w-full h-full'>
-                        <p className='text-lg'>You don&apos;t have any credentials yet</p>
-                        <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
-                    </div>
-                ) : (
-                    <div className='flex flex-col flex-grow gap-4 p-8 pt-10'>
-                        <CredentialsSortControls
-                            searchTerm={searchTerm}
-                            onSearchChange={setSearchTerm}
-                            sortOption={sortOption}
-                            onSortChange={(value: string) => setSortOption(value as CredentialsSortOption)}
-                            selectedTypes={selectedTypes}
-                            onTypeChange={types => setSelectedTypes(types as CredentialsType[])}
-                            hideExpired={hideExpired}
-                            onHideExpiredChange={setHideExpired}
-                        />
-                        {paginatedCredentials.length === 0 && isFiltered ? (
-                            <EmptySearch onResetFilters={resetFilters} />
+            <div className={`${totalPages > 1 && 'pb-10'} overflow-auto`}>
+                <Tabs defaultValue="shared" className='px-8 py-4'>
+                    <TabsList>
+                        <TabsTrigger value="shared">Shared</TabsTrigger>
+                        <TabsTrigger value="requested">Requested</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="shared">
+                        {credentials.length === 0 ? (
+                            <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
+                                <p className='text-lg'>You don&apos;t have any credentials yet</p>
+                                <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
+                            </div>
                         ) : (
-                            <CredentialsList credentials={paginatedCredentials} />
+                            <div className='flex flex-col flex-grow gap-4 pt-4'>
+                                <CredentialsSortControls
+                                    searchTerm={searchTerm}
+                                    onSearchChange={setSearchTerm}
+                                    sortOption={sortOption}
+                                    onSortChange={(value: string) => setSortOption(value as CredentialsSortOption)}
+                                    selectedTypes={selectedTypes}
+                                    onTypeChange={types => setSelectedTypes(types as CredentialsType[])}
+                                    hideExpired={hideExpired}
+                                    onHideExpiredChange={setHideExpired}
+                                />
+                                {paginatedCredentials.length === 0 && isFiltered ? (
+                                    <EmptySearch onResetFilters={resetFilters} />
+                                ) : (
+                                    <CredentialsList credentials={paginatedCredentials} />
+                                )}
+                            </div >
                         )}
-                    </div >
-                )}
+                    </TabsContent>
+                    <TabsContent value="requested">Requested credentials</TabsContent>
+                </Tabs>
             </div>
             {totalPages > 1 && (
                 <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10">
@@ -117,7 +128,7 @@ function CreateNewCredentialsDialog({ isOpen, setIsOpen }: CreateNewCredentialsD
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <CRUDCredentialsDialog isOpen={isOpen} setIsOpen={setIsOpen}>
                 <Button className='gap-2' variant={"outline"} >
-                    <PlusIcon className='w-5 h-5' />
+                    <PlusIcon className='w-4 h-4' />
                     New credentials
                 </Button>
             </CRUDCredentialsDialog>

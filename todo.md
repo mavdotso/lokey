@@ -35,8 +35,9 @@
 -   [ ] Sidebar menu
 
     -   [ ] Search
-    -   [ ] Shared credentials
-    -   [ ] Requested credentials
+    -   [ ] Credentials
+        -   [ ] Shared
+        -   [ ] Requested
     -   [ ] Workspace settings
         -   General:
             -   [x] ws name
