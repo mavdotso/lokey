@@ -35,7 +35,7 @@ export function InviteLinkDialog({ inviteLink }: InviteDialog) {
                             readOnly
                         />
                     </div>
-                    <Button type="submit" size="sm" className="px-3">
+                    <Button size="sm" className="px-3">
                         <span className="sr-only">Copy</span>
                         <CopyIcon className="w-4 h-4" />
                     </Button>

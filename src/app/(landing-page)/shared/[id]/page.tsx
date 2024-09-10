@@ -13,7 +13,6 @@ import { Id } from "@/convex/_generated/dataModel";
 import { capitalizeFirstLetter, decryptData } from "@/lib/utils";
 
 export default function SharePage() {
-
     const [credentialsData, setCredentialsData] = useState<any>(null)
     const [error, setError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true)

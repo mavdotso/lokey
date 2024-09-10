@@ -9,6 +9,7 @@ import { useMutation } from 'convex/react';
 import { encryptData, generateShareLink } from '@/lib/utils';
 import { api } from '@/convex/_generated/api';
 import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link';
+import { SubmitButton } from '@/components/global/submit-button';
 
 export default function LandingPage() {
     const [password, setPassword] = useState('');
@@ -16,14 +17,10 @@ export default function LandingPage() {
     const [expiration, setExpiration] = useState('1');
     const [link, setLink] = useState('');
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
 
     const createCredentials = useMutation(api.credentials.createCredentials);
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setIsLoading(true);
+    async function handleSubmit() {
         setError('');
         setLink('');
 
@@ -44,8 +41,6 @@ export default function LandingPage() {
             setLink(shareLink);
         } catch (err) {
             setError('An error occurred while creating the link. Please try again.');
-        } finally {
-            setIsLoading(false);
         }
     }
 
@@ -61,7 +56,7 @@ export default function LandingPage() {
             </div>
 
             <div className='flex flex-col gap-4 pt-8 max-w-xl'>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form action={handleSubmit} className="space-y-4">
                     <div className="flex gap-4">
                         <div className="flex-grow">
                             <Label>Password to share</Label>
@@ -103,9 +98,7 @@ export default function LandingPage() {
                             </Select>
                         </div>
                         <div className="flex items-end">
-                            <Button type="submit" size={"lg"} disabled={isLoading}>
-                                {isLoading ? 'Generating...' : 'Share password'}
-                            </Button>
+                            <SubmitButton buttonText='Share password' buttonPendingText='Generating...' />
                         </div>
                     </div>
                 </form>

@@ -63,6 +63,7 @@
 
 -   [ ] Stripe
 -   [ ] User / workspace limits
+-   [ ] Error pages
 
 ### Potentially:
 

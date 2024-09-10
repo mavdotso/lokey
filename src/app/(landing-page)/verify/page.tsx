@@ -1,12 +1,9 @@
-'use client'
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircleIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Verify() {
-    const router = useRouter()
     return (
         <>
             <div className="pt-20">
@@ -34,9 +31,9 @@ export default function Verify() {
                 </div>
 
                 <div className="mt-8">
-                    <Button onClick={() => router.push('/')}>
-                        Back to Home
-                    </Button>
+                    <Link href="/">
+                        <Button>Back to Home</Button>
+                    </Link>
                 </div>
             </div>
             <p className="pt-4 text-muted-foreground text-xs">
