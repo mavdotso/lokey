@@ -19,7 +19,7 @@ export function InviteLinkDialog({ workspaceId }: InviteLinkDialogProps) {
     const [role, setRole] = useState<"admin" | "manager" | "member">("member");
     const generateInviteLink = useMutation(api.invites.generateInviteLink);
 
-    const handleGenerateLink = async () => {
+    async function handleGenerateLink() {
         const result = await generateInviteLink({ workspaceId, role });
         if (result.success && typeof result.data === 'string') {
             setInviteLink(result.data);
@@ -31,7 +31,7 @@ export function InviteLinkDialog({ workspaceId }: InviteLinkDialogProps) {
         }
     };
 
-    const handleCopy = () => {
+    function handleCopy() {
         navigator.clipboard.writeText(inviteLink);
     };
 

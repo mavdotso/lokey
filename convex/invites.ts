@@ -1,6 +1,9 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { nanoid } from 'nanoid';
+import { getViewerId } from './auth';
+import { getUser } from './users';
+import { getURL } from '@/lib/utils';
 
 export const createInvite = mutation({
     args: {
@@ -11,15 +14,11 @@ export const createInvite = mutation({
     },
     handler: async (ctx, args) => {
         try {
-            const identity = await ctx.auth.getUserIdentity();
+            const identity = await getViewerId(ctx);
 
             if (!identity) return { success: false, message: 'Not authenticated' };
-            if (!identity.email) return { success: false, message: 'User has no email' };
 
-            const user = await ctx.db
-                .query('users')
-                .withIndex('email', (q) => q.eq('email', identity.email as string))
-                .first();
+            const user = await getUser(ctx, { _id: identity });
 
             if (!user) return { success: false, message: 'User not found' };
             if (!args.invitedUserId && !args.invitedEmail) return { success: false, message: 'Either invitedUserId or invitedEmail must be provided' };
@@ -81,15 +80,11 @@ export const respondToInvite = mutation({
     },
     handler: async (ctx, args) => {
         try {
-            const identity = await ctx.auth.getUserIdentity();
+            const identity = await getViewerId(ctx);
 
             if (!identity) return { success: false, message: 'Not authenticated' };
-            if (!identity.email) return { success: false, message: 'User has no email' };
 
-            const user = await ctx.db
-                .query('users')
-                .withIndex('email', (q) => q.eq('email', identity.email as string))
-                .first();
+            const user = await getUser(ctx, { _id: identity });
 
             if (!user) return { success: false, message: 'User not found' };
 
@@ -123,17 +118,11 @@ export const generateInviteLink = mutation({
     },
     handler: async (ctx, args) => {
         try {
-            const identity = await ctx.auth.getUserIdentity();
-
-            console.log(identity)
+            const identity = await getViewerId(ctx);
 
             if (!identity) return { success: false, message: 'Not authenticated' };
-            if (!identity.email) return { success: false, message: 'User has no email' };
 
-            const user = await ctx.db
-                .query('users')
-                .withIndex('email', (q) => q.eq('email', identity.email as string))
-                .first();
+            const user = await getUser(ctx, { _id: identity });
 
             if (!user) return { success: false, message: 'User not found' };
 
@@ -150,11 +139,21 @@ export const generateInviteLink = mutation({
                 inviteCode,
             });
 
-            const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${inviteCode}`;
+            const inviteLink = `${getURL()}/invite/${inviteCode}`;
 
             return { success: true, message: 'Invite link generated successfully', data: inviteLink };
         } catch (error: any) {
             return { success: false, message: `An unexpected error occurred: ${error.message}` };
         }
+    },
+});
+
+export const getInviteByCode = query({
+    args: { inviteCode: v.string() },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query('workspaceInvites')
+            .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
+            .first();
     },
 });
