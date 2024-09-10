@@ -20,8 +20,11 @@ export function UserSettingsCard({ users, workspace }: UserSettingsCardProps) {
                     <CardDescription>Teammates that have access to this workspace.</CardDescription>
                 </div>
                 <div className="flex gap-2">
-                    <InviteEmailDialog />
-                    <InviteLinkDialog inviteLink="/" />
+                    {workspace._id && <>
+                        <InviteEmailDialog workspaceId={workspace._id} />
+                        <InviteLinkDialog workspaceId={workspace._id} />
+                    </>
+                    }
                 </div>
             </CardHeader>
             <Separator />

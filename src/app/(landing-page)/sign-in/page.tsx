@@ -21,7 +21,7 @@ export default function SignIn() {
                         placeholder="Enter your email"
                         required
                     />
-                    <SubmitButton buttonText='Sign in with Magic link' buttonPendingText='Sending Magic link...' />
+                    <SubmitButton buttonText='Sign in with Magic link' buttonPendingText='Sending Magic Link...' />
                 </form>
                 <span className="text-center text-muted-foreground text-xs">
                     You will receive a sign-in link to your email address

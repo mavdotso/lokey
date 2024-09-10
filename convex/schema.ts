@@ -2,7 +2,6 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v, Validator } from 'convex/values';
 import { credentialsTypeValidator, roleTypeValidator } from './types';
 
-// Enums
 const userRole = roleTypeValidator;
 const credentialsType = credentialsTypeValidator;
 const pricingType = v.union(v.literal('recurring'), v.literal('one_time'));
@@ -17,7 +16,6 @@ const subscriptionStatus = v.union(
     v.literal('trialing')
 );
 
-// Schemas
 const workspaceSchema = {
     workspaceOwner: v.id('users'),
     name: v.string(),
@@ -67,6 +65,25 @@ const credentialsAccessLogSchema = {
     accessedAt: v.string(),
 };
 
+const activityNotificationSchema = {
+    workspaceId: v.id('workspaces'),
+    userId: v.id('users'),
+    message: v.string(),
+    readAt: v.optional(v.string()),
+};
+
+const workspaceInviteSchema = {
+    workspaceId: v.id('workspaces'),
+    invitedBy: v.id('users'),
+    invitedUserId: v.optional(v.id('users')),
+    invitedEmail: v.optional(v.string()),
+    role: userRole,
+    status: v.union(v.literal('pending'), v.literal('accepted'), v.literal('rejected')),
+    expiresAt: v.string(),
+    inviteCode: v.optional(v.string()),
+};
+
+/* STRIPE SCHEMA */
 const customerSchema = {
     stripeCustomerId: v.optional(v.string()),
 };
@@ -107,13 +124,6 @@ const subscriptionSchema = {
     canceledAt: v.optional(v.string()),
     trialStart: v.optional(v.string()),
     trialEnd: v.optional(v.string()),
-};
-
-const activityNotificationSchema = {
-    workspaceId: v.id('workspaces'),
-    userId: v.id('users'),
-    message: v.string(),
-    readAt: v.optional(v.string()),
 };
 
 /* NEXTAUTH SCHEMA*/
@@ -176,6 +186,7 @@ const schema = defineSchema({
     customCredentialsTypes: defineTable(customCredentialsTypeSchema),
     credentials: defineTable(credentialsSchema),
     credentialsAccessLog: defineTable(credentialsAccessLogSchema),
+    workspaceInvites: defineTable(workspaceInviteSchema).index('workspaceId', ['workspaceId']).index('invitedUserId', ['invitedUserId']).index('invitedEmail', ['invitedEmail']),
     customers: defineTable(customerSchema),
     products: defineTable(productSchema),
     prices: defineTable(priceSchema),

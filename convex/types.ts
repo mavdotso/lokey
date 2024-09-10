@@ -92,6 +92,30 @@ export type CredentialsAccessLog = {
     accessedAt: string;
 };
 
+export type ActivityNotification = {
+    _id?: Id<'activityNotifications'>;
+    _creationTime?: number;
+    workspaceId: Id<'workspaces'>;
+    userId: Id<'users'>;
+    message: string;
+    readAt?: string;
+};
+
+export type WorkspaceInvite = {
+    _id?: Id<'workspaceInvites'>;
+    _creationTime?: number;
+    workspaceId: Id<'workspaces'>;
+    invitedBy: Id<'users'>;
+    invitedUserId?: Id<'users'>;
+    invitedEmail?: string;
+    role: RoleType;
+    status: 'pending' | 'accepted' | 'rejected';
+    expiresAt: string;
+    inviteCode?: string;
+};
+
+/* STRIPE TYPES */
+
 export type Customer = {
     _id?: Id<'customers'>;
     _creationTime?: number;
@@ -140,15 +164,6 @@ export type Subscription = {
     canceledAt?: string;
     trialStart?: string;
     trialEnd?: string;
-};
-
-export type ActivityNotification = {
-    _id?: Id<'activityNotifications'>;
-    _creationTime?: number;
-    workspaceId: Id<'workspaces'>;
-    userId: Id<'users'>;
-    message: string;
-    readAt?: string;
 };
 
 /* NEXTAUTH TYPES */
