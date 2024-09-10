@@ -2,7 +2,7 @@ import { SignJWT, importPKCS8 } from 'jose';
 import NextAuth from 'next-auth';
 import Resend from 'next-auth/providers/resend';
 import { ConvexAdapter } from '@/lib/convex-adapter';
-import { html, MagicLinkEmail, text } from '@/components/emails/magic-link';
+import { html, text } from '@/emails/magic-link';
 
 if (process.env.CONVEX_AUTH_PRIVATE_KEY === undefined) {
     throw new Error('Missing CONVEX_AUTH_PRIVATE_KEY Next.js environment variable');
@@ -31,7 +31,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         from,
                         to: email,
                         subject: `Sign in to ${host}`,
-                        react: MagicLinkEmail({ url, host }),
                         html: html({ url, host }),
                         text: text({ url, host }),
                     }),

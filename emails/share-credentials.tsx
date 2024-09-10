@@ -8,9 +8,6 @@ interface ShareCredentialsEmailProps {
 
 export function ShareCredentialsEmail({ url, host }: ShareCredentialsEmailProps) {
     const previewText = `Credentials have been securely shared with you`;
-
-    const escapedHost = host.replace(/\./g, '&#8203;.');
-
     return (
         <Html>
             <Head />
@@ -28,7 +25,7 @@ export function ShareCredentialsEmail({ url, host }: ShareCredentialsEmailProps)
                         </Section>
                         <Section className="mt-[32px] mb-[32px] text-center">
                             <Text className="mb-[20px] text-[18px] text-foreground">
-                                Access your securely shared credentials on <strong>{escapedHost}</strong>
+                                Access your securely shared credentials on <strong>{host}</strong>
                             </Text>
                             <Button
                                 href={url}
