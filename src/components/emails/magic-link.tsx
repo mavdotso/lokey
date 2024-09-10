@@ -8,7 +8,7 @@ interface SecurePasswordSharingEmailProps {
 
 export function MagicLinkEmail({ url, host }: SecurePasswordSharingEmailProps) {
 
-  const hostParts = host.split(/(?<=\.)/);
+  const escapedHost = host.replace(/\./g, '&#8203;.');
   const previewText = `Sign in to ${host}`;
 
   return (
@@ -28,12 +28,7 @@ export function MagicLinkEmail({ url, host }: SecurePasswordSharingEmailProps) {
             </Section>
             <Section className="mt-[32px] mb-[32px] text-center">
               <Text className="mb-[20px] text-[18px] text-foreground">
-                Sign in to <strong>{hostParts.map((part, index) =>
-                  <React.Fragment key={index}>
-                    {part}
-                    {index < hostParts.length - 1 && <wbr />}
-                  </React.Fragment>
-                )}</strong>
+                Sign in to <strong>{escapedHost}</strong>
               </Text>
               <Button href={url} className="bg-primary px-6 py-3 rounded font-bold text-[16px] text-primary-foreground no-underline">
                 Sign in
