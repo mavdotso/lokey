@@ -336,3 +336,41 @@ export const updateWorkspaceLogo = mutation({
       return { success: true, message: 'Workspace logo updated successfully' };
     },
   });
+
+  export const deleteWorkspace = mutation({
+    args: {
+      workspaceId: v.id('workspaces'),
+    },
+    handler: async (ctx, args) => {
+      const identity = await getViewerId(ctx);
+  
+      if (identity === null) {
+        throw new Error('User is not authenticated');
+      }
+  
+      const workspace = await ctx.db.get(args.workspaceId);
+  
+      if (!workspace) {
+        throw new Error('Workspace not found');
+      }
+  
+      if (workspace.workspaceOwner !== identity) {
+        throw new Error('Unauthorized: Only the workspace owner can delete the workspace');
+      }
+  
+      // Delete the workspace
+      await ctx.db.delete(args.workspaceId);
+  
+      // Delete all associated userWorkspaces
+      const userWorkspaces = await ctx.db
+        .query('userWorkspaces')
+        .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+        .collect();
+  
+      for (const userWorkspace of userWorkspaces) {
+        await ctx.db.delete(userWorkspace._id);
+      }
+  
+      return { success: true, message: 'Workspace deleted successfully' };
+    },
+  });

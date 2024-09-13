@@ -13,6 +13,7 @@ import { UserSettingsCard } from "@/components/dashboard/settings/user-settings-
 import { User } from "@/convex/types";
 import { Id } from "@/convex/_generated/dataModel";
 import { UploadCard } from "@/components/dashboard/settings/upload-card";
+import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 
 
 const settingsItems = [
@@ -28,13 +29,15 @@ export default function SettingsPage() {
     const [workspaceName, setWorkspaceName] = useState('');
     const [workspaceSlug, setWorkspaceSlug] = useState('');
     const [workspaceUsers, setWorkspaceUsers] = useState<User[]>([])
-    const [isUpdatingLogo, setIsUpdatingLogo] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState('');
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string })
     const users = useQuery(api.workspaces.getWorkspaceUsers, workspace ? { _id: workspace._id } : 'skip')
 
     const editWorkspace = useMutation(api.workspaces.editWorkspace);
     const updateWorkspaceLogo = useMutation(api.workspaces.updateWorkspaceLogo);
+    const deleteWorkspaceMutation = useMutation(api.workspaces.deleteWorkspace);
 
     useEffect(() => {
         if (workspace) {
@@ -80,7 +83,6 @@ export default function SettingsPage() {
 
     async function handleLogoUpload(storageId: Id<"_storage">) {
         if (workspace) {
-            setIsUpdatingLogo(true);
             try {
                 const response = await updateWorkspaceLogo({
                     workspaceId: workspace._id,
@@ -95,8 +97,26 @@ export default function SettingsPage() {
             } catch (error) {
                 console.error('Error updating workspace logo:', error);
                 toast.error('An error occurred while updating the workspace logo');
-            } finally {
-                setIsUpdatingLogo(false);
+            }
+        }
+    }
+
+    async function handleDeleteWorkspace() {
+        if (workspace && confirmDelete === `DELETE ${workspace.name}`) {
+            setIsDeleteDialogOpen(true);
+        } else {
+            toast.error(`Please type "DELETE ${workspace?.name}" to confirm deletion`);
+        }
+    }
+
+    async function confirmDeleteWorkspace() {
+        if (workspace) {
+            const response = await deleteWorkspaceMutation({ workspaceId: workspace._id });
+            if (response.success) {
+                toast.success('Workspace deleted successfully');
+                router.push('/dashboard');
+            } else {
+                toast.error('Failed to delete workspace: ' + response.message);
             }
         }
     }
@@ -130,6 +150,15 @@ export default function SettingsPage() {
                                     acceptedFileTypes="image/*"
                                     onUploadComplete={handleLogoUpload}
                                 />
+                                <SettingsCard
+                                    title="Delete Workspace"
+                                    description={`Permanently delete this workspace and all of its data. This action cannot be undone. Type "DELETE ${workspace?.name}" to confirm.`}
+                                    inputValue={confirmDelete}
+                                    setInputValue={setConfirmDelete}
+                                    onSave={handleDeleteWorkspace}
+                                    isDangerous={true}
+                                    buttonText="Delete Workspace"
+                                />
                             </TabsContent>
                             <TabsContent value="users">
                                 <UserSettingsCard users={workspaceUsers} workspace={workspace} />
@@ -142,6 +171,15 @@ export default function SettingsPage() {
                     </div>
                 </Tabs>
             </div>
+            <ConfirmationDialog
+                title="Are you absolutely sure?"
+                description="This action cannot be undone. This will permanently delete your workspace and remove all associated data from our servers."
+                confirmText="Delete Workspace"
+                onConfirm={confirmDeleteWorkspace}
+                isDangerous={true}
+                isOpen={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
+            />
         </div>
     );
 }

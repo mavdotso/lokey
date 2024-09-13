@@ -4,7 +4,7 @@
 - [ ] react email -> change to https://jsx.email/
     OR Create a local API to send emails from there
 
-### ToDo
+### What's needed for launch:
 
 - [ ] Invite links:
     - [ ] Change getIdentity functions in schema
@@ -46,7 +46,7 @@
         -   General:
             -   [x] ws name
             -   [x] ws slug
-            -   [ ] ws logo
+            -   [x] ws logo
             -   [ ] delete
         -   Tags (+ apply tag instead of label)
         -   Billing
@@ -68,6 +68,7 @@
 -   [ ] Stripe
 -   [ ] User / workspace limits
 -   [ ] Error pages
+-   [ ] Support
 
 ### Potentially:
 

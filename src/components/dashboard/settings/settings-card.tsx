@@ -12,11 +12,23 @@ export interface SettingsCardProps {
     inputPlaceholder?: string,
     isInputRequired?: boolean,
     onSave?: () => void,
+    isDangerous?: boolean,
+    buttonText?: string,
 }
 
-export function SettingsCard({ title, description, inputValue, setInputValue, inputPlaceholder, isInputRequired, onSave }: SettingsCardProps) {
+export function SettingsCard({
+    title,
+    description,
+    inputValue,
+    setInputValue,
+    inputPlaceholder,
+    isInputRequired,
+    onSave,
+    isDangerous = false,
+    buttonText = "Save changes"
+}: SettingsCardProps) {
     return (
-        <Card className="shadow-none overflow-hidden">
+        <Card className={`shadow-none overflow-hidden ${isDangerous ? 'border-destructive' : ''}`}>
             <CardHeader>
                 <CardTitle>{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>
@@ -30,8 +42,11 @@ export function SettingsCard({ title, description, inputValue, setInputValue, in
                 />
             </CardContent>
             <CardFooter className="flex justify-end items-center gap-2 bg-muted py-4">
-                <Button onClick={onSave}>
-                    Save changes
+                <Button
+                    onClick={onSave}
+                    variant={isDangerous ? "destructive" : "default"}
+                >
+                    {buttonText}
                 </Button>
             </CardFooter>
         </Card>
