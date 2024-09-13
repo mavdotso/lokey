@@ -1,11 +1,12 @@
 ### Bugs
 
--   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
-- [ ] react email -> change to https://jsx.email/ OR Create a local API to send emails from there
+- [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
+- [ ] react email -> change to https://jsx.email/
+    OR Create a local API to send emails from there
 
 ### ToDo
 
-- [ ] Invite links: 
+- [ ] Invite links:
     - [ ] Change getIdentity functions in schema
     - [ ] Change to a permanent invite link (via link)
 

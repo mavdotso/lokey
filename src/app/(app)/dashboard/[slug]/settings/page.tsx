@@ -11,6 +11,8 @@ import { LoadingScreen } from "@/components/global/loading-screen";
 import { toast } from "sonner";
 import { UserSettingsCard } from "@/components/dashboard/settings/user-settings-card";
 import { User } from "@/convex/types";
+import { Id } from "@/convex/_generated/dataModel";
+import { UploadCard } from "@/components/dashboard/settings/upload-card";
 
 
 const settingsItems = [
@@ -26,11 +28,13 @@ export default function SettingsPage() {
     const [workspaceName, setWorkspaceName] = useState('');
     const [workspaceSlug, setWorkspaceSlug] = useState('');
     const [workspaceUsers, setWorkspaceUsers] = useState<User[]>([])
+    const [isUpdatingLogo, setIsUpdatingLogo] = useState(false);
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string })
     const users = useQuery(api.workspaces.getWorkspaceUsers, workspace ? { _id: workspace._id } : 'skip')
 
     const editWorkspace = useMutation(api.workspaces.editWorkspace);
+    const updateWorkspaceLogo = useMutation(api.workspaces.updateWorkspaceLogo);
 
     useEffect(() => {
         if (workspace) {
@@ -74,6 +78,29 @@ export default function SettingsPage() {
         }
     }
 
+    async function handleLogoUpload(storageId: Id<"_storage">) {
+        if (workspace) {
+            setIsUpdatingLogo(true);
+            try {
+                const response = await updateWorkspaceLogo({
+                    workspaceId: workspace._id,
+                    storageId: storageId
+                });
+
+                if (response.success) {
+                    toast.success('Successfully updated the workspace logo');
+                } else {
+                    toast.error('Failed to update workspace logo');
+                }
+            } catch (error) {
+                console.error('Error updating workspace logo:', error);
+                toast.error('An error occurred while updating the workspace logo');
+            } finally {
+                setIsUpdatingLogo(false);
+            }
+        }
+    }
+
     return (
         <div className="flex flex-col h-full">
             <div className="flex justify-between items-center px-8 py-6">
@@ -96,6 +123,14 @@ export default function SettingsPage() {
                             {generalSettings.map((item, index) => (
                                 <SettingsCard key={index} {...item} />
                             ))}
+                            <UploadCard
+                                title="Workspace Logo"
+                                description="Upload a logo for your workspace. Recommended size: 200x200px."
+                                acceptedFileTypes="image/*"
+                                onUploadComplete={handleLogoUpload}
+                                entityType="workspace"
+                                entityId={workspace._id}
+                            />
                         </TabsContent>
                         <TabsContent value="users">
                             <UserSettingsCard users={workspaceUsers} workspace={workspace} />

@@ -302,7 +302,37 @@ export const getWorkspaceUsers = query({
 export const getWorkspaceName = query({
     args: { workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
+        const workspace = await ctx.db.get(args.workspaceId);
+        return workspace?.name || '';
+    },
+});
+
+export const updateWorkspaceLogo = mutation({
+    args: {
+      workspaceId: v.id('workspaces'),
+      storageId: v.id('_storage'),
+    },
+    handler: async (ctx, args) => {
+      const identity = await getViewerId(ctx);
+  
+      if (identity === null) {
+        throw new Error('User is not authenticated');
+      }
+  
       const workspace = await ctx.db.get(args.workspaceId);
-      return workspace?.name || '';
+  
+      if (!workspace) {
+        throw new Error('Workspace not found');
+      }
+  
+      if (workspace.workspaceOwner !== identity) {
+        throw new Error('Unauthorized: You are not the owner of this workspace');
+      }
+  
+      await ctx.db.patch(args.workspaceId, {
+        logo: args.storageId,
+      });
+  
+      return { success: true, message: 'Workspace logo updated successfully' };
     },
   });
