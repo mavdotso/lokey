@@ -128,8 +128,6 @@ export default function SettingsPage() {
                                 description="Upload a logo for your workspace. Recommended size: 200x200px."
                                 acceptedFileTypes="image/*"
                                 onUploadComplete={handleLogoUpload}
-                                entityType="workspace"
-                                entityId={workspace._id}
                             />
                         </TabsContent>
                         <TabsContent value="users">
