@@ -6,10 +6,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Credentials } from "@/convex/types";
-import { ActionDialog } from "../global/action-dialog";
 import { toast } from "sonner";
 import { CRUDCredentialsDialog } from "@/components/credentials/crud-credentials-dialog";
 import { Dialog } from "../ui/dialog";
+import { ConfirmationDialog } from "../global/confirmation-dialog";
 
 const labels = [
     "feature",
@@ -130,16 +130,14 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
                     </Dialog>
                 </DropdownMenuContent>
             </DropdownMenu >
-            <ActionDialog
-                trigger=""
+            <ConfirmationDialog
                 title="Are you absolutely sure?"
                 description="This action cannot be undone. This will permanently remove the credentials from our servers."
-                cancelText="Cancel"
-                actionText="Remove the credentials"
-                open={dialogOpen}
+                confirmText="Remove the credentials"
+                onConfirm={handleRemove}
+                isDangerous={true}
+                isOpen={dialogOpen}
                 onOpenChange={setDialogOpen}
-                onAction={handleRemove}
-                actionButtonVariant={"destructive"}
             />
         </>
     );

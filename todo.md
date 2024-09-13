@@ -47,7 +47,7 @@
             -   [x] ws name
             -   [x] ws slug
             -   [x] ws logo
-            -   [ ] delete
+            -   [x] delete
         -   Tags (+ apply tag instead of label)
         -   Billing
         -   People / team
