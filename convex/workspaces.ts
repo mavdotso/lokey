@@ -298,3 +298,11 @@ export const getWorkspaceUsers = query({
         }
     },
 });
+
+export const getWorkspaceName = query({
+    args: { workspaceId: v.id('workspaces') },
+    handler: async (ctx, args) => {
+      const workspace = await ctx.db.get(args.workspaceId);
+      return workspace?.name || '';
+    },
+  });

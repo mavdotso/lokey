@@ -15,17 +15,37 @@ export default function InvitePage() {
     const inviteCode = searchParams.get('code');
     const getInviteDetails = useQuery(api.invites.getInviteByCode, { inviteCode: inviteCode || '' });
     const respondToInvite = useMutation(api.invites.respondToInvite);
+    const getWorkspaceName = useQuery(api.workspaces.getWorkspaceName,
+        getInviteDetails?.workspaceId ? { workspaceId: getInviteDetails.workspaceId } : 'skip');
 
     useEffect(() => {
-        if (getInviteDetails) {
-            if (getInviteDetails.status === 'pending') {
-                handleInviteResponse('accepted');
-            } else {
-                setInviteStatus('error');
-            }
+        if (getInviteDetails === undefined) {
+            // Still loading invite details
+            return;
         }
+
+        if (getInviteDetails === null) {
+            // Invite not found
+            setInviteStatus('error');
+            return;
+        }
+
+        if (getInviteDetails.status !== 'pending') {
+            // Invite already processed
+            setInviteStatus(getInviteDetails.status as 'accepted' | 'rejected');
+            return;
+        }
+
+        // Only process pending invites
+        handleInviteResponse('accepted');
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getInviteDetails]);
+
+    useEffect(() => {
+        if (getWorkspaceName) {
+            setWorkspaceName(getWorkspaceName);
+        }
+    }, [getWorkspaceName]);
 
     async function handleInviteResponse(response: 'accepted' | 'rejected') {
         if (!getInviteDetails || !getInviteDetails._id) {
@@ -45,7 +65,8 @@ export default function InvitePage() {
             }
         } catch (error) {
             setInviteStatus('error');
-            toast.error("Failed to process the invitation. Please try again.");
+            toast("Failed to process the invitation. Please try again.", {
+            });
         }
     }
 
