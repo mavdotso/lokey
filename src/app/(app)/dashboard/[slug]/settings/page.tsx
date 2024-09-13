@@ -107,9 +107,9 @@ export default function SettingsPage() {
                 <h1 className="font-bold text-2xl">Settings</h1>
             </div>
             <Separator />
-            <div className="flex gap-4 px-8 py-4 w-full h-full">
+            <div className="flex flex-grow gap-4 px-8 py-4 overflow-hidden">
                 <Tabs defaultValue="general" orientation="horizontal" className="flex gap-6 w-full h-full">
-                    <TabsList className="flex flex-col justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">
+                    <TabsList className="flex flex-col flex-shrink-0 justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">
                         <p className="text-left text-muted-foreground text-sm">Workspace settings</p>
                         {settingsItems.map((item) => (
                             <TabsTrigger value={item.tabName} key={item.name} className="flex justify-start gap-2 hover:bg-muted data-[state=active]:bg-muted py-2 w-full data-[state=active]:shadomw-none font-normal text-left text-primary">
@@ -118,25 +118,27 @@ export default function SettingsPage() {
                             </TabsTrigger>
                         ))}
                     </TabsList>
-                    <div className="w-4/5">
-                        <TabsContent value="general" className="space-y-8">
-                            {generalSettings.map((item, index) => (
-                                <SettingsCard key={index} {...item} />
-                            ))}
-                            <UploadCard
-                                title="Workspace Logo"
-                                description="Upload a logo for your workspace. Recommended size: 200x200px."
-                                acceptedFileTypes="image/*"
-                                onUploadComplete={handleLogoUpload}
-                            />
-                        </TabsContent>
-                        <TabsContent value="users">
-                            <UserSettingsCard users={workspaceUsers} workspace={workspace} />
-                        </TabsContent>
-                        <TabsContent value="billing">
-                            <h2 className="font-bold text-lg">Billing</h2>
-                            <p>Manage the billing for your workspace here.</p>
-                        </TabsContent>
+                    <div className="flex-grow w-4/5 overflow-hidden">
+                        <div className="pr-4 h-full overflow-y-auto">
+                            <TabsContent value="general" className="space-y-8">
+                                {generalSettings.map((item, index) => (
+                                    <SettingsCard key={index} {...item} />
+                                ))}
+                                <UploadCard
+                                    title="Workspace Logo"
+                                    description="Upload a logo for your workspace. Recommended size: 200x200px."
+                                    acceptedFileTypes="image/*"
+                                    onUploadComplete={handleLogoUpload}
+                                />
+                            </TabsContent>
+                            <TabsContent value="users">
+                                <UserSettingsCard users={workspaceUsers} workspace={workspace} />
+                            </TabsContent>
+                            <TabsContent value="billing">
+                                <h2 className="font-bold text-lg">Billing</h2>
+                                <p>Manage the billing for your workspace here.</p>
+                            </TabsContent>
+                        </div>
                     </div>
                 </Tabs>
             </div>
