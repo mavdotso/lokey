@@ -1,9 +1,9 @@
-import React from 'react';
 import { Button } from '@/components/ui/button';
 import { signout } from '@/lib/server-actions';
+import { ReactNode } from 'react';
 
 interface SignoutButtonProps {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 export default function SignoutButton({ children }: SignoutButtonProps) {

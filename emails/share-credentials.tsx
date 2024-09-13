@@ -1,4 +1,3 @@
-import React from 'react';
 import { Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text, Tailwind } from "@react-email/components";
 
 interface ShareCredentialsEmailProps {

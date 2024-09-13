@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CRUDCredentialsForm } from '@/components/credentials/crud-credentials-form';
 import { Id } from '@/convex/_generated/dataModel';
@@ -12,7 +12,7 @@ interface CRUDCredentialsDialogProps {
     onDialogClose?: () => void;
     editId?: Id<"credentials">;
     existingData?: Credentials;
-    children?: React.ReactNode;
+    children?: ReactNode;
 }
 
 export function CRUDCredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCreated, onCredentialsUpdated, onDialogClose, editId, existingData }: CRUDCredentialsDialogProps) {

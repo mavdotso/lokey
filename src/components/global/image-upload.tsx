@@ -1,4 +1,3 @@
-import React from "react";
 import Image from "next/image";
 import { CloudUploadIcon } from "lucide-react";
 import { RadialProgress } from "@/components/global/radial-progress";

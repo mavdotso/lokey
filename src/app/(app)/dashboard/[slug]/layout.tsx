@@ -1,8 +1,9 @@
 import { auth } from '@/lib/auth';
 import Sidebar from '@/components/sidebar/sidebar';
+import { ReactNode } from 'react';
 
 interface DashboardLayoutProps {
-    children: React.ReactNode;
+    children: ReactNode;
     params: { slug: string };
 }
 

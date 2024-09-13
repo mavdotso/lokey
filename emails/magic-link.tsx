@@ -1,5 +1,4 @@
 import { Body, Button, Container, Column, Head, Heading, Hr, Html, Img, Link, Preview, Row, Section, Text, Tailwind } from "@react-email/components";
-import React from "react";
 
 interface SecurePasswordSharingEmailProps {
   url: string;

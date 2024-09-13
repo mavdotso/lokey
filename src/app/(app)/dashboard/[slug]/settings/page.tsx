@@ -120,7 +120,7 @@ export default function SettingsPage() {
                     </TabsList>
                     <div className="flex-grow w-4/5 overflow-hidden">
                         <div className="pr-4 h-full overflow-y-auto">
-                            <TabsContent value="general" className="space-y-8">
+                            <TabsContent value="general" className="space-y-4">
                                 {generalSettings.map((item, index) => (
                                     <SettingsCard key={index} {...item} />
                                 ))}

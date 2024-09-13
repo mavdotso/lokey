@@ -6,6 +6,7 @@ import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown'
 import { Separator } from '@/components/ui/separator';
 import { UpgradeBox } from '@/components/sidebar/upgrade-box';
 import { NavigationItem } from '@/components/sidebar/nav-item';
+import { ElementType } from 'react';
 
 interface SidebarProps {
     params: { slug: string };
@@ -16,7 +17,7 @@ interface SidebarProps {
 
 export interface NavItemProps {
     href?: string;
-    icon: React.ElementType;
+    icon: ElementType;
     name: string;
     onClick?: () => void,
     badge?: string;

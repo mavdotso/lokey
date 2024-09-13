@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -100,7 +100,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
         }
     }, [existingData]);
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: FormEvent) {
         e.preventDefault();
         try {
             if (!currentWorkspaceId) {

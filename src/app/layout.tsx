@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Lokey — Secure Password Sharing With Superpowers",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   const session = await auth();
 

@@ -1,5 +1,5 @@
 "use client"
-import { useState, useRef } from 'react';
+import { useState, useRef, ChangeEvent } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useMutation } from 'convex/react';
@@ -63,7 +63,7 @@ export function UploadCard({ title, description, acceptedFileTypes = 'image/*', 
         }
     }
 
-    function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];
         if (file) {
             if (file.size > MAX_LOGO_SIZE) {

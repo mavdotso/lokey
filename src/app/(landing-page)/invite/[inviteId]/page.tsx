@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -38,7 +38,7 @@ export default function InvitePage() {
 
         // Only process pending invites
         handleInviteResponse('accepted');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getInviteDetails]);
 
     useEffect(() => {
