@@ -2,6 +2,7 @@
 
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
 -   [x] Re-think the schema for workspaces / users and who does what — e.g. payments, access to features etc.
+- [ ] Faster redirect after creating the first workspace
 
 ### What's needed for launch:
 

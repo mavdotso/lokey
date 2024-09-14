@@ -73,8 +73,10 @@ export default function SettingsPage() {
 
             if (response.success) {
                 toast.success('Successfully updated the workspace')
-                // TODO: push only if the slug is new
-                router.push('/dashboard/' + workspaceSlug + '/settings')
+                // Redirect only if the slug has changed
+                if (workspaceSlug !== workspace.slug) {
+                    router.push('/dashboard/' + workspaceSlug + '/settings')
+                }
             } else {
                 toast.error('Something went wrong: ' + response.message)
             }
