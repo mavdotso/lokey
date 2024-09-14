@@ -93,7 +93,9 @@ export type UsageLimit = {
     secretsPerMonth: number;
     secretRequestsAndChats: number;
     secretAttachmentSize: number;
+    customDomain: boolean;
     teamSize: number;
+    apiAccess: boolean;
 };
 
 export type UsageTracking = {

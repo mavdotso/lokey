@@ -1,6 +1,6 @@
 
 import { BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon } from 'lucide-react';
-import UserCard from '@/components/sidebar/user-card';
+import { UserCard } from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
 import { Separator } from '@/components/ui/separator';

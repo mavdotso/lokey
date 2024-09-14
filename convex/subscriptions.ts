@@ -1,13 +1,13 @@
 import { query } from './_generated/server';
 import { v } from 'convex/values';
 
-export const getUserSubscriptionStatus = query({
-    args: { userId: v.string() },
+export const getWorkspaceSubscriptionStatus = query({
+    args: { workspaceId: v.string() },
     handler: async (ctx, args) => {
         try {
             const subscription = await ctx.db
                 .query('subscriptions')
-                .filter((q) => q.eq(q.field('userId'), args.userId))
+                .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
                 .first();
 
             if (subscription && subscription.priceId) {

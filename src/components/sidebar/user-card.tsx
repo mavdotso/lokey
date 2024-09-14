@@ -4,7 +4,7 @@ import SignoutButton from '@/components/auth/signout-button';
 import ThemeToggle from '@/components/global/theme-toggle';
 import UserAvatar from '@/components/global/user-avatar';
 
-export default function UserCard({ session }: { session: Session }) {
+export function UserCard({ session }: { session: Session }) {
     return (
         <div className="flex justify-between items-center gap-2 w-full">
             <aside className="flex flex-grow justify-center items-center gap-2 min-w-0">

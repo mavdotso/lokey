@@ -64,7 +64,9 @@ const usageLimitSchema = {
     secretsPerMonth: v.number(),
     secretRequestsAndChats: v.number(),
     secretAttachmentSize: v.number(),
+    customDomain: v.boolean(),
     teamSize: v.number(),
+    apiAccess: v.boolean(),
 };
 
 const usageTrackingSchema = {

@@ -7,7 +7,7 @@ import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { ImageUpload } from "@/components/global/image-upload";
 import { toast } from 'sonner';
-import { MAX_LOGO_SIZE } from '@/lib/consts';
+import { MAX_WORKSPACE_LOGO_SIZE } from '@/lib/consts';
 
 export interface UploadCardProps {
     title: string;
@@ -28,9 +28,9 @@ export function UploadCard({ title, description, acceptedFileTypes = 'image/*', 
     async function handleUpload() {
         if (!selectedFile) return;
 
-        if (selectedFile.size > MAX_LOGO_SIZE) {
-            setError(`File size exceeds the limit of ${MAX_LOGO_SIZE / 1024 / 1024}MB`);
-            toast.error(`File size exceeds the limit of ${MAX_LOGO_SIZE / 1024 / 1024}MB`);
+        if (selectedFile.size > MAX_WORKSPACE_LOGO_SIZE) {
+            setError(`File size exceeds the limit of ${MAX_WORKSPACE_LOGO_SIZE / 1024 / 1024}MB`);
+            toast.error(`File size exceeds the limit of ${MAX_WORKSPACE_LOGO_SIZE / 1024 / 1024}MB`);
             return;
         }
 
@@ -66,9 +66,9 @@ export function UploadCard({ title, description, acceptedFileTypes = 'image/*', 
     function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
         const file = event.target.files?.[0];
         if (file) {
-            if (file.size > MAX_LOGO_SIZE) {
-                setError(`File size exceeds the limit of ${MAX_LOGO_SIZE / 1024 / 1024}MB`);
-                toast.error(`File size exceeds the limit of ${MAX_LOGO_SIZE / 1024 / 1024}MB`);
+            if (file.size > MAX_WORKSPACE_LOGO_SIZE) {
+                setError(`File size exceeds the limit of ${MAX_WORKSPACE_LOGO_SIZE / 1024 / 1024}MB`);
+                toast.error(`File size exceeds the limit of ${MAX_WORKSPACE_LOGO_SIZE / 1024 / 1024}MB`);
                 event.target.value = '';
             } else {
                 setSelectedFile(file);
@@ -81,9 +81,9 @@ export function UploadCard({ title, description, acceptedFileTypes = 'image/*', 
         event.preventDefault();
         const file = event.dataTransfer.files?.[0];
         if (file) {
-            if (file.size > MAX_LOGO_SIZE) {
-                setError(`File size exceeds the limit of ${MAX_LOGO_SIZE / 1024 / 1024}MB`);
-                toast.error(`File size exceeds the limit of ${MAX_LOGO_SIZE / 1024 / 1024}MB`);
+            if (file.size > MAX_WORKSPACE_LOGO_SIZE) {
+                setError(`File size exceeds the limit of ${MAX_WORKSPACE_LOGO_SIZE / 1024 / 1024}MB`);
+                toast.error(`File size exceeds the limit of ${MAX_WORKSPACE_LOGO_SIZE / 1024 / 1024}MB`);
             } else {
                 setSelectedFile(file);
                 setError(null);
