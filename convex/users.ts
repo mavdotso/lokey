@@ -22,7 +22,7 @@ export const getUser = query({
 
 export const assignUserRole = mutation({
     args: {
-        userId: v.id('users'),
+        _id: v.id('users'),
         role: v.union(v.literal('admin'), v.literal('manager'), v.literal('member')),
     },
     handler: async (ctx, args) => {
@@ -46,14 +46,14 @@ export const assignUserRole = mutation({
             // Check if a role already exists for this user
             const existingRole = await ctx.db
                 .query('userRoles')
-                .filter((q) => q.eq(q.field('userId'), args.userId))
+                .filter((q) => q.eq(q.field('userId'), args._id))
                 .unique();
 
             if (existingRole) {
                 await ctx.db.patch(existingRole._id, { role: args.role });
             } else {
                 await ctx.db.insert('userRoles', {
-                    userId: args.userId,
+                    userId: args._id,
                     role: args.role,
                 });
             }
@@ -66,11 +66,11 @@ export const assignUserRole = mutation({
 });
 
 export const getUserRole = query({
-    args: { userId: v.id('users'), workspaceId: v.id('workspaces') },
+    args: { _id: v.id('users'), workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
         const user = await ctx.db
             .query('userWorkspaces')
-            .filter((q) => q.eq(q.field('userId'), args.userId))
+            .filter((q) => q.eq(q.field('userId'), args._id))
             .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
             .first();
 

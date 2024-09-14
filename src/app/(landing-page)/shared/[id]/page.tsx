@@ -43,7 +43,7 @@ export default function SharePage() {
 
                     const parsedData = JSON.parse(decryptedData)
 
-                    await incrementCredentialsViewCount({ id: id as string })
+                    await incrementCredentialsViewCount({ _id: id as Id<"credentials"> })
                     setCredentialsData(parsedData);
                 } else {
                     throw new Error('Failed to retrieve encrypted data');

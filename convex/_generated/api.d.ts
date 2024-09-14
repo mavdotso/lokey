@@ -19,7 +19,7 @@ import type * as credentials from "../credentials.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as invites from "../invites.js";
-import type * as queries from "../queries.js";
+import type * as subscriptions from "../subscriptions.js";
 import type * as types from "../types.js";
 import type * as users from "../users.js";
 import type * as workspaces from "../workspaces.js";
@@ -39,7 +39,7 @@ declare const fullApi: ApiFromModules<{
   files: typeof files;
   http: typeof http;
   invites: typeof invites;
-  queries: typeof queries;
+  subscriptions: typeof subscriptions;
   types: typeof types;
   users: typeof users;
   workspaces: typeof workspaces;

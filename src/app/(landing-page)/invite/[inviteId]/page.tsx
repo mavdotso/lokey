@@ -14,7 +14,9 @@ export default function InvitePage() {
     const searchParams = useSearchParams();
     const inviteCode = searchParams.get('code');
     const getInviteDetails = useQuery(api.invites.getInviteByCode, { inviteCode: inviteCode || '' });
+
     const respondToInvite = useMutation(api.invites.respondToInvite);
+
     const getWorkspaceName = useQuery(api.workspaces.getWorkspaceName,
         getInviteDetails?.workspaceId ? { workspaceId: getInviteDetails.workspaceId } : 'skip');
 
@@ -48,14 +50,14 @@ export default function InvitePage() {
     }, [getWorkspaceName]);
 
     async function handleInviteResponse(response: 'accepted' | 'rejected') {
-        if (!getInviteDetails || !getInviteDetails._id) {
+        if (!getInviteDetails) {
             setInviteStatus('error');
             return;
         }
 
         try {
             const result = await respondToInvite({
-                inviteId: getInviteDetails._id,
+                _id: getInviteDetails._id,
                 response
             });
             if (result.success) {

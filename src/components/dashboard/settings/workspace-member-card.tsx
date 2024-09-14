@@ -12,7 +12,7 @@ interface WorkspaceMemberCardProps {
 
 export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProps) {
 
-    const userRole = useQuery(api.users.getUserRole, (user._id && workspace._id) ? { userId: user._id, workspaceId: workspace._id } : 'skip')
+    const userRole = useQuery(api.users.getUserRole, (user._id && workspace._id) ? { _id: user._id, workspaceId: workspace._id } : 'skip')
 
     return (
         <div className="flex justify-between items-center gap-2 p-2 w-full">

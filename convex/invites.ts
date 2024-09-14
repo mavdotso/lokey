@@ -43,39 +43,9 @@ export const createInvite = mutation({
     },
 });
 
-export const getInvitesByWorkspace = query({
-    args: { workspaceId: v.id('workspaces') },
-    handler: async (ctx, args) => {
-        return await ctx.db
-            .query('workspaceInvites')
-            .withIndex('workspaceId', (q) => q.eq('workspaceId', args.workspaceId))
-            .collect();
-    },
-});
-
-export const getInvitesByUser = query({
-    args: { userId: v.id('users') },
-    handler: async (ctx, args) => {
-        return await ctx.db
-            .query('workspaceInvites')
-            .withIndex('invitedUserId', (q) => q.eq('invitedUserId', args.userId))
-            .collect();
-    },
-});
-
-export const getInvitesByEmail = query({
-    args: { email: v.string() },
-    handler: async (ctx, args) => {
-        return await ctx.db
-            .query('workspaceInvites')
-            .withIndex('invitedEmail', (q) => q.eq('invitedEmail', args.email))
-            .collect();
-    },
-});
-
 export const respondToInvite = mutation({
     args: {
-        inviteId: v.id('workspaceInvites'),
+        _id: v.id('workspaceInvites'),
         response: v.union(v.literal('accepted'), v.literal('rejected')),
     },
     handler: async (ctx, args) => {
@@ -88,13 +58,13 @@ export const respondToInvite = mutation({
 
             if (!user) return { success: false, message: 'User not found' };
 
-            const invite = await ctx.db.get(args.inviteId);
+            const invite = await ctx.db.get(args._id);
 
             if (!invite) return { success: false, message: 'Invite not found' };
             if (invite.invitedUserId && invite.invitedUserId !== user._id) return { success: false, message: 'Unauthorized' };
             if (invite.invitedEmail && invite.invitedEmail !== user.email) return { success: false, message: 'Unauthorized' };
 
-            await ctx.db.patch(args.inviteId, { status: args.response });
+            await ctx.db.patch(args._id, { status: args.response });
 
             if (args.response === 'accepted') {
                 await ctx.db.insert('userWorkspaces', {
@@ -151,19 +121,27 @@ export const generateInviteLink = mutation({
 export const getInviteByCode = query({
     args: { inviteCode: v.string() },
     handler: async (ctx, args) => {
-        const workspace = await ctx.db
-            .query('workspaces')
+        const invite = await ctx.db
+            .query('workspaceInvites')
             .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
             .first();
+
+        if (!invite) {
+            return null;
+        }
+
+        const workspace = await ctx.db.get(invite.workspaceId);
 
         if (!workspace) {
             return null;
         }
 
         return {
+            _id: invite._id,
             workspaceId: workspace._id,
             workspaceName: workspace.name,
-            inviteCode: workspace.inviteCode,
+            inviteCode: invite.inviteCode,
+            status: invite.status,
         };
     },
 });

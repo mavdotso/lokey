@@ -4,35 +4,6 @@ import { mutation } from './_generated/server';
 import { getViewerId } from './auth';
 import { credentialsTypeValidator } from './types';
 
-export const getCredential = query({
-    args: { _id: v.string() },
-    handler: async (ctx, args) => {
-        return await ctx.db
-            .query('credentials')
-            .filter((q) => q.eq(q.field('_id'), args._id))
-            .first();
-    },
-});
-
-export const getUserCredentials = query({
-    args: { userId: v.string() },
-    handler: async (ctx, args) => {
-        const userSpaces = await ctx.db
-            .query('userWorkspaces')
-            .filter((q) => q.eq(q.field('userId'), args.userId))
-            .collect();
-
-        const workspaceIds = userSpaces.map((space) => space.workspaceId);
-
-        const credentials = await ctx.db
-            .query('credentials')
-            .filter((q) => q.or(...workspaceIds.map((id) => q.eq(q.field('workspaceId'), id))))
-            .collect();
-
-        return credentials;
-    },
-});
-
 export const getWorkspaceCredentials = query({
     args: { workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
@@ -81,11 +52,11 @@ export const createCredentials = mutation({
 });
 
 export const incrementCredentialsViewCount = mutation({
-    args: { id: v.string() },
+    args: { _id: v.id('credentials'), },
     handler: async (ctx, args) => {
         const credential = await ctx.db
             .query('credentials')
-            .filter((q) => q.eq(q.field('_id'), args.id))
+            .filter((q) => q.eq(q.field('_id'), args._id))
             .first();
 
         if (!credential) {
