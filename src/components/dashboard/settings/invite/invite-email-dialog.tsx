@@ -15,8 +15,10 @@ interface InviteEmailDialogProps {
     workspaceId: Id<"workspaces">;
 }
 
+type InvitableRoleType = Exclude<RoleType, "admin">;
+
 export function InviteEmailDialog({ workspaceId }: InviteEmailDialogProps) {
-    const [emails, setEmails] = useState([{ id: 1, value: '', role: 'member' as RoleType }]);
+    const [emails, setEmails] = useState([{ id: 1, value: '', role: 'member' as InvitableRoleType }]);
     const createInvite = useMutation(api.invites.createInvite);
 
     function addEmailField() {
@@ -32,7 +34,7 @@ export function InviteEmailDialog({ workspaceId }: InviteEmailDialogProps) {
         setEmails(emails.map(email => email.id === id ? { ...email, value } : email));
     };
 
-    function handleRoleChange(id: number, role: RoleType) {
+    function handleRoleChange(id: number, role: InvitableRoleType) {
         setEmails(emails.map(email => email.id === id ? { ...email, role } : email));
     };
 
@@ -54,7 +56,7 @@ export function InviteEmailDialog({ workspaceId }: InviteEmailDialogProps) {
             }
         }
         // Reset the form after sending invites
-        setEmails([{ id: 1, value: '', role: 'member' as RoleType }]);
+        setEmails([{ id: 1, value: '', role: 'member' as InvitableRoleType }]);
     }
 
     return (
@@ -82,7 +84,7 @@ export function InviteEmailDialog({ workspaceId }: InviteEmailDialogProps) {
                                 value={email.value}
                                 onChange={(e) => handleEmailChange(email.id, e.target.value)}
                             />
-                            <Select value={email.role} onValueChange={(value: RoleType) => handleRoleChange(email.id, value)}>
+                            <Select value={email.role} onValueChange={(value: InvitableRoleType) => handleRoleChange(email.id, value)}>
                                 <SelectTrigger className="w-[110px]">
                                     <SelectValue placeholder="Role" />
                                 </SelectTrigger>

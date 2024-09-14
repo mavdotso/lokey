@@ -1,8 +1,6 @@
 ### Bugs
 
 - [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
-- [ ] react email -> change to https://jsx.email/
-    OR Create a local API to send emails from there
 
 ### What's needed for launch:
 

@@ -24,7 +24,7 @@ export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
     async function handleUpdateInviteCode() {
         if (!workspace._id) return;
 
-        const result = await updateWorkspaceInviteCode({ workspaceId: workspace._id });
+        const result = await updateWorkspaceInviteCode({ _id: workspace._id });
         if (result.success) {
             setInviteLink(`${getURL()}/invite/${result.inviteCode}`);
             toast.success("Invite code updated", {

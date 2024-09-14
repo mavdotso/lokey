@@ -18,7 +18,7 @@ export default function InvitePage() {
     const respondToInvite = useMutation(api.invites.respondToInvite);
 
     const getWorkspaceName = useQuery(api.workspaces.getWorkspaceName,
-        getInviteDetails?.workspaceId ? { workspaceId: getInviteDetails.workspaceId } : 'skip');
+        getInviteDetails?.workspaceId ? { _id: getInviteDetails.workspaceId } : 'skip');
 
     useEffect(() => {
         if (getInviteDetails === undefined) {

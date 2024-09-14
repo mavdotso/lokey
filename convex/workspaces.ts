@@ -109,7 +109,7 @@ export const getWorkspaceBySlug = query({
 
 export const inviteUserToWorkspace = mutation({
     args: {
-        workspaceId: v.id('workspaces'),
+        _id: v.id('workspaces'),
         userId: v.id('users'),
         role: v.union(v.literal('manager'), v.literal('member')),
     },
@@ -125,7 +125,7 @@ export const inviteUserToWorkspace = mutation({
             const inviterWorkspace = await ctx.db
                 .query('userWorkspaces')
                 .filter((q) => q.eq(q.field('userId'), inviterId))
-                .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+                .filter((q) => q.eq(q.field('workspaceId'), args._id))
                 .first();
 
             if (!inviterWorkspace || !['admin', 'manager'].includes(inviterWorkspace.role)) {
@@ -146,7 +146,7 @@ export const inviteUserToWorkspace = mutation({
             const existingMembership = await ctx.db
                 .query('userWorkspaces')
                 .filter((q) => q.eq(q.field('userId'), args.userId))
-                .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+                .filter((q) => q.eq(q.field('workspaceId'), args._id))
                 .first();
 
             if (existingMembership) {
@@ -156,7 +156,7 @@ export const inviteUserToWorkspace = mutation({
             // Add the invited user to the workspace
             await ctx.db.insert('userWorkspaces', {
                 userId: args.userId,
-                workspaceId: args.workspaceId,
+                workspaceId: args._id,
                 role: args.role,
             });
 
@@ -169,7 +169,7 @@ export const inviteUserToWorkspace = mutation({
 
 export const kickUserFromWorkspace = mutation({
     args: {
-        workspaceId: v.id('workspaces'),
+        _id: v.id('workspaces'),
         userId: v.id('users'),
     },
     handler: async (ctx, args) => {
@@ -184,7 +184,7 @@ export const kickUserFromWorkspace = mutation({
             const requesterWorkspace = await ctx.db
                 .query('userWorkspaces')
                 .filter((q) => q.eq(q.field('userId'), requesterId))
-                .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+                .filter((q) => q.eq(q.field('workspaceId'), args._id))
                 .first();
 
             if (!requesterWorkspace || requesterWorkspace.role !== 'admin') {
@@ -195,7 +195,7 @@ export const kickUserFromWorkspace = mutation({
             const userWorkspace = await ctx.db
                 .query('userWorkspaces')
                 .filter((q) => q.eq(q.field('userId'), args.userId))
-                .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+                .filter((q) => q.eq(q.field('workspaceId'), args._id))
                 .first();
 
             if (!userWorkspace) {
@@ -203,7 +203,7 @@ export const kickUserFromWorkspace = mutation({
             }
 
             // Prevent kicking the workspace owner
-            const workspace = await ctx.db.get(args.workspaceId);
+            const workspace = await ctx.db.get(args._id);
 
             if (!workspace) {
                 return { success: false, message: 'Cannot find the workspace' };
@@ -303,16 +303,16 @@ export const getWorkspaceUsers = query({
 });
 
 export const getWorkspaceName = query({
-    args: { workspaceId: v.id('workspaces') },
+    args: { _id: v.id('workspaces') },
     handler: async (ctx, args) => {
-        const workspace = await ctx.db.get(args.workspaceId);
+        const workspace = await ctx.db.get(args._id);
         return workspace?.name || '';
     },
 });
 
 export const updateWorkspaceLogo = mutation({
     args: {
-      workspaceId: v.id('workspaces'),
+        _id: v.id('workspaces'),
       storageId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
@@ -322,7 +322,7 @@ export const updateWorkspaceLogo = mutation({
         throw new Error('User is not authenticated');
       }
   
-      const workspace = await ctx.db.get(args.workspaceId);
+      const workspace = await ctx.db.get(args._id);
   
       if (!workspace) {
         throw new Error('Workspace not found');
@@ -332,7 +332,7 @@ export const updateWorkspaceLogo = mutation({
         throw new Error('Unauthorized: You are not the owner of this workspace');
       }
   
-      await ctx.db.patch(args.workspaceId, {
+      await ctx.db.patch(args._id, {
         logo: args.storageId,
       });
   
@@ -342,7 +342,7 @@ export const updateWorkspaceLogo = mutation({
 
   export const deleteWorkspace = mutation({
     args: {
-      workspaceId: v.id('workspaces'),
+        _id: v.id('workspaces'),
     },
     handler: async (ctx, args) => {
       const identity = await getViewerId(ctx);
@@ -351,7 +351,7 @@ export const updateWorkspaceLogo = mutation({
         throw new Error('User is not authenticated');
       }
   
-      const workspace = await ctx.db.get(args.workspaceId);
+      const workspace = await ctx.db.get(args._id);
   
       if (!workspace) {
         throw new Error('Workspace not found');
@@ -362,12 +362,12 @@ export const updateWorkspaceLogo = mutation({
       }
   
       // Delete the workspace
-      await ctx.db.delete(args.workspaceId);
+      await ctx.db.delete(args._id);
   
       // Delete all associated userWorkspaces
       const userWorkspaces = await ctx.db
         .query('userWorkspaces')
-        .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+        .filter((q) => q.eq(q.field('workspaceId'), args._id))
         .collect();
   
       for (const userWorkspace of userWorkspaces) {
@@ -380,7 +380,7 @@ export const updateWorkspaceLogo = mutation({
 
   export const updateWorkspaceInviteCode = mutation({
     args: {
-        workspaceId: v.id('workspaces'),
+        _id: v.id('workspaces'),
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
@@ -389,7 +389,7 @@ export const updateWorkspaceLogo = mutation({
             throw new Error('User is not authenticated');
         }
 
-        const workspace = await ctx.db.get(args.workspaceId);
+        const workspace = await ctx.db.get(args._id);
 
         if (!workspace) {
             throw new Error('Workspace not found');
@@ -401,7 +401,7 @@ export const updateWorkspaceLogo = mutation({
 
         const newInviteCode = nanoid(10);
 
-        await ctx.db.patch(args.workspaceId, {
+        await ctx.db.patch(args._id, {
             inviteCode: newInviteCode,
         });
 

@@ -85,7 +85,7 @@ export default function SettingsPage() {
         if (workspace) {
             try {
                 const response = await updateWorkspaceLogo({
-                    workspaceId: workspace._id,
+                    _id: workspace._id,
                     storageId: storageId
                 });
 
@@ -111,7 +111,7 @@ export default function SettingsPage() {
 
     async function confirmDeleteWorkspace() {
         if (workspace) {
-            const response = await deleteWorkspaceMutation({ workspaceId: workspace._id });
+            const response = await deleteWorkspaceMutation({ _id: workspace._id });
             if (response.success) {
                 toast.success('Workspace deleted successfully');
                 router.push('/dashboard');
