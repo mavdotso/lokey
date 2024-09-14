@@ -1,6 +1,7 @@
 import { DatabaseReader } from './_generated/server';
 import { Id } from './_generated/dataModel';
 import { PlanType, UsageLimit } from './types';
+import { MAX_FREE_WORKSPACES } from '@/lib/consts';
 
 // Helper function to get the current subscription and usage limits
 async function getCurrentSubscription(db: DatabaseReader, workspaceId: Id<'workspaces'>): Promise<{ planType: PlanType; usageLimits: UsageLimit } | null> {
@@ -78,4 +79,25 @@ export async function hasFeatureAccess(db: DatabaseReader, workspaceId: Id<'work
     if (!subscription) return false;
 
     return planHasAccess(subscription.planType, feature);
+}
+
+export async function canCreateWorkspace(db: DatabaseReader, userId: Id<'users'>): Promise<boolean> {
+    const userWorkspaces = await db
+        .query('userWorkspaces')
+        .filter((q) => q.eq(q.field('userId'), userId))
+        .collect();
+
+    if (userWorkspaces.length >= MAX_FREE_WORKSPACES) {
+        const freeWorkspaces = await Promise.all(
+            userWorkspaces.map(async (uw) => {
+                const workspace = await db.get(uw.workspaceId);
+                return workspace?.planType === 'FREE';
+            })
+        );
+
+        const freeWorkspaceCount = freeWorkspaces.filter(Boolean).length;
+        return freeWorkspaceCount < 2;
+    }
+
+    return true;
 }

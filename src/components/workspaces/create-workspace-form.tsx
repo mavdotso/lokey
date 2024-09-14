@@ -11,6 +11,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Button } from '@/components/ui/button'
 import { Id } from '@/convex/_generated/dataModel'
 import { api } from '@/convex/_generated/api'
+import { SubmitButton } from '../global/submit-button'
 
 
 export function CreateWorkspaceForm() {
@@ -47,9 +48,7 @@ export function CreateWorkspaceForm() {
         }
     }, [formState.slug, isUnique])
 
-    async function handleSubmit(e: FormEvent) {
-        e.preventDefault()
-
+    async function handleSubmit(formData: FormData) {
         if (formState.isSubmitting || !formState.isSlugUnique) {
             setFormState(prev => ({ ...prev, showSlugError: !formState.isSlugUnique }))
             return
@@ -60,11 +59,11 @@ export function CreateWorkspaceForm() {
         try {
             // TODO: planType — add check to see if the user can create a free space
             const { workspaceId } = await createWorkspace({ name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
-            
+
             toast.success('Workspace created successfully!')
-            
+
             setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))
-            
+
             setIsRedirecting(true);
         } catch (error) {
             toast.error('Failed to create workspace')
@@ -81,7 +80,7 @@ export function CreateWorkspaceForm() {
     }, [formState.newWorkspaceId, formState.slug, router, isRedirecting])
 
     return (
-        <form id="create-workspace-form" onSubmit={handleSubmit} className="space-y-4">
+        <form id="create-workspace-form" action={handleSubmit} className="space-y-4">
             <div className='flex flex-col gap-2'>
                 <Label htmlFor="name" className="flex items-center text-foreground">
                     Workspace Name
@@ -141,9 +140,7 @@ export function CreateWorkspaceForm() {
                     <p className="mt-1 text-center text-destructive text-sm">The slug &quot;{formState.slug}&quot; is already in use.</p>
                 )}
             </div>
-            <Button disabled={!formState.isSlugUnique} type="submit" size={"lg"} form="create-workspace-form" className="bg-primary w-full text-primary-foreground">
-                Create workspace
-            </Button>
+            <SubmitButton disabled={!formState.isSlugUnique} text='Create workspace' size={"lg"} pendingText='Creating workspace...' className='w-full' />
         </form>
     )
 }

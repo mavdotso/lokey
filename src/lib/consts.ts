@@ -1,7 +1,7 @@
 export const MAX_WORKSPACE_LOGO_SIZE = 5 * 1024 * 1024; // 5 MB
 
 /* PLANS AND PRICING */
-export const FREE_WORKSPACES_LIMIT = 2;
+export const MAX_FREE_WORKSPACES = 2;
 
 export const WORKSPACE_PLAN_LIMITS = {
     FREE: {

@@ -83,9 +83,10 @@
 -   [ ] Generate a QR code
 -   [ ] Notifications / webhooks
 -   [ ] Add to password manager button
+-   [ ] Import from CSV
 
 ###
 
 ### UI
 
--   [ ] Fix the Separator alignment with the content
+-   [ ] Fix the Separator alignment with the content on the Sidebar

@@ -3,6 +3,7 @@ import { v } from 'convex/values';
 import { getViewerId } from './auth';
 import { nanoid } from 'nanoid';
 import { planTypeValidator } from './types';
+import { canCreateWorkspace } from './limits';
 
 export const createWorkspace = mutation({
     args: {
@@ -10,7 +11,7 @@ export const createWorkspace = mutation({
         slug: v.string(),
         iconId: v.string(),
         logo: v.optional(v.string()),
-        planType: planTypeValidator
+        planType: planTypeValidator,
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
@@ -26,6 +27,13 @@ export const createWorkspace = mutation({
 
         if (!user) {
             throw new Error('User not found');
+        }
+
+        if (args.planType === 'FREE') {
+            const canCreate = await canCreateWorkspace(ctx.db, user._id);
+            if (!canCreate) {
+                throw new Error('You have reached the maximum number of free workspaces');
+            }
         }
 
         const isUnique = await isSlugUnique(ctx, { slug: args.slug });

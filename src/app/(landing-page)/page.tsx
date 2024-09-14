@@ -98,7 +98,7 @@ export default function LandingPage() {
                             </Select>
                         </div>
                         <div className="flex items-end">
-                            <SubmitButton buttonText='Share password' buttonPendingText='Generating...' />
+                            <SubmitButton text='Share password' pendingText='Generating...' />
                         </div>
                     </div>
                 </form>
