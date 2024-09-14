@@ -6,18 +6,23 @@
 ### What's needed for launch:
 
 -   [x] Add a "free" plan limit of 2
--   [ ] Invite links:
+-   [x] Invite links:
 
-    -   [ ] Change getIdentity functions in schema
+    -   [x] Change getIdentity functions in schema
     -   [x] Change to a permanent invite link (via link)
 
 -   [ ] Workspace settings
 
     -   [ ] Invite users
-        -   [ ] Via email
+        -   [x] Invite links
+        -   [x] Via email
             -   [ ] New user
             -   [ ] Refistered user
         -   [ ] Via userId
+    -   [ ] Accept invitations
+
+        -   [ ] Sign in
+
     -   [ ] Remove users
     -   [ ] Change workspace owner
     -   [ ] Change credentials owner
@@ -27,35 +32,25 @@
             -   [ ] all
             -   [ ] nothing (read only)
 
--   [ ] Request passwords from clients
-
+-   [ ] Request credentials from clients
     -   [ ] Add instructions on where to get the passwords from
 
 -   [ ] Share link via email / text
 
--   [ ] Insert the website you're providing the password for
-
-    -   [ ] Fetch the website icon
-
 -   [ ] Sidebar menu
-
-    -   [ ] Search
-    -   [ ] Credentials
-        -   [ ] Shared
-        -   [ ] Requested
-    -   [ ] Workspace settings
+    -   [x] Credentials
+        -   [x] Shared
+        -   [x] Requested
+    -   [x] Workspace settings
         -   General:
             -   [x] ws name
             -   [x] ws slug
             -   [x] ws logo
             -   [x] delete
-        -   Tags (+ apply tag instead of label)
-        -   Billing
-        -   People / team
-    -   [ ] Upgrade
+        -   [ ] Billing
+        -   [ ] People / team
 
 -   [ ] User settings
-
     -   General:
     -   [ ] name
     -   [ ] picture
@@ -69,7 +64,7 @@
 -   [ ] Stripe
 -   [ ] User / workspace limits
 -   [ ] Error pages
--   [ ] Support
+-   [ ] Support (email)
 
 ### Potentially:
 
@@ -84,8 +79,9 @@
 -   [ ] Notifications / webhooks
 -   [ ] Add to password manager button
 -   [ ] Import from CSV
-
-###
+-   [ ] Insert the website you're providing the password for
+    -   [ ] Fetch the website icon
+-   [ ] Credentials tags (+ apply tag instead of label)
 
 ### UI
 

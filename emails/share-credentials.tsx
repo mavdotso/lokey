@@ -1,4 +1,5 @@
-import { Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text, Tailwind } from "@react-email/components";
+import { Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text, Tailwind, Hr } from "@react-email/components";
+import EmailLogo from "./components/logo";
 
 interface ShareCredentialsEmailProps {
     url: string;
@@ -6,44 +7,37 @@ interface ShareCredentialsEmailProps {
 }
 
 export function ShareCredentialsEmail({ url, host }: ShareCredentialsEmailProps) {
-    const previewText = `Credentials have been securely shared with you`;
     return (
         <Html>
             <Head />
-            <Preview>{previewText}</Preview>
+            <Preview>Access shared credentials on {host}</Preview>
             <Tailwind>
                 <Body className="bg-muted font-sans">
-                    <Container className="bg-background shadow-md mx-auto my-[40px] p-[20px] border border-solid rounded-[10px] max-w-[600px]">
-                        <Section className="mt-[32px] text-center">
-                            <Heading className="m-0 font-normal text-[24px] text-foreground">
-                                Secure Credential Sharing
-                            </Heading>
-                            <Text className="mt-[10px] mb-[20px] text-[16px] text-muted-foreground">
-                                With Superpowers
-                            </Text>
+                    <Container className="border-[#eaeaea] mx-auto my-[40px] p-[20px] border border-solid rounded max-w-[465px]">
+                        <Section className="mt-[20px] text-center">
+                            <EmailLogo />
                         </Section>
                         <Section className="mt-[32px] mb-[32px] text-center">
-                            <Text className="mb-[20px] text-[18px] text-foreground">
-                                Access your securely shared credentials on <strong>{host}</strong>
+                            <Text className="mx-0 my-[34px] p-0 font-normal text-[24px] text-black text-center">
+                                Access shared credentials on <strong>{host}</strong>
                             </Text>
                             <Button
                                 href={url}
-                                className="bg-primary px-6 py-3 rounded font-bold text-[16px] text-primary-foreground no-underline"
+                                className="bg-[#000000] px-5 py-3 rounded font-semibold text-[12px] text-center text-white no-underline"
                             >
                                 View Credentials
                             </Button>
-                        </Section>
-                        <Section className="mt-[32px] text-center">
-                            <Text className="m-0 text-[14px] text-muted-foreground">
+                            <Text className="text-[12px] text-center leading-[24px]">
                                 These credentials will be deleted after you close the page.
                             </Text>
-                            <Text className="mt-[10px] mb-0 text-[14px] text-muted-foreground">
-                                Make sure to copy and store them securely.
+                            <Text className="text-[12px] text-center leading-[24px]">
+                                <strong>The button doesn&apos;t work?</strong><br /> Copy and paste the link into your browser:<br /> <Link href={url} target="_blank">{url}</Link>
                             </Text>
                         </Section>
-                        <Section className="mt-[32px] text-center">
-                            <Text className="m-0 text-[12px] text-muted-foreground">
-                                If you did not request these credentials, please ignore this email.
+                        <Hr className="border-[#eaeaea] mx-0 my-[14px] border border-solid w-full" />
+                        <Section className="mt-[20px]">
+                            <Text className="text-[#666666] text-[12px] text-center leading-[24px]">
+                                Make sure to copy and store the credentials securely. <br /> If you did not request these credentials, you can safely ignore this email.
                             </Text>
                         </Section>
                     </Container>
