@@ -24,7 +24,7 @@ const workspaceSchema = {
     slug: v.string(),
     iconId: v.string(),
     logo: v.optional(v.string()),
-    inviteCode: v.string(),
+    defaultInvite: v.optional(v.id("workspaceInvites")),
     planType: planTypes,
     customer: v.optional(v.id('customers')),
 };

@@ -2,7 +2,8 @@
 
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
 -   [x] Re-think the schema for workspaces / users and who does what — e.g. payments, access to features etc.
-- [ ] Faster redirect after creating the first workspace
+-   [ ] Faster redirect after creating the first workspace
+-   [ ] On regenerate invite link, make the previous one expired
 
 ### What's needed for launch:
 
@@ -34,11 +35,13 @@
             -   [ ] nothing (read only)
 
 -   [ ] Request credentials from clients
+
     -   [ ] Add instructions on where to get the passwords from
 
 -   [ ] Share link via email / text
 
 -   [ ] Sidebar menu
+
     -   [x] Credentials
         -   [x] Shared
         -   [x] Requested
@@ -52,6 +55,7 @@
         -   [ ] People / team
 
 -   [ ] User settings
+
     -   General:
     -   [ ] name
     -   [ ] picture

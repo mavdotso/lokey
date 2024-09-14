@@ -4,6 +4,7 @@ import { getViewerId } from './auth';
 import { nanoid } from 'nanoid';
 import { planTypeValidator } from './types';
 import { canCreateWorkspace } from './limits';
+import { createInvite } from './invites';
 
 export const createWorkspace = mutation({
     args: {
@@ -42,14 +43,22 @@ export const createWorkspace = mutation({
             throw new Error('The slug is not unique');
         }
 
-        const inviteCode = nanoid(10);
-
         const workspaceId = await ctx.db.insert('workspaces', {
             ...args,
             ownerId: identity,
-            inviteCode,
             planType: args.planType,
         });
+
+        const newInvite = await createInvite(ctx, {
+            workspaceId,
+            role: 'member',
+        });
+
+        if (newInvite.success && newInvite.data) {
+            await ctx.db.patch(workspaceId, {
+                defaultInvite: newInvite.data.inviteId,
+            });
+        }
 
         await ctx.db.insert('userWorkspaces', {
             userId: user._id,
@@ -410,12 +419,17 @@ export const updateWorkspaceInviteCode = mutation({
             throw new Error('Unauthorized: You are not the owner of this workspace');
         }
 
-        const newInviteCode = nanoid(10);
-
-        await ctx.db.patch(args._id, {
-            inviteCode: newInviteCode,
+        const newInvite = await createInvite(ctx, {
+            workspaceId: args._id,
+            role: 'member',
         });
 
-        return { success: true, message: 'Workspace invite code updated successfully', inviteCode: newInviteCode };
+        if (newInvite.success && newInvite.data) {
+            await ctx.db.patch(args._id, {
+                defaultInvite: newInvite.data.inviteId,
+            });
+        }
+
+        return { success: true, message: 'Workspace invite code updated successfully', inviteCode: newInvite.data?.inviteCode };
     },
 });

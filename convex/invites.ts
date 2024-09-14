@@ -21,13 +21,12 @@ export const createInvite = mutation({
             const user = await getUser(ctx, { _id: identity });
 
             if (!user) return { success: false, message: 'User not found' };
-            if (!args.invitedUserId && !args.invitedEmail) return { success: false, message: 'Either invitedUserId or invitedEmail must be provided' };
 
             const inviteCode = nanoid(10);
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 7);
 
-            await ctx.db.insert('workspaceInvites', {
+            const inviteId = await ctx.db.insert('workspaceInvites', {
                 workspaceId: args.workspaceId,
                 invitedBy: user._id,
                 invitedUserId: args.invitedUserId,
@@ -38,7 +37,7 @@ export const createInvite = mutation({
                 inviteCode,
             });
 
-            return { success: true, message: 'Invite created successfully', data: inviteCode };
+            return { success: true, message: 'Invite created successfully', data: { inviteId, inviteCode } };
         } catch (error: any) {
             return { success: false, message: `An unexpected error occurred: ${error.message}` };
         }
@@ -120,19 +119,40 @@ export const generateInviteLink = mutation({
     },
 });
 
-export const getInviteByCode = query({
-    args: { inviteCode: v.string() },
+export const getInviteById = query({
+    args: { _id: v.string() },
     handler: async (ctx, args) => {
         const invite = await ctx.db
             .query('workspaceInvites')
-            .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
+            .filter((q) => q.eq(q.field('_id'), args._id))
             .first();
 
         if (!invite) {
             return null;
         }
 
+        return invite;
+    },
+});
+
+export const getInviteByCode = query({
+    args: { inviteCode: v.string() },
+    handler: async (ctx, args) => {
+        console.log('Searching for invite with code:', args.inviteCode);
+        const invite = await ctx.db
+            .query('workspaceInvites')
+            .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
+            .first();
+
+        console.log('Found invite:', invite);
+
+        if (!invite) {
+            return null;
+        }
+
         const workspace = await ctx.db.get(invite.workspaceId);
+
+        console.log('Found workspace:', workspace);
 
         if (!workspace) {
             return null;
@@ -157,19 +177,23 @@ export const joinWorkspaceByInviteCode = mutation({
             throw new Error('User is not authenticated');
         }
 
-        const workspace = await ctx.db
-            .query('workspaces')
+        const invite = await ctx.db
+            .query('workspaceInvites')
             .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
             .first();
 
-        if (!workspace) {
+        if (!invite) {
             throw new Error('Invalid invite code');
+        }
+
+        if (invite.status !== 'pending') {
+            throw new Error('This invite has already been processed');
         }
 
         const existingMembership = await ctx.db
             .query('userWorkspaces')
             .filter((q) => q.eq(q.field('userId'), identity))
-            .filter((q) => q.eq(q.field('workspaceId'), workspace._id))
+            .filter((q) => q.eq(q.field('workspaceId'), invite.workspaceId))
             .first();
 
         if (existingMembership) {
@@ -178,9 +202,11 @@ export const joinWorkspaceByInviteCode = mutation({
 
         await ctx.db.insert('userWorkspaces', {
             userId: identity,
-            workspaceId: workspace._id,
-            role: 'member',
+            workspaceId: invite.workspaceId,
+            role: invite.role,
         });
+
+        await ctx.db.patch(invite._id, { status: 'accepted' });
 
         return { success: true, message: 'Successfully joined the workspace' };
     },

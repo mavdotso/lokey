@@ -15,11 +15,17 @@ interface InviteLinkDialogProps {
 
 export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
     const [inviteLink, setInviteLink] = useState("");
+
     const updateWorkspaceInviteCode = useMutation(api.workspaces.updateWorkspaceInviteCode);
+    const getInviteLink = useQuery(api.invites.getInviteById, workspace.defaultInvite ? { _id: workspace.defaultInvite } : 'skip')
+
+    console.log(getInviteLink)
 
     useEffect(() => {
-        setInviteLink(`${getURL()}/invite/${workspace.inviteCode}`);
-    }, [workspace]);
+        if (getInviteLink) {
+            setInviteLink(`${getURL()}/invite/${getInviteLink.inviteCode}`);
+        }
+    }, [getInviteLink]);
 
     async function handleUpdateInviteCode() {
         if (!workspace._id) return;

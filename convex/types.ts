@@ -47,7 +47,7 @@ export type Workspace = {
     slug: string;
     iconId: string;
     logo?: string;
-    inviteCode: string;
+    defaultInvite?: Id<"workspaceInvites">;
     planType: PlanType;
     customer?: Id<'customers'>;
 };
