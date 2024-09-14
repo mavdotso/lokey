@@ -25,9 +25,13 @@ export const ConvexAdapter: Adapter = {
     },
     async createUser({ id: _, ...user }: User) {
         const id = await callMutation(api.authAdapter.createUser, {
-            user: toDB(user),
+            user: toDB({
+                ...user,
+                planType: 'FREE' as const,
+                twoFactorEnabled: false,
+            }),
         });
-        return { ...user, id };
+        return { ...user, id, planType: 'FREE', twoFactorEnabled: false };
     },
     async createVerificationToken(verificationToken: VerificationToken) {
         await callMutation(api.authAdapter.createVerificationToken, {
