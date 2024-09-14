@@ -10,7 +10,7 @@ export const createInvite = mutation({
         workspaceId: v.id('workspaces'),
         invitedUserId: v.optional(v.id('users')),
         invitedEmail: v.optional(v.string()),
-        role: v.union(v.literal('admin'), v.literal('manager'), v.literal('member')),
+        role: v.union(v.literal('manager'), v.literal('member')),
     },
     handler: async (ctx, args) => {
         try {
@@ -114,7 +114,7 @@ export const respondToInvite = mutation({
 export const generateInviteLink = mutation({
     args: {
         workspaceId: v.id('workspaces'),
-        role: v.union(v.literal('admin'), v.literal('manager'), v.literal('member')),
+        role: v.union(v.literal('manager'), v.literal('member')),
     },
     handler: async (ctx, args) => {
         try {
@@ -151,9 +151,57 @@ export const generateInviteLink = mutation({
 export const getInviteByCode = query({
     args: { inviteCode: v.string() },
     handler: async (ctx, args) => {
-        return await ctx.db
-            .query('workspaceInvites')
+        const workspace = await ctx.db
+            .query('workspaces')
             .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
             .first();
+
+        if (!workspace) {
+            return null;
+        }
+
+        return {
+            workspaceId: workspace._id,
+            workspaceName: workspace.name,
+            inviteCode: workspace.inviteCode,
+        };
+    },
+});
+
+export const joinWorkspaceByInviteCode = mutation({
+    args: { inviteCode: v.string() },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+
+        if (!identity) {
+            throw new Error('User is not authenticated');
+        }
+
+        const workspace = await ctx.db
+            .query('workspaces')
+            .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
+            .first();
+
+        if (!workspace) {
+            throw new Error('Invalid invite code');
+        }
+
+        const existingMembership = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), identity))
+            .filter((q) => q.eq(q.field('workspaceId'), workspace._id))
+            .first();
+
+        if (existingMembership) {
+            throw new Error('You are already a member of this workspace');
+        }
+
+        await ctx.db.insert('userWorkspaces', {
+            userId: identity,
+            workspaceId: workspace._id,
+            role: 'member',
+        });
+
+        return { success: true, message: 'Successfully joined the workspace' };
     },
 });

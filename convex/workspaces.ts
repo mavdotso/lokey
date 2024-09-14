@@ -1,7 +1,7 @@
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { User } from './types';
+import { nanoid } from 'nanoid';
 
 export const createWorkspace = mutation({
     args: {
@@ -32,9 +32,12 @@ export const createWorkspace = mutation({
             throw new Error('The slug is not unique');
         }
 
+        const inviteCode = nanoid(10);
+
         const workspaceId = await ctx.db.insert('workspaces', {
             ...args,
             workspaceOwner: identity,
+            inviteCode,
         });
 
         await ctx.db.insert('userWorkspaces', {
@@ -374,3 +377,34 @@ export const updateWorkspaceLogo = mutation({
       return { success: true, message: 'Workspace deleted successfully' };
     },
   });
+
+  export const updateWorkspaceInviteCode = mutation({
+    args: {
+        workspaceId: v.id('workspaces'),
+    },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+
+        if (!identity) {
+            throw new Error('User is not authenticated');
+        }
+
+        const workspace = await ctx.db.get(args.workspaceId);
+
+        if (!workspace) {
+            throw new Error('Workspace not found');
+        }
+
+        if (workspace.workspaceOwner !== identity) {
+            throw new Error('Unauthorized: You are not the owner of this workspace');
+        }
+
+        const newInviteCode = nanoid(10);
+
+        await ctx.db.patch(args.workspaceId, {
+            inviteCode: newInviteCode,
+        });
+
+        return { success: true, message: 'Workspace invite code updated successfully', inviteCode: newInviteCode };
+    },
+});

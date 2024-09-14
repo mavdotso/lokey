@@ -22,7 +22,7 @@ export function UserSettingsCard({ users, workspace }: UserSettingsCardProps) {
                 <div className="flex gap-2">
                     {workspace._id && <>
                         <InviteEmailDialog workspaceId={workspace._id} />
-                        <InviteLinkDialog workspaceId={workspace._id} />
+                        <InviteLinkDialog workspace={workspace} />
                     </>
                     }
                 </div>

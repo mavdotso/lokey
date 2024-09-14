@@ -40,7 +40,7 @@ export function CredentialsSortControls({
             <div className="flex items-center gap-6 w-full">
                 <Input
                     type="text"
-                    placeholder="Search credentials..."
+                    placeholder="Search by name"
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
                     className='flex bg-background'
@@ -49,7 +49,7 @@ export function CredentialsSortControls({
                     options={credentialTypeOptions}
                     onValueChange={onTypeChange}
                     defaultValue={selectedTypes}
-                    placeholder="Search types"
+                    placeholder="Search by type"
                     variant="default"
                     maxCount={1}
                 />
@@ -58,10 +58,10 @@ export function CredentialsSortControls({
                         <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="name">Sort by Name</SelectItem>
-                        <SelectItem value="createdAtAsc">Sort by Date Created (Asc)</SelectItem>
-                        <SelectItem value="createdAtDesc">Sort by Date Created (Desc)</SelectItem>
-                        <SelectItem value="updatedAt">Sort by Date Updated</SelectItem>
+                        <SelectItem value="name">Sort by name</SelectItem>
+                        <SelectItem value="createdAtAsc">Sort by nate created (asc)</SelectItem>
+                        <SelectItem value="createdAtDesc">Sort by date created (desc)</SelectItem>
+                        <SelectItem value="updatedAt">Sort by date updated</SelectItem>
                     </SelectContent>
                 </Select>
                 <div className="flex items-center space-x-2 whitespace-nowrap">

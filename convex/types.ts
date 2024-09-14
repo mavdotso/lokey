@@ -39,6 +39,7 @@ export type Workspace = {
     slug: string;
     iconId: string;
     logo?: string;
+    inviteCode: string;
 };
 
 export type UserRole = {

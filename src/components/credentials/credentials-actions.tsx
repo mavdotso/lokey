@@ -60,7 +60,6 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
         }
     }
 
-
     return (
         <>
             <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>

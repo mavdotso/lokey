@@ -22,6 +22,7 @@ const workspaceSchema = {
     slug: v.string(),
     iconId: v.string(),
     logo: v.optional(v.string()),
+    inviteCode: v.string(),
 };
 
 const userRoleSchema = {
