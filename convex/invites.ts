@@ -23,10 +23,11 @@ export const createInvite = mutation({
             if (!user) return { success: false, message: 'User not found' };
             if (!args.invitedUserId && !args.invitedEmail) return { success: false, message: 'Either invitedUserId or invitedEmail must be provided' };
 
+            const inviteCode = nanoid(10);
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 7);
 
-            const inviteId = await ctx.db.insert('workspaceInvites', {
+            await ctx.db.insert('workspaceInvites', {
                 workspaceId: args.workspaceId,
                 invitedBy: user._id,
                 invitedUserId: args.invitedUserId,
@@ -34,9 +35,10 @@ export const createInvite = mutation({
                 role: args.role,
                 status: 'pending',
                 expiresAt: expiresAt.toISOString(),
+                inviteCode,
             });
 
-            return { success: true, message: 'Invite created successfully', data: inviteId };
+            return { success: true, message: 'Invite created successfully', data: inviteCode };
         } catch (error: any) {
             return { success: false, message: `An unexpected error occurred: ${error.message}` };
         }

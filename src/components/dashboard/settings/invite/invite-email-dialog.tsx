@@ -4,22 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Trash, Plus } from "lucide-react";
-import { RoleType } from "@/convex/types";
+import { RoleType, Workspace } from "@/convex/types";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { getURL } from "@/lib/utils";
 
 interface InviteEmailDialogProps {
-    workspaceId: Id<"workspaces">;
+    workspace: Workspace;
 }
 
 type InvitableRoleType = Exclude<RoleType, "admin">;
 
-export function InviteEmailDialog({ workspaceId }: InviteEmailDialogProps) {
+export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
     const [emails, setEmails] = useState([{ id: 1, value: '', role: 'member' as InvitableRoleType }]);
     const createInvite = useMutation(api.invites.createInvite);
+    const [isLoading, setIsLoading] = useState(false);
+    const baseUrl = getURL();
 
     function addEmailField() {
         const newId = emails.length > 0 ? Math.max(...emails.map(e => e.id)) + 1 : 1;
@@ -39,24 +41,66 @@ export function InviteEmailDialog({ workspaceId }: InviteEmailDialogProps) {
     };
 
     async function handleSendInvites() {
-        for (const email of emails) {
-            if (email.value) {
-                try {
-                    await createInvite({
-                        workspaceId,
-                        invitedEmail: email.value,
+        if (!workspace || !workspace._id) {
+            toast.error("Invalid workspace");
+            return;
+        }
+
+        setIsLoading(true);
+        const validEmails = emails.filter(email => email.value.trim());
+
+        try {
+            const invitePromises = validEmails.map(async (email) => {
+
+                const result = await createInvite({
+                    workspaceId: workspace._id!,
+                    invitedEmail: email.value.trim(),
+                    role: email.role,
+                });
+
+                if (result.success) {
+                    return {
+                        to: email.value.trim(),
+                        invitedByUsername: 'A team member',
+                        workspaceName: workspace?.name || 'Your Workspace',
+                        inviteLink: `${baseUrl}/invite/${result.data}`,
                         role: email.role,
-                    });
-                    toast.success("Invitation sent", {
-                        description: `An invitation has been sent to ${email.value}`,
-                    });
-                } catch (error) {
-                    toast.error(`Failed to send invitation to ${email.value}`);
+                    };
+
+                } else {
+                    throw new Error(`Failed to create invite for ${email.value}: ${result.message}`);
+                }
+            });
+
+            const invites = await Promise.all(invitePromises);
+
+            for (const invite of invites) {
+                const response = await fetch('/api/emails/invite', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(invite),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to send invitation to ${invite.to}`);
                 }
             }
+
+            toast.success("Invitations sent", {
+                description: `Invitations have been sent to ${validEmails.length} email${validEmails.length > 1 ? 's' : ''}.`,
+            });
+
+            setEmails([{ id: 1, value: '', role: 'member' as InvitableRoleType }]);
+        } catch (error) {
+            console.error('Error sending invitations:', error);
+            toast.error("Failed to send invitations", {
+                description: "An error occurred while sending the invitations. Please try again.",
+            });
+        } finally {
+            setIsLoading(false);
         }
-        // Reset the form after sending invites
-        setEmails([{ id: 1, value: '', role: 'member' as InvitableRoleType }]);
     }
 
     return (
@@ -109,8 +153,14 @@ export function InviteEmailDialog({ workspaceId }: InviteEmailDialogProps) {
                     </Button>
                 </div>
                 <DialogFooter className="sm:justify-between py-2">
-                    <Button type="button" size={"lg"} className="w-full" onClick={handleSendInvites}>
-                        Send invites
+                    <Button
+                        type="button"
+                        size={"lg"}
+                        className="w-full"
+                        onClick={handleSendInvites}
+                        disabled={isLoading || emails.every(email => !email.value.trim())}
+                    >
+                        {isLoading ? 'Sending...' : 'Send invites'}
                     </Button>
                 </DialogFooter>
             </DialogContent>
