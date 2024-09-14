@@ -1,17 +1,19 @@
-import { User, Workspace } from "@/convex/types";
+import { User, Workspace, WorkspaceInvite } from "@/convex/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WorkspaceMemberCard } from "./workspace-member-card";
 import { Separator } from "@/components/ui/separator";
 import { InviteLinkDialog } from "./invite/invite-link-dialog";
 import { InviteEmailDialog } from "./invite/invite-email-dialog";
+import { InviteCard } from "./invite-card";
 
 interface UserSettingsCardProps {
-    users: User[],
     workspace: Workspace
+    users: User[],
+    invites: WorkspaceInvite[]
 }
 
-export function UserSettingsCard({ users, workspace }: UserSettingsCardProps) {
+export function UserSettingsCard({ users, workspace, invites }: UserSettingsCardProps) {
     return (
         <Card className="shadow-none overflow-hidden">
             <CardHeader className="flex flex-row justify-between">
@@ -20,11 +22,11 @@ export function UserSettingsCard({ users, workspace }: UserSettingsCardProps) {
                     <CardDescription>Teammates that have access to this workspace.</CardDescription>
                 </div>
                 <div className="flex gap-2">
-                    {workspace && 
-                    <>
-                        <InviteEmailDialog workspace={workspace} />
-                        <InviteLinkDialog workspace={workspace} />
-                    </>
+                    {workspace &&
+                        <>
+                            <InviteEmailDialog workspace={workspace} />
+                            <InviteLinkDialog workspace={workspace} />
+                        </>
                     }
                 </div>
             </CardHeader>
@@ -33,14 +35,20 @@ export function UserSettingsCard({ users, workspace }: UserSettingsCardProps) {
                 <Tabs defaultValue="account" className="w-full">
                     <TabsList>
                         <TabsTrigger value="account">Members</TabsTrigger>
-                        <TabsTrigger value="password">Invites</TabsTrigger>
+                        <TabsTrigger value="invites">Invites</TabsTrigger>
                     </TabsList>
                     <TabsContent value="account" className="space-y-4">
                         {users.map((user, index) => (
                             <WorkspaceMemberCard key={index} user={user} workspace={workspace} />
                         ))}
                     </TabsContent>
-                    <TabsContent value="password">Change your password here.</TabsContent>
+                    <TabsContent value="invites">{invites.length > 0 ? (
+                        invites.map((invite, index) => (
+                            <InviteCard key={index} invite={invite} />
+                        ))
+                    ) : (
+                        <p className="text-left text-muted-foreground text-sm">No pending invites</p>
+                    )}</TabsContent>
                 </Tabs>
             </CardContent>
         </Card>

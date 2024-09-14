@@ -34,6 +34,7 @@ export default function SettingsPage() {
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string })
     const users = useQuery(api.workspaces.getWorkspaceUsers, workspace ? { _id: workspace._id } : 'skip')
+    const invites = useQuery(api.invites.getWorkspaceInvites, workspace ? { workspaceId: workspace._id } : 'skip')
 
     const editWorkspace = useMutation(api.workspaces.editWorkspace);
     const updateWorkspaceLogo = useMutation(api.workspaces.updateWorkspaceLogo);
@@ -163,7 +164,7 @@ export default function SettingsPage() {
                                 />
                             </TabsContent>
                             <TabsContent value="users">
-                                <UserSettingsCard users={workspaceUsers} workspace={workspace} />
+                                <UserSettingsCard users={workspaceUsers} workspace={workspace} invites={invites ?? []} />
                             </TabsContent>
                             <TabsContent value="billing">
                                 <h2 className="font-bold text-lg">Billing</h2>

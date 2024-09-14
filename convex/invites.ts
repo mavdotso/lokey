@@ -185,3 +185,16 @@ export const joinWorkspaceByInviteCode = mutation({
         return { success: true, message: 'Successfully joined the workspace' };
     },
 });
+
+export const getWorkspaceInvites = query({
+    args: { workspaceId: v.id('workspaces') },
+    handler: async (ctx, args) => {
+        const invites = await ctx.db
+            .query('workspaceInvites')
+            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+            .filter((q) => q.eq(q.field('status'), 'pending'))
+            .collect();
+
+        return invites;
+    },
+});
