@@ -8,7 +8,7 @@
 
 - [ ] Invite links:
     - [ ] Change getIdentity functions in schema
-    - [ ] Change to a permanent invite link (via link)
+    - [x] Change to a permanent invite link (via link)
 
 -   [ ] Workspace settings
 

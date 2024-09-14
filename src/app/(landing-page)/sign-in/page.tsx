@@ -14,7 +14,7 @@ export default function SignIn() {
                         Or start your 14-day free trial
                     </p>
                 </div>
-                <form action={signin} className="flex flex-row justify-center items-center gap-2 py-4 max-w-lg">
+                <form action={signin} className="flex flex-row justify-center items-center gap-2 max-w-lg">
                     <Input
                         type="email"
                         name="email"
@@ -23,7 +23,7 @@ export default function SignIn() {
                     />
                     <SubmitButton buttonText='Sign in with Magic link' buttonPendingText='Sending Magic Link...' />
                 </form>
-                <span className="text-center text-muted-foreground text-xs">
+                <span className="pt-4 text-center text-muted-foreground text-xs">
                     You will receive a sign-in link to your email address
                 </span>
             </div>

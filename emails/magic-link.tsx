@@ -5,7 +5,7 @@ interface SecurePasswordSharingEmailProps {
   host: string;
 }
 
-export function MagicLinkEmail({ url, host }: SecurePasswordSharingEmailProps) {
+export function MagicLinkEmailReact({ url, host }: SecurePasswordSharingEmailProps) {
 
   const previewText = `Sign in to ${host}`;
 
@@ -81,7 +81,7 @@ export function html({ url, host }: { url: string; host: string }) {
     `;
 }
 
-export function text({ url, host }: { url: string; host: string }) {
+export function MagicLinkEmailText({ url, host }: { url: string; host: string }) {
   return `
   Sign in to ${host}
   

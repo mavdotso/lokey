@@ -2,7 +2,7 @@ import { SignJWT, importPKCS8 } from 'jose';
 import NextAuth from 'next-auth';
 import Resend from 'next-auth/providers/resend';
 import { ConvexAdapter } from '@/lib/convex-adapter';
-import { html, text } from '@/emails/magic-link';
+import { getURL } from './utils';
 
 if (process.env.CONVEX_AUTH_PRIVATE_KEY === undefined) {
     throw new Error('Missing CONVEX_AUTH_PRIVATE_KEY Next.js environment variable');
@@ -21,23 +21,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             from: process.env.EMAIL_FROM,
             async sendVerificationRequest({ identifier: email, url, provider: { server, from } }) {
                 const { host } = new URL(url);
-                const res = await fetch('https://api.resend.com/emails', {
+                const baseUrl = getURL();
+
+                const response = await fetch(`${baseUrl}/api/emails/magic-link`, {
                     method: 'POST',
                     headers: {
-                        Authorization: `Bearer ${process.env.AUTH_RESEND_KEY}`,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        from,
                         to: email,
-                        subject: `Sign in to ${host}`,
-                        html: html({ url, host }),
-                        text: text({ url, host }),
+                        url,
+                        host,
                     }),
                 });
 
-                if (!res.ok) {
-                    throw new Error('Resend error: ' + JSON.stringify(await res.json()));
+                if (!response.ok) {
+                    throw new Error('Failed to send verification email');
                 }
             },
         }),
