@@ -17,7 +17,6 @@ export default function InvitePage() {
     const session = useSession();
     const params = useParams();
     const inviteCode = params.inviteCode as string;
-    console.log('Invite code:', inviteCode);
     const getInviteDetails = useQuery(api.invites.getInviteByCode, { inviteCode });
 
     const respondToInvite = useMutation(api.invites.respondToInvite);

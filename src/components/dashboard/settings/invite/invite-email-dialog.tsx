@@ -10,6 +10,7 @@ import { api } from "@/convex/_generated/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { getURL } from "@/lib/utils";
+import { addDays } from 'date-fns';
 
 interface InviteEmailDialogProps {
     workspace: Workspace;
@@ -51,22 +52,23 @@ export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
 
         try {
             const invitePromises = validEmails.map(async (email) => {
+                const expiresAt = addDays(new Date(), 5).toISOString();
 
                 const result = await createInvite({
                     workspaceId: workspace._id!,
                     invitedEmail: email.value.trim(),
                     role: email.role,
+                    expiresAt: expiresAt,
                 });
 
-                if (result.success) {
+                if (result.success && result.data) {
                     return {
                         to: email.value.trim(),
                         invitedByUsername: 'A team member',
                         workspaceName: workspace?.name || 'Your Workspace',
-                        inviteLink: `${baseUrl}/invite/${result.data}`,
+                        inviteLink: `${baseUrl}/invite/${result.data.inviteCode}`,
                         role: email.role,
                     };
-
                 } else {
                     throw new Error(`Failed to create invite for ${email.value}: ${result.message}`);
                 }
@@ -114,7 +116,7 @@ export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
                 <DialogHeader>
                     <DialogTitle>Invite people</DialogTitle>
                     <DialogDescription>
-                        Invite teammates to join your workspace. Invitations will be valid for 14 days.
+                        Invite teammates to join your workspace. Invitations are valid for 5 days.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col gap-2 py-2">
