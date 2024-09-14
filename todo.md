@@ -3,7 +3,8 @@
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
 -   [x] Re-think the schema for workspaces / users and who does what — e.g. payments, access to features etc.
 -   [ ] Faster redirect after creating the first workspace
--   [ ] On regenerate invite link, make the previous one expired
+-   [x] On regenerate invite link, make the previous one expired
+-   [x] Make default workspace links not expire
 
 -   [ ] When redirected to sign-in with /invite, pass it through the entire onboarding and open a popup with the 'Join workspace' instead of creating a new one
     -   Perhaps add a flag during user registration?

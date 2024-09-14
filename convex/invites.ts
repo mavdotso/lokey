@@ -11,6 +11,7 @@ export const createInvite = mutation({
         invitedUserId: v.optional(v.id('users')),
         invitedEmail: v.optional(v.string()),
         role: v.union(v.literal('manager'), v.literal('member')),
+        expiresAt: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         try {
@@ -23,8 +24,6 @@ export const createInvite = mutation({
             if (!user) return { success: false, message: 'User not found' };
 
             const inviteCode = nanoid(10);
-            const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + 7);
 
             const inviteId = await ctx.db.insert('workspaceInvites', {
                 workspaceId: args.workspaceId,
@@ -33,7 +32,7 @@ export const createInvite = mutation({
                 invitedEmail: args.invitedEmail,
                 role: args.role,
                 status: 'pending',
-                expiresAt: expiresAt.toISOString(),
+                expiresAt: args.expiresAt,
                 inviteCode,
             });
 
@@ -222,5 +221,32 @@ export const getWorkspaceInvites = query({
             .collect();
 
         return invites;
+    },
+});
+
+export const setInviteExpired = mutation({
+    args: {
+        _id: v.id('workspaceInvites'),
+    },
+    handler: async (ctx, args) => {
+        try {
+            const identity = await getViewerId(ctx);
+
+            if (!identity) return { success: false, message: 'Not authenticated' };
+
+            const invite = await ctx.db.get(args._id);
+
+            if (!invite) return { success: false, message: 'Invite not found' };
+
+            if (invite.status !== 'pending') {
+                return { success: false, message: 'Invite is not in pending status' };
+            }
+
+            await ctx.db.patch(args._id, { status: 'expired' });
+
+            return { success: true, message: 'Invite set as expired successfully' };
+        } catch (error: any) {
+            return { success: false, message: `An unexpected error occurred: ${error.message}` };
+        }
     },
 });

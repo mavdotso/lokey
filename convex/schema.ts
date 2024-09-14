@@ -1,10 +1,11 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v, Validator } from 'convex/values';
-import { credentialsTypeValidator, planTypeValidator, roleTypeValidator } from './types';
+import { credentialsTypeValidator, inviteTypeValidator, planTypeValidator, roleTypeValidator } from './types';
 
 const userRole = roleTypeValidator;
 const credentialsType = credentialsTypeValidator;
 const planTypes = planTypeValidator;
+const inviteTypes = inviteTypeValidator;
 
 const pricingType = v.union(v.literal('recurring'), v.literal('one_time'));
 const pricingPlanInterval = v.union(v.literal('year'), v.literal('month'), v.literal('week'), v.literal('day'));
@@ -24,7 +25,7 @@ const workspaceSchema = {
     slug: v.string(),
     iconId: v.string(),
     logo: v.optional(v.string()),
-    defaultInvite: v.optional(v.id("workspaceInvites")),
+    defaultInvite: v.optional(v.id('workspaceInvites')),
     planType: planTypes,
     customer: v.optional(v.id('customers')),
 };
@@ -55,8 +56,8 @@ const workspaceInviteSchema = {
     invitedUserId: v.optional(v.id('users')),
     invitedEmail: v.optional(v.string()),
     role: userRole,
-    status: v.union(v.literal('pending'), v.literal('accepted'), v.literal('rejected')),
-    expiresAt: v.string(),
+    status: inviteTypes,
+    expiresAt: v.optional(v.string()),
     inviteCode: v.optional(v.string()),
 };
 

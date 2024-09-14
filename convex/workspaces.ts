@@ -4,7 +4,7 @@ import { getViewerId } from './auth';
 import { nanoid } from 'nanoid';
 import { planTypeValidator } from './types';
 import { canCreateWorkspace } from './limits';
-import { createInvite } from './invites';
+import { createInvite, setInviteExpired } from './invites';
 
 export const createWorkspace = mutation({
     args: {
@@ -417,6 +417,13 @@ export const updateWorkspaceInviteCode = mutation({
 
         if (workspace.ownerId !== identity) {
             throw new Error('Unauthorized: You are not the owner of this workspace');
+        }
+
+        if (workspace.defaultInvite) {
+            const expireResult = await setInviteExpired(ctx, { _id: workspace.defaultInvite });
+            if (!expireResult.success) {
+                throw new Error(`Failed to expire previous invite: ${expireResult.message}`);
+            }
         }
 
         const newInvite = await createInvite(ctx, {

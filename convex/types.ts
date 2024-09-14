@@ -38,6 +38,11 @@ export const planTypes = ['FREE', 'TEAM'] as const;
 export type PlanType = (typeof planTypes)[number];
 export const planTypeValidator = v.union(...planTypes.map(v.literal));
 
+/* INVITE TYPES */
+export const inviteTypes = ['accepted', 'rejected', 'expired', 'pending'] as const;
+export type InviteType = (typeof inviteTypes)[number];
+export const inviteTypeValidator = v.union(...inviteTypes.map(v.literal));
+
 /* APP TYPES */
 export type Workspace = {
     _id?: Id<'workspaces'>;
@@ -47,7 +52,7 @@ export type Workspace = {
     slug: string;
     iconId: string;
     logo?: string;
-    defaultInvite?: Id<"workspaceInvites">;
+    defaultInvite?: Id<'workspaceInvites'>;
     planType: PlanType;
     customer?: Id<'customers'>;
 };
@@ -84,8 +89,8 @@ export type WorkspaceInvite = {
     invitedUserId?: Id<'users'>;
     invitedEmail?: string;
     role: RoleType;
-    status: 'pending' | 'accepted' | 'rejected';
-    expiresAt: string;
+    status: InviteType;
+    expiresAt?: string;
     inviteCode?: string;
 };
 

@@ -9,6 +9,7 @@ export const WORKSPACE_PLAN_LIMITS = {
         secretRequestsAndChats: 10,
         secretAttachmentSize: 5 * 1024 * 1024, // 5 MB
         teamSize: 1,
+        apiAccess: false,
     },
     TEAM: {
         secretsPerMonth: Infinity,
