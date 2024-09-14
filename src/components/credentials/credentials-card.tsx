@@ -38,12 +38,11 @@ export function CredentialsCard({ credentials }: CredentialCardProps) {
 
     function getCredentialTags() {
         const tags: string[] = [credentials.type];
-        if (credentials.subtype) {
-            tags.push(credentials.subtype);
-        }
-        if (credentials.type === 'custom' && credentials.customTypeId) {
+
+        if (credentials.type === 'custom') {
             tags.push('custom');
         }
+        
         return tags;
     }
 

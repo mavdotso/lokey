@@ -19,17 +19,14 @@ const subscriptionStatus = v.union(
 );
 
 const workspaceSchema = {
-    workspaceOwner: v.id('users'),
+    ownerId: v.id('users'),
     name: v.string(),
     slug: v.string(),
     iconId: v.string(),
     logo: v.optional(v.string()),
     inviteCode: v.string(),
-};
-
-const userRoleSchema = {
-    userId: v.id('users'),
-    role: userRole,
+    planType: planTypes,
+    customer: v.optional(v.id('customers')),
 };
 
 const userWorkspaceSchema = {
@@ -38,41 +35,18 @@ const userWorkspaceSchema = {
     role: userRole,
 };
 
-const customCredentialsTypeSchema = {
-    workspaceId: v.id('workspaces'),
-    name: v.string(),
-    description: v.optional(v.string()),
-    schema: v.any(),
-    updatedAt: v.string(),
-};
-
 const credentialsSchema = {
     workspaceId: v.optional(v.id('workspaces')),
     name: v.string(),
     description: v.optional(v.string()),
     createdBy: v.optional(v.id('users')),
     type: credentialsType,
-    subtype: v.optional(v.string()),
-    customTypeId: v.optional(v.id('customCredentialsTypes')),
     encryptedData: v.string(),
     privateKey: v.string(),
     updatedAt: v.string(),
     expiresAt: v.optional(v.string()),
     maxViews: v.optional(v.number()),
     viewCount: v.number(),
-};
-
-const credentialsAccessLogSchema = {
-    credentialsId: v.id('credentials'),
-    userId: v.optional(v.id('users')),
-    accessedAt: v.string(),
-};
-
-const activityNotificationSchema = {
-    workspaceId: v.id('workspaces'),
-    userId: v.id('users'),
-    message: v.string(),
-    readAt: v.optional(v.string()),
 };
 
 const workspaceInviteSchema = {
@@ -129,7 +103,7 @@ const priceSchema = {
 };
 
 const subscriptionSchema = {
-    userId: v.id('users'),
+    workspaceId: v.id('workspaces'),
     status: v.optional(subscriptionStatus),
     metadata: v.optional(v.any()),
     priceId: v.optional(v.id('prices')),
@@ -158,6 +132,9 @@ const userSchema = {
     billingAddress: v.optional(v.any()),
     paymentMethod: v.optional(v.any()),
     updatedAt: v.optional(v.string()),
+    planType: planTypes,
+    twoFactorEnabled: v.boolean(),
+    lastLogin: v.optional(v.string()),
 };
 
 const sessionSchema = {
@@ -201,24 +178,20 @@ const authenticatorSchema = {
 const schema = defineSchema({
     workspaces: defineTable(workspaceSchema),
     users: defineTable(userSchema).index('email', ['email']),
-    userRoles: defineTable(userRoleSchema).index('userId', ['userId']),
     sessions: defineTable(sessionSchema).index('sessionToken', ['sessionToken']).index('userId', ['userId']),
     accounts: defineTable(accountSchema).index('providerAndAccountId', ['provider', 'providerAccountId']).index('userId', ['userId']),
     userWorkspaces: defineTable(userWorkspaceSchema),
-    customCredentialsTypes: defineTable(customCredentialsTypeSchema),
     credentials: defineTable(credentialsSchema),
-    credentialsAccessLog: defineTable(credentialsAccessLogSchema),
     workspaceInvites: defineTable(workspaceInviteSchema).index('workspaceId', ['workspaceId']).index('invitedUserId', ['invitedUserId']).index('invitedEmail', ['invitedEmail']),
     customers: defineTable(customerSchema),
     products: defineTable(productSchema),
     prices: defineTable(priceSchema),
     subscriptions: defineTable(subscriptionSchema),
     usageTracking: defineTable(usageTrackingSchema).index('userIdAndMonth', ['userId', 'month']).index('workspaceIdAndMonth', ['workspaceId', 'month']),
-    activityNotifications: defineTable(activityNotificationSchema),
     authenticators: defineTable(authenticatorSchema).index('userId', ['userId']).index('credentialID', ['credentialID']),
     verificationTokens: defineTable(verificationTokenSchema).index('identifierToken', ['identifier', 'token']),
 });
 
-export { accountSchema, authenticatorSchema, sessionSchema, userSchema, verificationTokenSchema, userRoleSchema };
+export { accountSchema, authenticatorSchema, sessionSchema, userSchema, verificationTokenSchema };
 
 export default schema;

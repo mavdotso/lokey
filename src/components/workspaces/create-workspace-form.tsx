@@ -58,9 +58,13 @@ export function CreateWorkspaceForm() {
         setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
 
         try {
-            const { workspaceId } = await createWorkspace({ name: formState.name, slug: formState.slug, iconId: 'default' })
+            // TODO: planType — add check to see if the user can create a free space
+            const { workspaceId } = await createWorkspace({ name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
+            
             toast.success('Workspace created successfully!')
+            
             setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))
+            
             setIsRedirecting(true);
         } catch (error) {
             toast.error('Failed to create workspace')

@@ -2,6 +2,7 @@ import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
 import { nanoid } from 'nanoid';
+import { planTypeValidator } from './types';
 
 export const createWorkspace = mutation({
     args: {
@@ -9,6 +10,7 @@ export const createWorkspace = mutation({
         slug: v.string(),
         iconId: v.string(),
         logo: v.optional(v.string()),
+        planType: planTypeValidator
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
@@ -36,8 +38,9 @@ export const createWorkspace = mutation({
 
         const workspaceId = await ctx.db.insert('workspaces', {
             ...args,
-            workspaceOwner: identity,
+            ownerId: identity,
             inviteCode,
+            planType: args.planType,
         });
 
         await ctx.db.insert('userWorkspaces', {
@@ -61,7 +64,7 @@ export const getUserWorkspaces = query({
 
         const workspaces = await ctx.db
             .query('workspaces')
-            .filter((q) => q.eq(q.field('workspaceOwner'), identity))
+            .filter((q) => q.eq(q.field('ownerId'), identity))
             .collect();
 
         return workspaces.filter(Boolean);
@@ -209,7 +212,7 @@ export const kickUserFromWorkspace = mutation({
                 return { success: false, message: 'Cannot find the workspace' };
             }
 
-            if (workspace.workspaceOwner === args.userId) {
+            if (workspace.ownerId === args.userId) {
                 return { success: false, message: 'Cannot remove the workspace owner' };
             }
 
@@ -247,7 +250,7 @@ export const editWorkspace = mutation({
                 return { success: false, message: 'Workspace not found' };
             }
 
-            if (workspace.workspaceOwner !== identity) {
+            if (workspace.ownerId !== identity) {
                 return { success: false, message: 'Unauthorized: You are not the owner of this workspace' };
             }
 
@@ -313,72 +316,72 @@ export const getWorkspaceName = query({
 export const updateWorkspaceLogo = mutation({
     args: {
         _id: v.id('workspaces'),
-      storageId: v.id('_storage'),
+        storageId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
-      const identity = await getViewerId(ctx);
-  
-      if (identity === null) {
-        throw new Error('User is not authenticated');
-      }
-  
-      const workspace = await ctx.db.get(args._id);
-  
-      if (!workspace) {
-        throw new Error('Workspace not found');
-      }
-  
-      if (workspace.workspaceOwner !== identity) {
-        throw new Error('Unauthorized: You are not the owner of this workspace');
-      }
-  
-      await ctx.db.patch(args._id, {
-        logo: args.storageId,
-      });
-  
-      return { success: true, message: 'Workspace logo updated successfully' };
-    },
-  });
+        const identity = await getViewerId(ctx);
 
-  export const deleteWorkspace = mutation({
+        if (identity === null) {
+            throw new Error('User is not authenticated');
+        }
+
+        const workspace = await ctx.db.get(args._id);
+
+        if (!workspace) {
+            throw new Error('Workspace not found');
+        }
+
+        if (workspace.ownerId !== identity) {
+            throw new Error('Unauthorized: You are not the owner of this workspace');
+        }
+
+        await ctx.db.patch(args._id, {
+            logo: args.storageId,
+        });
+
+        return { success: true, message: 'Workspace logo updated successfully' };
+    },
+});
+
+export const deleteWorkspace = mutation({
     args: {
         _id: v.id('workspaces'),
     },
     handler: async (ctx, args) => {
-      const identity = await getViewerId(ctx);
-  
-      if (identity === null) {
-        throw new Error('User is not authenticated');
-      }
-  
-      const workspace = await ctx.db.get(args._id);
-  
-      if (!workspace) {
-        throw new Error('Workspace not found');
-      }
-  
-      if (workspace.workspaceOwner !== identity) {
-        throw new Error('Unauthorized: Only the workspace owner can delete the workspace');
-      }
-  
-      // Delete the workspace
-      await ctx.db.delete(args._id);
-  
-      // Delete all associated userWorkspaces
-      const userWorkspaces = await ctx.db
-        .query('userWorkspaces')
-        .filter((q) => q.eq(q.field('workspaceId'), args._id))
-        .collect();
-  
-      for (const userWorkspace of userWorkspaces) {
-        await ctx.db.delete(userWorkspace._id);
-      }
-  
-      return { success: true, message: 'Workspace deleted successfully' };
-    },
-  });
+        const identity = await getViewerId(ctx);
 
-  export const updateWorkspaceInviteCode = mutation({
+        if (identity === null) {
+            throw new Error('User is not authenticated');
+        }
+
+        const workspace = await ctx.db.get(args._id);
+
+        if (!workspace) {
+            throw new Error('Workspace not found');
+        }
+
+        if (workspace.ownerId !== identity) {
+            throw new Error('Unauthorized: Only the workspace owner can delete the workspace');
+        }
+
+        // Delete the workspace
+        await ctx.db.delete(args._id);
+
+        // Delete all associated userWorkspaces
+        const userWorkspaces = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('workspaceId'), args._id))
+            .collect();
+
+        for (const userWorkspace of userWorkspaces) {
+            await ctx.db.delete(userWorkspace._id);
+        }
+
+        return { success: true, message: 'Workspace deleted successfully' };
+    },
+});
+
+export const updateWorkspaceInviteCode = mutation({
     args: {
         _id: v.id('workspaces'),
     },
@@ -395,7 +398,7 @@ export const updateWorkspaceLogo = mutation({
             throw new Error('Workspace not found');
         }
 
-        if (workspace.workspaceOwner !== identity) {
+        if (workspace.ownerId !== identity) {
             throw new Error('Unauthorized: You are not the owner of this workspace');
         }
 

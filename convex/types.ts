@@ -38,22 +38,18 @@ export const planTypes = ['FREE', 'TEAM'] as const;
 export type PlanType = (typeof planTypes)[number];
 export const planTypeValidator = v.union(...planTypes.map(v.literal));
 
+/* APP TYPES */
 export type Workspace = {
     _id?: Id<'workspaces'>;
     _creationTime?: number;
-    workspaceOwner: Id<'users'>;
+    ownerId: Id<'users'>;
     name: string;
     slug: string;
     iconId: string;
     logo?: string;
     inviteCode: string;
-};
-
-export type UserRole = {
-    _id?: Id<'userRoles'>;
-    _creationTime?: number;
-    userId: Id<'users'>;
-    role: RoleType;
+    planType: PlanType;
+    customer?: Id<'customers'>;
 };
 
 export type UserWorkspace = {
@@ -64,16 +60,6 @@ export type UserWorkspace = {
     role: RoleType;
 };
 
-export type CustomCredentialsType = {
-    _id?: Id<'customCredentialsTypes'>;
-    _creationTime?: number;
-    workspaceId: Id<'workspaces'>;
-    name: string;
-    description?: string;
-    schema: any;
-    updatedAt: string;
-};
-
 export type Credentials = {
     _id?: Id<'credentials'>;
     _creationTime?: number;
@@ -82,31 +68,12 @@ export type Credentials = {
     description?: string;
     createdBy?: Id<'users'>;
     type: CredentialsType;
-    subtype?: string;
-    customTypeId?: Id<'customCredentialsTypes'>;
     encryptedData: string;
     privateKey: string;
     updatedAt: string;
     expiresAt?: string;
     maxViews?: number;
     viewCount: number;
-};
-
-export type CredentialsAccessLog = {
-    _id?: Id<'credentialsAccessLog'>;
-    _creationTime?: number;
-    credentialsId: Id<'credentials'>;
-    userId?: Id<'users'>;
-    accessedAt: string;
-};
-
-export type ActivityNotification = {
-    _id?: Id<'activityNotifications'>;
-    _creationTime?: number;
-    workspaceId: Id<'workspaces'>;
-    userId: Id<'users'>;
-    message: string;
-    readAt?: string;
 };
 
 export type WorkspaceInvite = {
@@ -176,7 +143,7 @@ export type Price = {
 export type Subscription = {
     _id?: Id<'subscriptions'>;
     _creationTime?: number;
-    userId: Id<'users'>;
+    workspaceId: Id<'workspaces'>;
     status?: 'unpaid' | 'past_due' | 'incomplete_expired' | 'incomplete' | 'canceled' | 'active' | 'trialing';
     metadata?: any;
     priceId?: Id<'prices'>;
