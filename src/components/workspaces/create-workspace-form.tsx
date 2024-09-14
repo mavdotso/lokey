@@ -8,7 +8,6 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { Info } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Button } from '@/components/ui/button'
 import { Id } from '@/convex/_generated/dataModel'
 import { api } from '@/convex/_generated/api'
 import { SubmitButton } from '../global/submit-button'
@@ -57,16 +56,15 @@ export function CreateWorkspaceForm() {
         setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
 
         try {
-            // TODO: planType — add check to see if the user can create a free space
             const { workspaceId } = await createWorkspace({ name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
 
             toast.success('Workspace created successfully!')
-
             setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))
-
             setIsRedirecting(true);
-        } catch (error) {
-            toast.error('Failed to create workspace')
+        } catch (error: any) {
+            toast.error('Failed to create workspace', {
+                description: `${error.message}`,
+            })
             console.error('Error creating workspace:', error)
         } finally {
             setFormState(prev => ({ ...prev, isSubmitting: false }))
@@ -75,7 +73,7 @@ export function CreateWorkspaceForm() {
 
     useEffect(() => {
         if (formState.newWorkspaceId && isRedirecting) {
-            router.push(`/dashboard/${formState.slug}`)
+            router.push(`/dashboard/${formState.slug}/credentials`)
         }
     }, [formState.newWorkspaceId, formState.slug, router, isRedirecting])
 

@@ -5,7 +5,7 @@
 
 ### What's needed for launch:
 
--   [ ] Add a "free" plan limit of 2
+-   [x] Add a "free" plan limit of 2
 -   [ ] Invite links:
 
     -   [ ] Change getIdentity functions in schema

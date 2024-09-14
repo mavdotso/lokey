@@ -20,11 +20,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
-interface DashboardProps {
+interface CredentialsProps {
     params: { slug: string };
 }
 
-export default function DashboardPage({ params }: DashboardProps) {
+export default function CredentialsPage({ params }: CredentialsProps) {
     const session = useSession();
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState<CredentialsSortOption>('name');

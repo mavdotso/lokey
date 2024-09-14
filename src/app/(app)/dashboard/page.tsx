@@ -17,6 +17,7 @@ export default function Dashboard() {
             </div>
         );
     } else {
-        redirect(`/dashboard/${workspaces[0].slug}`);
+        // TODO: Redirect to the default user's space, not the first
+        redirect(`/dashboard/${workspaces[0].slug}/credentials`);
     }
 }
