@@ -1,9 +1,9 @@
-import { MagicLinkEmailReact, MagicLinkEmailText } from '@/emails/magic-link';
+import MagicLinkEmailReact, { MagicLinkEmailText } from '@/emails/magic-link';
 import { resend } from '@/lib/resend';
 
 export async function POST(req: Request) {
     const { to, url, host } = await req.json();
-    
+
     const from = process.env.EMAIL_FROM;
 
     if (!to || !url || !host || !from) {
