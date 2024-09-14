@@ -1,6 +1,7 @@
 import { v } from 'convex/values';
 import { Id } from './_generated/dataModel';
 
+/* CREDENTIALS TYPES */
 export const credentialsTypes = [
     'password',
     'login_password',
@@ -27,9 +28,15 @@ export const credentialsTypes = [
 export type CredentialsType = (typeof credentialsTypes)[number];
 export const credentialsTypeValidator = v.union(...credentialsTypes.map(v.literal));
 
+/* USER ROLES TYPES */
 export const roleTypes = ['admin', 'manager', 'member'] as const;
 export type RoleType = (typeof roleTypes)[number];
 export const roleTypeValidator = v.union(...roleTypes.map(v.literal));
+
+/* PLAN TYPES */
+export const planTypes = ['FREE', 'TEAM'] as const;
+export type PlanType = (typeof planTypes)[number];
+export const planTypeValidator = v.union(...planTypes.map(v.literal));
 
 export type Workspace = {
     _id?: Id<'workspaces'>;
@@ -115,6 +122,24 @@ export type WorkspaceInvite = {
     inviteCode?: string;
 };
 
+export type UsageLimit = {
+    secretsPerMonth: number;
+    secretRequestsAndChats: number;
+    secretAttachmentSize: number;
+    teamSize: number;
+};
+
+export type UsageTracking = {
+    _id?: Id<'usageTracking'>;
+    _creationTime?: number;
+    userId: Id<'users'>;
+    workspaceId: Id<'workspaces'>;
+    month: string; // Format: "YYYY-MM"
+    secretsCreated: number;
+    secretRequestsAndChats: number;
+    largestAttachmentSize: number;
+};
+
 /* STRIPE TYPES */
 
 export type Customer = {
@@ -165,6 +190,8 @@ export type Subscription = {
     canceledAt?: string;
     trialStart?: string;
     trialEnd?: string;
+    planType: PlanType;
+    usageLimits: UsageLimit;
 };
 
 /* NEXTAUTH TYPES */

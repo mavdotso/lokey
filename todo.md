@@ -1,12 +1,14 @@
 ### Bugs
 
-- [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
+-   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
+-   [ ] Re-think the schema for workspaces / users and who does what — e.g. payments, access to features etc.
 
 ### What's needed for launch:
 
-- [ ] Invite links:
-    - [ ] Change getIdentity functions in schema
-    - [x] Change to a permanent invite link (via link)
+-   [ ] Invite links:
+
+    -   [ ] Change getIdentity functions in schema
+    -   [x] Change to a permanent invite link (via link)
 
 -   [ ] Workspace settings
 

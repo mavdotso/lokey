@@ -1,9 +1,11 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v, Validator } from 'convex/values';
-import { credentialsTypeValidator, roleTypeValidator } from './types';
+import { credentialsTypeValidator, planTypeValidator, roleTypeValidator } from './types';
 
 const userRole = roleTypeValidator;
 const credentialsType = credentialsTypeValidator;
+const planTypes = planTypeValidator;
+
 const pricingType = v.union(v.literal('recurring'), v.literal('one_time'));
 const pricingPlanInterval = v.union(v.literal('year'), v.literal('month'), v.literal('week'), v.literal('day'));
 const subscriptionStatus = v.union(
@@ -84,6 +86,22 @@ const workspaceInviteSchema = {
     inviteCode: v.optional(v.string()),
 };
 
+const usageLimitSchema = {
+    secretsPerMonth: v.number(),
+    secretRequestsAndChats: v.number(),
+    secretAttachmentSize: v.number(),
+    teamSize: v.number(),
+};
+
+const usageTrackingSchema = {
+    userId: v.id('users'),
+    workspaceId: v.id('workspaces'),
+    month: v.string(), // Format: "YYYY-MM"
+    secretsCreated: v.number(),
+    secretRequestsAndChats: v.number(),
+    largestAttachmentSize: v.number(),
+};
+
 /* STRIPE SCHEMA */
 const customerSchema = {
     stripeCustomerId: v.optional(v.string()),
@@ -125,6 +143,9 @@ const subscriptionSchema = {
     canceledAt: v.optional(v.string()),
     trialStart: v.optional(v.string()),
     trialEnd: v.optional(v.string()),
+    // Custom limits
+    planType: planTypes,
+    usageLimits: v.object(usageLimitSchema),
 };
 
 /* NEXTAUTH SCHEMA*/
@@ -192,6 +213,7 @@ const schema = defineSchema({
     products: defineTable(productSchema),
     prices: defineTable(priceSchema),
     subscriptions: defineTable(subscriptionSchema),
+    usageTracking: defineTable(usageTrackingSchema).index('userIdAndMonth', ['userId', 'month']).index('workspaceIdAndMonth', ['workspaceId', 'month']),
     activityNotifications: defineTable(activityNotificationSchema),
     authenticators: defineTable(authenticatorSchema).index('userId', ['userId']).index('credentialID', ['credentialID']),
     verificationTokens: defineTable(verificationTokenSchema).index('identifierToken', ['identifier', 'token']),
