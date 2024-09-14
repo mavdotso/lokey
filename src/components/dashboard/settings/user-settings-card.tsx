@@ -42,13 +42,17 @@ export function UserSettingsCard({ users, workspace, invites }: UserSettingsCard
                             <WorkspaceMemberCard key={index} user={user} workspace={workspace} />
                         ))}
                     </TabsContent>
-                    <TabsContent value="invites">{invites.length > 0 ? (
-                        invites.map((invite, index) => (
-                            <InviteCard key={index} invite={invite} />
-                        ))
-                    ) : (
-                        <p className="text-left text-muted-foreground text-sm">No pending invites</p>
-                    )}</TabsContent>
+                    <TabsContent value="invites">
+                        {invites.filter(invite => invite.invitedEmail).length > 0 ? (
+                            invites
+                                .filter(invite => invite.invitedEmail)
+                                .map((invite, index) => (
+                                    <InviteCard key={index} invite={invite} />
+                                ))
+                        ) : (
+                            <p className="text-left text-muted-foreground text-sm">No pending invites</p>
+                        )}
+                    </TabsContent>
                 </Tabs>
             </CardContent>
         </Card>

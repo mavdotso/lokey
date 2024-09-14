@@ -5,6 +5,10 @@
 -   [ ] Faster redirect after creating the first workspace
 -   [ ] On regenerate invite link, make the previous one expired
 
+-   [ ] When redirected to sign-in with /invite, pass it through the entire onboarding and open a popup with the 'Join workspace' instead of creating a new one
+    -   Perhaps add a flag during user registration?
+    -   Or simply add to a workspace as a 'role' on registration
+
 ### What's needed for launch:
 
 -   [x] Add a "free" plan limit of 2
@@ -35,8 +39,6 @@
             -   [ ] nothing (read only)
 
 -   [ ] Request credentials from clients
-
-    -   [ ] Add instructions on where to get the passwords from
 
 -   [ ] Share link via email / text
 
@@ -71,8 +73,9 @@
 -   [ ] Error pages
 -   [ ] Support (email)
 
-### Potentially:
+### AFTER THE FIRST 5 CUSTOMERS:
 
+-   [ ] API
 -   [ ] Secure chats (p2p)
 -   [ ] Secure file sharing
 -   [ ] Custom SMTP
@@ -81,12 +84,12 @@
 -   [ ] Geoblocking
 -   [ ] Whitelisting
 -   [ ] Generate a QR code
--   [ ] Notifications / webhooks
--   [ ] Add to password manager button
+-   [ ] Notifications
+-   [ ] Webhooks
 -   [ ] Import from CSV
--   [ ] Insert the website you're providing the password for
-    -   [ ] Fetch the website icon
+-   [ ] Insert the website you're providing the password for and fetch the website icon
 -   [ ] Credentials tags (+ apply tag instead of label)
+-   [ ] Add instructions on where to get the passwords from to credentials requests
 
 ### UI
 
