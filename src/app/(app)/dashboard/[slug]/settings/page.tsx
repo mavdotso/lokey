@@ -1,6 +1,6 @@
 "use client"
 import { Separator } from "@/components/ui/separator";
-import { CogIcon, UsersIcon, WalletIcon } from "lucide-react";
+import { CogIcon, LockIcon, UsersIcon, WalletIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { SettingsCard, SettingsCardProps } from "@/components/dashboard/settings/settings-card";
 import { useEffect, useState } from "react";
@@ -16,15 +16,15 @@ import { UploadCard } from "@/components/dashboard/settings/upload-card";
 import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { useSession } from "next-auth/react";
 
-
 const workspaceSettingsItems = [
-    { tabName: 'general', icon: CogIcon, name: 'General' },
-    { tabName: 'users', icon: UsersIcon, name: 'Users' },
-    { tabName: 'billing', icon: WalletIcon, name: 'Billing' },
+    { tabName: 'workspaceGeneral', icon: CogIcon, name: 'General' },
+    { tabName: 'workspaceUsers', icon: UsersIcon, name: 'Users' },
+    { tabName: 'workspaceBilling', icon: WalletIcon, name: 'Billing' },
 ];
 
 const userSettingsItems = [
     { tabName: 'userGeneral', icon: CogIcon, name: 'General' },
+    { tabName: 'userSecurity', icon: LockIcon, name: 'Security' },
 ];
 
 export default function SettingsPage() {
@@ -141,7 +141,7 @@ export default function SettingsPage() {
             </div>
             <Separator />
             <div className="flex flex-grow gap-4 px-8 py-4 overflow-hidden">
-                <Tabs defaultValue={isAdmin() ? `general` : `userGeneral`} orientation="horizontal" className="flex gap-6 w-full h-full">
+                <Tabs defaultValue={isAdmin() ? "workspaceGeneral" : "userGeneral"} orientation="horizontal" className="flex gap-6 w-full h-full">
                     <TabsList className="flex flex-col flex-shrink-0 justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">
                         {isAdmin() && (
                             <>
@@ -165,7 +165,7 @@ export default function SettingsPage() {
                     </TabsList>
                     <div className="flex-grow w-4/5 overflow-hidden">
                         <div className="pr-4 h-full overflow-y-auto">
-                            <TabsContent value="general" className="space-y-4">
+                            <TabsContent value="workspaceGeneral" className="space-y-4">
                                 {generalSettings.map((item, index) => (
                                     <SettingsCard key={index} {...item} />
                                 ))}
@@ -185,15 +185,19 @@ export default function SettingsPage() {
                                     buttonText="Delete Workspace"
                                 />
                             </TabsContent>
-                            <TabsContent value="users">
+                            <TabsContent value="workspaceUsers">
                                 <UserSettingsCard users={workspaceUsers} workspace={workspace} invites={invites ?? []} />
                             </TabsContent>
-                            <TabsContent value="billing">
+                            <TabsContent value="workspaceBilling">
                                 <h2 className="font-bold text-lg">Billing</h2>
                                 <p>Manage the billing for your workspace here.</p>
                             </TabsContent>
                             <TabsContent value="userGeneral">
                                 <h2 className="font-bold text-lg">User settings</h2>
+                                <p>Manage the billing for your workspace here.</p>
+                            </TabsContent>
+                            <TabsContent value="userSecurity">
+                                <h2 className="font-bold text-lg">User security</h2>
                                 <p>Manage the billing for your workspace here.</p>
                             </TabsContent>
                         </div>
