@@ -54,9 +54,10 @@
 -   [ ] User settings
 
     -   General:
-    -   [ ] name
+    -   [x] name
     -   [ ] picture
     -   [ ] email
+        - [ ] Send an email change request
     -   [ ] Default workspace
     -   [ ] Delete account
     -   Security:

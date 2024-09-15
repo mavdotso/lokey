@@ -1,4 +1,4 @@
-import { query } from './_generated/server';
+import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
 import { roleTypeValidator } from './types';
@@ -60,5 +60,78 @@ export const checkUserPermission = query({
         const hasPermission = roleHierarchy[userWorkspace.role] >= roleHierarchy[args.requiredRole];
 
         return { hasPermission, userRole: userWorkspace.role };
+    },
+});
+
+export const editUser = mutation({
+    args: {
+        updates: v.object({
+            name: v.optional(v.string()),
+            email: v.optional(v.string()),
+        }),
+    },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+
+        if (!identity) {
+            return { success: false, message: 'Log in to edit user profile' };
+        }
+
+        const user = await ctx.db.get(identity);
+
+        if (!user) {
+            return { success: false, message: 'User not found' };
+        }
+
+        await ctx.db.patch(identity, {
+            ...args.updates,
+        });
+
+        return { success: true, message: 'User profile updated successfully' };
+    },
+});
+
+export const updateUserAvatar = mutation({
+    args: {
+        storageId: v.id('_storage'),
+    },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+
+        if (!identity) {
+            return { success: false, message: 'User is not authenticated' };
+        }
+
+        await ctx.db.patch(identity, {
+            image: args.storageId,
+        });
+
+        return { success: true, message: 'User avatar updated successfully' };
+    },
+});
+
+export const deleteUser = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await getViewerId(ctx);
+
+        if (!identity) {
+            return { success: false, message: 'User is not authenticated' };
+        }
+
+        // Delete the user
+        await ctx.db.delete(identity);
+
+        // Delete all associated userWorkspaces
+        const userWorkspaces = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), identity))
+            .collect();
+
+        for (const userWorkspace of userWorkspaces) {
+            await ctx.db.delete(userWorkspace._id);
+        }
+
+        return { success: true, message: 'User account deleted successfully' };
     },
 });

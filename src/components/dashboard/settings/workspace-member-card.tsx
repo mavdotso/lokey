@@ -55,7 +55,7 @@ export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProp
         <div className="flex justify-between items-center gap-2 p-2 w-full">
             <div className="flex gap-2">
                 <UserAvatar user={user} />
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col justify-center">
                     <p className="text-sm">{user.name}</p>
                     <p className="text-muted-foreground text-xs">{user.email}</p>
                 </div>

@@ -15,6 +15,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { UploadCard } from "@/components/dashboard/settings/upload-card";
 import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { useSession } from "next-auth/react";
+import { signout } from "@/lib/server-actions";
 
 const workspaceSettingsItems = [
     { tabName: 'workspaceGeneral', icon: CogIcon, name: 'General' },
@@ -38,6 +39,11 @@ export default function SettingsPage() {
     const [confirmDelete, setConfirmDelete] = useState('');
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+    const [userName, setUserName] = useState('');
+    const [userEmail, setUserEmail] = useState('');
+    const [confirmUserDelete, setConfirmUserDelete] = useState('');
+    const [isUserDeleteDialogOpen, setIsUserDeleteDialogOpen] = useState(false);
+
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string })
     const users = useQuery(api.workspaces.getWorkspaceUsers, workspace ? { _id: workspace._id } : 'skip')
     const invites = useQuery(api.invites.getWorkspaceInvites, workspace ? { workspaceId: workspace._id } : 'skip')
@@ -45,6 +51,10 @@ export default function SettingsPage() {
     const editWorkspace = useMutation(api.workspaces.editWorkspace);
     const updateWorkspaceLogo = useMutation(api.workspaces.updateWorkspaceLogo);
     const deleteWorkspaceMutation = useMutation(api.workspaces.deleteWorkspace);
+
+    const editUser = useMutation(api.users.editUser);
+    const updateUserAvatar = useMutation(api.users.updateUserAvatar);
+    const deleteUserMutation = useMutation(api.users.deleteUser);
 
     useEffect(() => {
         if (workspace) {
@@ -62,11 +72,23 @@ export default function SettingsPage() {
 
     }, [workspace, users])
 
+    useEffect(() => {
+        if (session.data?.user) {
+            setUserName(session.data.user.name || '');
+            setUserEmail(session.data.user.email || '');
+        }
+    }, [session.data?.user]);
+
     if (!workspace) return <LoadingScreen />
 
-    const generalSettings: SettingsCardProps[] = [
+    const workspaceGeneralSettings: SettingsCardProps[] = [
         { title: 'Workspace name', description: 'This is the name of your workspace on Lokey.', inputValue: workspaceName, setInputValue: setWorkspaceName, inputPlaceholder: workspaceName, isInputRequired: false, onSave: handleEdit, },
         { title: 'Workspace slug', description: 'This is the slug of your workspace on Lokey.', inputValue: workspaceSlug, setInputValue: setWorkspaceSlug, inputPlaceholder: workspaceSlug, isInputRequired: false, onSave: handleEdit, },
+    ]
+
+    const userGeneralSettings: SettingsCardProps[] = [
+        { title: 'Account name', description: 'This is the name of your account on Lokey.', inputValue: userName, setInputValue: setUserName, inputPlaceholder: userName, isInputRequired: false, onSave: handleEditUser, },
+        { title: 'Account email', description: 'This is an email address you use to sign in to Lokey.', inputValue: userEmail, setInputValue: setUserEmail, inputPlaceholder: userEmail, isInputRequired: false, onSave: handleEditUser, },
     ]
 
     async function handleEdit() {
@@ -130,6 +152,56 @@ export default function SettingsPage() {
         }
     }
 
+    async function handleEditUser() {
+        const response = await editUser({
+            updates: {
+                name: userName,
+                email: userEmail
+            }
+        });
+
+        if (response.success) {
+            toast.success('Successfully updated user profile');
+        } else {
+            toast.error('Something went wrong', { description: response.message });
+        }
+    }
+
+    async function handleUserAvatarUpload(storageId: Id<"_storage">) {
+        try {
+            const response = await updateUserAvatar({
+                storageId: storageId
+            });
+
+            if (response.success) {
+                toast.success('Successfully updated user avatar');
+            } else {
+                toast.error('Failed to update user avatar');
+            }
+        } catch (error) {
+            console.error('Error updating user avatar:', error);
+            toast.error('An error occurred while updating the user avatar');
+        }
+    }
+
+    async function handleDeleteUser() {
+        if (confirmUserDelete === `DELETE ${session.data?.user?.email}`) {
+            setIsUserDeleteDialogOpen(true);
+        } else {
+            toast.error(`Please type "DELETE ${session.data?.user?.email}" to confirm deletion`);
+        }
+    }
+
+    async function confirmDeleteUser() {
+        const response = await deleteUserMutation();
+        if (response.success) {
+            toast.success('User account deleted successfully');
+            signout();
+        } else {
+            toast.error('Failed to delete user account', { description: response.message });
+        }
+    }
+
     function isAdmin() {
         return session.data?.user?.id === workspace?.ownerId
     }
@@ -166,7 +238,7 @@ export default function SettingsPage() {
                     <div className="flex-grow w-4/5 overflow-hidden">
                         <div className="pr-4 h-full overflow-y-auto">
                             <TabsContent value="workspaceGeneral" className="space-y-4">
-                                {generalSettings.map((item, index) => (
+                                {workspaceGeneralSettings.map((item, index) => (
                                     <SettingsCard key={index} {...item} />
                                 ))}
                                 <UploadCard
@@ -192,9 +264,25 @@ export default function SettingsPage() {
                                 <h2 className="font-bold text-lg">Billing</h2>
                                 <p>Manage the billing for your workspace here.</p>
                             </TabsContent>
-                            <TabsContent value="userGeneral">
-                                <h2 className="font-bold text-lg">User settings</h2>
-                                <p>Manage the billing for your workspace here.</p>
+                            <TabsContent value="userGeneral" className="space-y-4">
+                                {userGeneralSettings.map((item, index) => (
+                                    <SettingsCard key={index} {...item} />
+                                ))}
+                                <UploadCard
+                                    title="User image"
+                                    description="Upload your avatar. Recommended size: 200x200px."
+                                    acceptedFileTypes="image/*"
+                                    onUploadComplete={handleUserAvatarUpload}
+                                />
+                                <SettingsCard
+                                    title="Delete Account"
+                                    description={`Permanently delete this account and all of its data. This action cannot be undone. Type "DELETE ${session.data?.user?.email}" to confirm.`}
+                                    inputValue={confirmUserDelete}
+                                    setInputValue={setConfirmUserDelete}
+                                    onSave={handleDeleteUser}
+                                    isDangerous={true}
+                                    buttonText="Delete Account"
+                                />
                             </TabsContent>
                             <TabsContent value="userSecurity">
                                 <h2 className="font-bold text-lg">User security</h2>
@@ -212,6 +300,15 @@ export default function SettingsPage() {
                 isDangerous={true}
                 isOpen={isDeleteDialogOpen}
                 onOpenChange={setIsDeleteDialogOpen}
+            />
+            <ConfirmationDialog
+                title="Are you absolutely sure?"
+                description="This action cannot be undone. This will permanently delete your account and remove all associated data from our servers."
+                confirmText="Delete Account"
+                onConfirm={confirmDeleteUser}
+                isDangerous={true}
+                isOpen={isUserDeleteDialogOpen}
+                onOpenChange={setIsUserDeleteDialogOpen}
             />
         </div>
     );
