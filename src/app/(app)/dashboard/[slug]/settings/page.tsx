@@ -104,8 +104,8 @@ export default function SettingsPage() {
     ]
 
     const userGeneralSettings: SettingsCardProps[] = [
-        { title: 'Account name', description: 'This is the name of your account on Lokey.', inputValue: userName, setInputValue: setUserName, inputPlaceholder: userName, isInputRequired: false, onSave: handleEditUser, },
-        { title: 'Account email', description: 'This is an email address you use to sign in to Lokey.', inputValue: userEmail, setInputValue: setUserEmail, inputPlaceholder: userEmail, isInputRequired: false, onSave: handleEditUser, },
+        { title: 'Name', description: 'This is the name of your account on Lokey.', inputValue: userName, setInputValue: setUserName, inputPlaceholder: userName, isInputRequired: false, onSave: handleEditUser, },
+        // { title: 'Account email', description: 'This is an email address you use to sign in to Lokey.', inputValue: userEmail, setInputValue: setUserEmail, inputPlaceholder: userEmail, isInputRequired: false, onSave: handleEditUser, },
     ]
 
     const workspaceOptions = userWorkspaces?.map(workspace => ({
@@ -318,7 +318,7 @@ export default function SettingsPage() {
                                     onSave={handleEditUser}
                                 />
                                 <UploadCard
-                                    title="User image"
+                                    title="Avatar"
                                     description="Upload your avatar. Recommended size: 200x200px."
                                     acceptedFileTypes="image/*"
                                     onUploadComplete={handleUserAvatarUpload}

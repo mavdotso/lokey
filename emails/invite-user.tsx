@@ -8,12 +8,10 @@ interface InviteUserEmailProps {
 }
 
 export default function InviteUserReact({ invitedByUsername, workspaceName, inviteLink }: InviteUserEmailProps) {
-    const previewText = `Join ${workspaceName} on Lokey`;
-
     return (
         <Html>
             <Head />
-            <Preview>{previewText}</Preview>
+            <Preview>Join {workspaceName} on Lokey</Preview>
             <Tailwind>
                 <Body className="bg-muted font-sans">
                     <Container className="border-[#eaeaea] mx-auto my-[40px] p-[20px] border border-solid rounded max-w-[465px]">

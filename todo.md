@@ -2,47 +2,26 @@
 
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
 -   [ ] Faster redirect after creating the first workspace
--   [x] Remove workspace settings if 'member'
 -   [ ] User is not authenticated after avatar upload?
 
 ### What's needed for launch:
-
--   [x] Add a "free" plan limit of 2
-    -   [ ] Change to "is a member of 2 free ones" instead of has created
--   [x] Invite links:
-
-    -   [x] Change getIdentity functions in schema
-    -   [x] Change to a permanent invite link (via link)
-
--   [ ] Workspace settings
-
-    -   [ ] Invite users
-        -   [x] Invite links
-        -   [x] Via email
-            -   [ ] New user
-            -   [ ] Refistered user
-        -   [ ] Via userId
-    -   [ ] Accept invitations
-
-        -   [ ] Sign in
-
-    -   [ ] Remove users
-    -   [ ] Change workspace owner
-    -   [ ] Change credentials owner
-    -   [ ] User roles
-        -   [ ] Admin — access to everything
-        -   [ ] Manager — access to everything (CRUD all credentials) except workspace settings
-        -   [ ] Member — access ONLY to CRUD personal credentials
+-   [ ] Change workspace owner
+-   [ ] Change credentials owner
+-   [ ] User roles
+    -   [ ] Admin — access to everything
+    -   [ ] Manager — access to everything (CRUD all credentials) except workspace settings
+    -   [ ] Member — access ONLY to CRUD personal credentials
 
 -   [ ] Request credentials from clients
 
+    -   [ ] Form builder
+    -   [ ] Share via link / email
+    -   [ ] Page to input
+
 -   [ ] Share link via email / text
 
--   [x] Sidebar menu
+-   [ ] Sidebar
 
-    -   [x] Credentials
-        -   [x] Shared
-        -   [x] Requested
     -   [x] Workspace settings
         -   General:
             -   [x] ws name
@@ -51,17 +30,13 @@
             -   [x] delete
         -   [ ] Billing
         -   [ ] People / team
+            -   [ ] Promote / demote
 
 -   [ ] User settings
 
     -   General:
-    -   [x] name
-    -   [ ] picture
-        -   [ ] set as profile pic
     -   [ ] email
         -   [ ] Send an email change request
-    -   [ ] Default workspace
-    -   [x] Delete account
     -   Security:
     -   [ ] Create password
     -   [ ] 2FA
@@ -70,6 +45,7 @@
 -   [ ] User / workspace limits
 -   [ ] Error pages
 -   [ ] Support (email)
+-   [ ] Request feature
 
 ### AFTER THE FIRST 5 CUSTOMERS:
 
