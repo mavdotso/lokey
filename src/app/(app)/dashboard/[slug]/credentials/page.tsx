@@ -26,6 +26,7 @@ interface CredentialsProps {
 
 export default function CredentialsPage({ params }: CredentialsProps) {
     const session = useSession();
+    
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState<CredentialsSortOption>('name');
     const [selectedTypes, setSelectedTypes] = useState<CredentialsType[]>([]);

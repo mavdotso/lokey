@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 export default function Dashboard() {
     const router = useRouter();
     const [inviteCode, setInviteCode] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true)
 
     const workspaces = useQuery(api.workspaces.getUserWorkspaces);
     const getInviteByCode = useQuery(api.invites.getInviteByCode, inviteCode ? { inviteCode } : "skip");
@@ -35,12 +36,16 @@ export default function Dashboard() {
     }, [inviteCode, joinWorkspace, router]);
 
     useEffect(() => {
-        if (inviteCode && getInviteByCode) {
-            handleInvite();
+        if (workspaces !== undefined) {
+            if (inviteCode && getInviteByCode !== undefined) {
+                handleInvite();
+            }
+            setIsLoading(false);
         }
-    }, [inviteCode, getInviteByCode, handleInvite]);
+    }, [workspaces, inviteCode, getInviteByCode, handleInvite]);
 
-    if (workspaces === undefined) return <LoadingScreen />
+
+    if (isLoading) return <LoadingScreen />
 
     if (!workspaces || workspaces.length === 0) {
         return (
