@@ -38,13 +38,19 @@ export default function SettingsPage() {
     const [workspaceSlug, setWorkspaceSlug] = useState('');
     const [workspaceUsers, setWorkspaceUsers] = useState<User[]>([])
     const [confirmDelete, setConfirmDelete] = useState('');
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [defaultWorkspace, setDefaultWorkspace] = useState('');
     const [confirmUserDelete, setConfirmUserDelete] = useState('');
-    const [isUserDeleteDialogOpen, setIsUserDeleteDialogOpen] = useState(false);
+
+    const [confirmationDialogProps, setConfirmationDialogProps] = useState({
+        isOpen: false,
+        title: "",
+        description: "",
+        confirmText: "",
+        onConfirm: () => { },
+    });
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string })
     const users = useQuery(api.workspaces.getWorkspaceUsers, workspace ? { _id: workspace._id } : 'skip')
@@ -156,7 +162,13 @@ export default function SettingsPage() {
 
     async function handleDeleteWorkspace() {
         if (workspace && confirmDelete === `DELETE ${workspace.name}`) {
-            setIsDeleteDialogOpen(true);
+            setConfirmationDialogProps({
+                isOpen: true,
+                title: "Are you absolutely sure?",
+                description: "This action cannot be undone. This will permanently delete your workspace and remove all associated data from our servers.",
+                confirmText: "Delete Workspace",
+                onConfirm: confirmDeleteWorkspace,
+            });
         } else {
             toast.error(`Please type "DELETE ${workspace?.name}" to confirm deletion`);
         }
@@ -227,7 +239,13 @@ export default function SettingsPage() {
 
     async function handleDeleteUser() {
         if (confirmUserDelete === `DELETE ${session.data?.user?.email}`) {
-            setIsUserDeleteDialogOpen(true);
+            setConfirmationDialogProps({
+                isOpen: true,
+                title: "Are you absolutely sure?",
+                description: "This action cannot be undone. This will permanently delete your account and remove all associated data from our servers.",
+                confirmText: "Delete Account",
+                onConfirm: confirmDeleteUser,
+            });
         } else {
             toast.error(`Please type "DELETE ${session.data?.user?.email}" to confirm deletion`);
         }
@@ -342,22 +360,13 @@ export default function SettingsPage() {
                 </Tabs>
             </div>
             <ConfirmationDialog
-                title="Are you absolutely sure?"
-                description="This action cannot be undone. This will permanently delete your workspace and remove all associated data from our servers."
-                confirmText="Delete Workspace"
-                onConfirm={confirmDeleteWorkspace}
+                title={confirmationDialogProps.title}
+                description={confirmationDialogProps.description}
+                confirmText={confirmationDialogProps.confirmText}
+                onConfirm={confirmationDialogProps.onConfirm}
                 isDangerous={true}
-                isOpen={isDeleteDialogOpen}
-                onOpenChange={setIsDeleteDialogOpen}
-            />
-            <ConfirmationDialog
-                title="Are you absolutely sure?"
-                description="This action cannot be undone. This will permanently delete your account and remove all associated data from our servers."
-                confirmText="Delete Account"
-                onConfirm={confirmDeleteUser}
-                isDangerous={true}
-                isOpen={isUserDeleteDialogOpen}
-                onOpenChange={setIsUserDeleteDialogOpen}
+                isOpen={confirmationDialogProps.isOpen}
+                onOpenChange={(isOpen) => setConfirmationDialogProps(prev => ({ ...prev, isOpen }))}
             />
         </div>
     );
