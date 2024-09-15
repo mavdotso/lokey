@@ -137,21 +137,16 @@ export const getInviteById = query({
 export const getInviteByCode = query({
     args: { inviteCode: v.string() },
     handler: async (ctx, args) => {
-        console.log('Searching for invite with code:', args.inviteCode);
         const invite = await ctx.db
             .query('workspaceInvites')
             .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
             .first();
-
-        console.log('Found invite:', invite);
 
         if (!invite) {
             return null;
         }
 
         const workspace = await ctx.db.get(invite.workspaceId);
-
-        console.log('Found workspace:', workspace);
 
         if (!workspace) {
             return null;
@@ -205,7 +200,9 @@ export const joinWorkspaceByInviteCode = mutation({
             role: invite.role,
         });
 
-        await ctx.db.patch(invite._id, { status: 'accepted' });
+        if (invite.invitedEmail) {
+            await ctx.db.patch(invite._id, { status: 'accepted' });
+        }
 
         return { success: true, message: 'Successfully joined the workspace' };
     },

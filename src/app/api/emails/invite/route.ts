@@ -4,8 +4,6 @@ import { resend } from '@/lib/resend';
 export async function POST(req: Request) {
     const { to, invitedByUsername, workspaceName, inviteLink } = await req.json();
 
-    console.log(to, invitedByUsername, workspaceName, inviteLink);
-
     const from = process.env.EMAIL_FROM;
 
     if (!to || !invitedByUsername || !workspaceName || !inviteLink || !from) {

@@ -19,8 +19,6 @@ export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
     const updateWorkspaceInviteCode = useMutation(api.workspaces.updateWorkspaceInviteCode);
     const getInviteLink = useQuery(api.invites.getInviteById, workspace.defaultInvite ? { _id: workspace.defaultInvite } : 'skip')
 
-    console.log(getInviteLink)
-
     useEffect(() => {
         if (getInviteLink) {
             setInviteLink(`${getURL()}/invite/${getInviteLink.inviteCode}`);

@@ -1,7 +1,6 @@
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { nanoid } from 'nanoid';
 import { planTypeValidator } from './types';
 import { canCreateWorkspace } from './limits';
 import { createInvite, setInviteExpired } from './invites';
