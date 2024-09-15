@@ -50,6 +50,22 @@ const credentialsSchema = {
     viewCount: v.number(),
 };
 
+const credentialRequestSchema = {
+    workspaceId: v.id('workspaces'),
+    createdBy: v.id('users'),
+    type: credentialsType,
+    description: v.string(),
+    fields: v.array(
+        v.object({
+            name: v.string(),
+            description: v.optional(v.string()),
+        })
+    ),
+    status: v.union(v.literal('pending'), v.literal('fulfilled'), v.literal('rejected')),
+    fulfilledBy: v.optional(v.id('users')),
+    fulfilledAt: v.optional(v.string()),
+};
+
 const workspaceInviteSchema = {
     workspaceId: v.id('workspaces'),
     invitedBy: v.id('users'),
@@ -185,6 +201,7 @@ const schema = defineSchema({
     accounts: defineTable(accountSchema).index('providerAndAccountId', ['provider', 'providerAccountId']).index('userId', ['userId']),
     userWorkspaces: defineTable(userWorkspaceSchema),
     credentials: defineTable(credentialsSchema),
+    credentialRequests: defineTable(credentialRequestSchema).index('workspaceId', ['workspaceId']).index('createdBy', ['createdBy']).index('status', ['status']),
     workspaceInvites: defineTable(workspaceInviteSchema).index('workspaceId', ['workspaceId']).index('invitedUserId', ['invitedUserId']).index('invitedEmail', ['invitedEmail']),
     customers: defineTable(customerSchema),
     products: defineTable(productSchema),

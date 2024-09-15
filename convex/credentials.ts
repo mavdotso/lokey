@@ -48,7 +48,7 @@ export const createCredentials = mutation({
 });
 
 export const incrementCredentialsViewCount = mutation({
-    args: { _id: v.id('credentials'), },
+    args: { _id: v.id('credentials') },
     handler: async (ctx, args) => {
         const credential = await ctx.db
             .query('credentials')
@@ -204,5 +204,125 @@ export const setExpired = mutation({
         } catch (error: any) {
             return { success: false, message: `An unexpected error occurred: ${error.message}` };
         }
+    },
+});
+
+export const createCredentialRequest = mutation({
+    args: {
+        workspaceId: v.id('workspaces'),
+        type: credentialsTypeValidator,
+        description: v.string(),
+        fields: v.array(
+            v.object({
+                name: v.string(),
+                description: v.optional(v.string()),
+            })
+        ),
+    },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+        if (!identity) {
+            throw new Error('Unauthorized');
+        }
+
+        const credentialRequestId = await ctx.db.insert('credentialRequests', {
+            workspaceId: args.workspaceId,
+            createdBy: identity,
+            type: args.type,
+            description: args.description,
+            fields: args.fields,
+            status: 'pending',
+        });
+
+        return { credentialRequestId };
+    },
+});
+
+export const getCredentialRequests = query({
+    args: { workspaceId: v.id('workspaces') },
+    handler: async (ctx, args) => {
+        const requests = await ctx.db
+            .query('credentialRequests')
+            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+            .collect();
+
+        return requests;
+    },
+});
+
+export const fulfillCredentialRequest = mutation({
+    args: {
+        requestId: v.id('credentialRequests'),
+        credentials: v.object({
+            name: v.string(),
+            description: v.optional(v.string()),
+            type: credentialsTypeValidator,
+            encryptedData: v.string(),
+            privateKey: v.string(),
+        }),
+    },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+        if (!identity) {
+            throw new Error('Unauthorized');
+        }
+
+        const request = await ctx.db.get(args.requestId);
+        if (!request) {
+            throw new Error('Credential request not found');
+        }
+
+        if (request.status !== 'pending') {
+            throw new Error('Credential request is no longer pending');
+        }
+
+        // Create the new credential
+        const credentialId = await ctx.db.insert('credentials', {
+            workspaceId: request.workspaceId,
+            name: args.credentials.name,
+            description: args.credentials.description,
+            type: args.credentials.type,
+            encryptedData: args.credentials.encryptedData,
+            privateKey: args.credentials.privateKey,
+            updatedAt: new Date().toISOString(),
+            viewCount: 0,
+            createdBy: identity,
+        });
+
+        // Update the request status
+        await ctx.db.patch(args.requestId, {
+            status: 'fulfilled',
+            fulfilledBy: identity,
+            fulfilledAt: new Date().toISOString(),
+        });
+
+        return { credentialId };
+    },
+});
+
+export const rejectCredentialRequest = mutation({
+    args: { requestId: v.id('credentialRequests') },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+        if (!identity) {
+            throw new Error('Unauthorized');
+        }
+
+        const request = await ctx.db.get(args.requestId);
+        if (!request) {
+            throw new Error('Credential request not found');
+        }
+
+        if (request.status !== 'pending') {
+            throw new Error('Credential request is no longer pending');
+        }
+
+        await ctx.db.patch(args.requestId, {
+            status: 'rejected',
+            fulfilledBy: identity,
+            fulfilledAt: new Date().toISOString(),
+        });
+
+        return { success: true };
     },
 });

@@ -81,6 +81,22 @@ export type Credentials = {
     viewCount: number;
 };
 
+export type CredentialRequest = {
+    _id?: Id<'credentialRequests'>;
+    _creationTime?: number;
+    workspaceId: Id<'workspaces'>;
+    createdBy: Id<'users'>;
+    type: CredentialsType;
+    description: string;
+    fields: Array<{
+        name: string;
+        description?: string;
+    }>;
+    status: 'pending' | 'fulfilled' | 'rejected';
+    fulfilledBy?: Id<'users'>;
+    fulfilledAt?: string;
+};
+
 export type WorkspaceInvite = {
     _id?: Id<'workspaceInvites'>;
     _creationTime?: number;

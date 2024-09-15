@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { Dialog } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CreateCredentialRequestDialog } from '@/components/credentials/create-credentials-request-dialog';
+import { RequestedCredentialsList } from '@/components/credentials/requested-credentials-list';
 
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
@@ -26,7 +28,7 @@ interface CredentialsProps {
 
 export default function CredentialsPage({ params }: CredentialsProps) {
     const session = useSession();
-    
+
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState<CredentialsSortOption>('name');
     const [selectedTypes, setSelectedTypes] = useState<CredentialsType[]>([]);
@@ -36,8 +38,9 @@ export default function CredentialsPage({ params }: CredentialsProps) {
 
     const workspace = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
+    const credentialRequests = useQuery(api.credentials.getCredentialRequests, workspace ? { workspaceId: workspace._id } : 'skip');
 
-    if (credentials === undefined) return <LoadingScreen />;
+    if (credentials === undefined || credentialRequests === undefined) return <LoadingScreen />;
     if (!session || !session.data || !session.data.user) return <LoadingScreen />;
 
     const filteredCredentials = credentials
@@ -68,7 +71,10 @@ export default function CredentialsPage({ params }: CredentialsProps) {
         <div className="flex flex-col h-full">
             <div className='flex justify-between items-center px-8 py-6'>
                 <h1 className='font-bold text-2xl'>Credentials</h1>
-                <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
+                <div className='flex gap-2'>
+                    <CreateCredentialRequestDialog />
+                    <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
+                </div>
             </div>
             <Separator />
             <div className={`${totalPages > 1 && 'pb-10'} overflow-auto`}>
@@ -103,7 +109,18 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                             </div >
                         )}
                     </TabsContent>
-                    <TabsContent value="requested">Requested credentials</TabsContent>
+                    <TabsContent value="requested">
+                        {credentialRequests.length === 0 ? (
+                            <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
+                                <p className='text-lg'>No credential requests yet</p>
+                                <CreateCredentialRequestDialog />
+                            </div>
+                        ) : (
+                            <div className='flex flex-col flex-grow gap-4 pt-4'>
+                                <RequestedCredentialsList credentialRequests={credentialRequests} />
+                            </div>
+                        )}
+                    </TabsContent>
                 </Tabs>
             </div>
             {totalPages > 1 && (
