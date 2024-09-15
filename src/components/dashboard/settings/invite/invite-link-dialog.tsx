@@ -35,7 +35,7 @@ export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
                 description: "The workspace invite code has been updated successfully.",
             });
         } else {
-            toast.error(result.message);
+            toast.error('Error: something went wrong', { description: result.message });
         }
     };
 

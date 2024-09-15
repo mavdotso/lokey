@@ -104,7 +104,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
         e.preventDefault();
         try {
             if (!currentWorkspaceId) {
-                toast.error(`Failed to ${editId != undefined ? `update` : `create`}  credentials`);
+                toast.error(`Failed to ${editId != undefined ? `update` : `create`}  credentials`, { description: "Workspace id is undefined" });
                 console.error('Error: Workspace id is undefined');
                 return;
             }
@@ -123,7 +123,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                     toast.success('Credentials were updated successfully');
                     onDialogClose && onDialogClose();
                 } else {
-                    toast.error('Error: something went wrong: ' + response.message);
+                    toast.error('Error: something went wrong', { description: response.message });
                 }
             } else {
                 const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data));

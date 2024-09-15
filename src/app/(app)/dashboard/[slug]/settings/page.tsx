@@ -79,7 +79,7 @@ export default function SettingsPage() {
                     router.push('/dashboard/' + workspaceSlug + '/settings')
                 }
             } else {
-                toast.error('Something went wrong: ' + response.message)
+                toast.error('Something went wrong', { description: response.message })
             }
         }
     }
@@ -119,7 +119,7 @@ export default function SettingsPage() {
                 toast.success('Workspace deleted successfully');
                 router.push('/dashboard');
             } else {
-                toast.error('Failed to delete workspace: ' + response.message);
+                toast.error('Failed to delete workspace', { description: response.message });
             }
         }
     }

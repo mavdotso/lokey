@@ -44,7 +44,7 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
             if (response.success) {
                 toast.success('Credentials have been removed successfully');
             } else {
-                toast.error('Error: something went wrong: ' + response.message);
+                toast.error('Error: something went wrong', { description: response.message });
             }
         }
     }
@@ -55,7 +55,7 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
             if (response.success) {
                 toast.success('Credentials were successfully set as expired.');
             } else {
-                toast.error('Error: something went wrong: ' + response.message);
+                toast.error('Error: something went wrong', { description: response.message });
             }
         }
     }

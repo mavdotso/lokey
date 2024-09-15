@@ -71,8 +71,8 @@
 ### AFTER THE FIRST 5 CUSTOMERS:
 
 -   [ ] API
--   [ ] Secure chats (p2p)
 -   [ ] Secure file sharing
+-   [ ] Secure chats (p2p)
 -   [ ] Custom SMTP
 -   [ ] Custom URL
 -   [ ] IP tracking
@@ -85,6 +85,8 @@
 -   [ ] Insert the website you're providing the password for and fetch the website icon
 -   [ ] Credentials tags (+ apply tag instead of label)
 -   [ ] Add instructions on where to get the passwords from to credentials requests
+-   [ ] Master password encryption for the account to decrypt passwords inside
+-   [ ] Team sharing credentials
 
 ### UI
 

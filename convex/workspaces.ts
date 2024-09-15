@@ -1,7 +1,7 @@
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { planTypeValidator } from './types';
+import { planTypeValidator, roleTypeValidator } from './types';
 import { canCreateWorkspace } from './limits';
 import { createInvite, setInviteExpired } from './invites';
 
@@ -146,7 +146,7 @@ export const inviteUserToWorkspace = mutation({
     args: {
         _id: v.id('workspaces'),
         userId: v.id('users'),
-        role: v.union(v.literal('manager'), v.literal('member')),
+        role: roleTypeValidator,
     },
     handler: async (ctx, args) => {
         try {
@@ -156,15 +156,15 @@ export const inviteUserToWorkspace = mutation({
                 return { success: false, message: 'Log in to invite users' };
             }
 
-            // Check if inviter has permission (admin or manager)
+            // Check if inviter has permission (admin only)
             const inviterWorkspace = await ctx.db
                 .query('userWorkspaces')
                 .filter((q) => q.eq(q.field('userId'), inviterId))
                 .filter((q) => q.eq(q.field('workspaceId'), args._id))
                 .first();
 
-            if (!inviterWorkspace || !['admin', 'manager'].includes(inviterWorkspace.role)) {
-                return { success: false, message: 'Unauthorized: You cannot invite users to this workspace' };
+            if (!inviterWorkspace || inviterWorkspace.role !== 'admin') {
+                return { success: false, message: 'Unauthorized: Only admins can invite users to this workspace' };
             }
 
             // Check if the invited user exists
@@ -213,17 +213,6 @@ export const kickUserFromWorkspace = mutation({
 
             if (!requesterId) {
                 return { success: false, message: 'Log in to manage workspace members' };
-            }
-
-            // Check if the requester has admin rights
-            const requesterWorkspace = await ctx.db
-                .query('userWorkspaces')
-                .filter((q) => q.eq(q.field('userId'), requesterId))
-                .filter((q) => q.eq(q.field('workspaceId'), args._id))
-                .first();
-
-            if (!requesterWorkspace || requesterWorkspace.role !== 'admin') {
-                return { success: false, message: 'Unauthorized: Only admins can remove users from the workspace' };
             }
 
             // Check if the user to be kicked is in the workspace
