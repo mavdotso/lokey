@@ -238,10 +238,6 @@ export const setInviteExpired = mutation({
 
             if (!invite) return { success: false, message: 'Invite not found' };
 
-            if (invite.status !== 'pending') {
-                return { success: false, message: 'Invite is not in pending status' };
-            }
-
             await ctx.db.patch(args._id, { status: 'expired' });
 
             return { success: true, message: 'Invite set as expired successfully' };

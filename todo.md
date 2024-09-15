@@ -1,10 +1,7 @@
 ### Bugs
 
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
--   [x] Re-think the schema for workspaces / users and who does what — e.g. payments, access to features etc.
 -   [ ] Faster redirect after creating the first workspace
--   [x] On regenerate invite link, make the previous one expired
--   [x] Make default workspace links not expire
 
 -   [ ] When redirected to sign-in with /invite, pass it through the entire onboarding and open a popup with the 'Join workspace' instead of creating a new one
     -   Perhaps add a flag during user registration?
@@ -13,6 +10,7 @@
 ### What's needed for launch:
 
 -   [x] Add a "free" plan limit of 2
+    - [ ] Change to "is a member of 2 free ones" instead of has created
 -   [x] Invite links:
 
     -   [x] Change getIdentity functions in schema
@@ -33,17 +31,16 @@
     -   [ ] Remove users
     -   [ ] Change workspace owner
     -   [ ] Change credentials owner
-    -   [ ] User roles (access?)
-        -   [ ] CRUD
-            -   [ ] only what they own
-            -   [ ] all
-            -   [ ] nothing (read only)
+    -   [ ] User roles 
+        -   [ ] Admin — access to everything
+        -   [ ] Manager — access to everything (CRUD all credentials) except workspace settings
+        -   [ ] Member — access ONLY to CRUD personal credentials
 
 -   [ ] Request credentials from clients
 
 -   [ ] Share link via email / text
 
--   [ ] Sidebar menu
+-   [x] Sidebar menu
 
     -   [x] Credentials
         -   [x] Shared

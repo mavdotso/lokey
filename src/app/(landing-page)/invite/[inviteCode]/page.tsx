@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import Link from 'next/link';
-import {  useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
@@ -27,6 +27,11 @@ export default function InvitePage() {
         getInviteDetails?.workspaceId ? { _id: getInviteDetails.workspaceId } : 'skip');
 
     useEffect(() => {
+
+        if (inviteCode) {
+            localStorage.setItem('inviteCode', inviteCode);
+        }
+
         console.log('Session state:', session.status);
         console.log('Invite details:', getInviteDetails);
         console.log('Workspace name:', getWorkspaceName);
@@ -51,7 +56,7 @@ export default function InvitePage() {
 
         // Invite is pending
         setInviteStatus('pending');
-    }, [getInviteDetails, session.status, getWorkspaceName]);
+    }, [getInviteDetails, session.status, getWorkspaceName, inviteCode]);
 
     useEffect(() => {
         if (getWorkspaceName) {
@@ -85,8 +90,7 @@ export default function InvitePage() {
     }
 
     function handleSignIn() {
-        // Redirect to sign-in page, passing the invite code as a parameter
-        router.push(`/sign-in?redirect=/invite/${inviteCode}`);
+        router.push(`/sign-in?inviteCode=${inviteCode}`);
     }
 
     return (

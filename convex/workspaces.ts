@@ -79,12 +79,28 @@ export const getUserWorkspaces = query({
             throw new Error('User is not authenticated');
         }
 
-        const workspaces = await ctx.db
+        // Get workspaces owned by the user
+        const ownedWorkspaces = await ctx.db
             .query('workspaces')
             .filter((q) => q.eq(q.field('ownerId'), identity))
             .collect();
 
-        return workspaces.filter(Boolean);
+        // Get workspaces where the user is a member
+        const userWorkspaces = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), identity))
+            .collect();
+
+        // Fetch the actual workspace documents for user memberships
+        const memberWorkspaces = await Promise.all(userWorkspaces.map(async (uw) => await ctx.db.get(uw.workspaceId)));
+
+        // Combine and deduplicate the results
+        const allWorkspaces = [...ownedWorkspaces, ...memberWorkspaces];
+        const uniqueWorkspaces = Array.from(new Set(allWorkspaces.map((w) => w?._id)))
+            .map((id) => allWorkspaces.find((w) => w?._id === id))
+            .filter((w): w is NonNullable<typeof w> => w !== null && w !== undefined);
+
+        return uniqueWorkspaces;
     },
 });
 
