@@ -14,17 +14,23 @@ import { User } from "@/convex/types";
 import { Id } from "@/convex/_generated/dataModel";
 import { UploadCard } from "@/components/dashboard/settings/upload-card";
 import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
+import { useSession } from "next-auth/react";
 
 
-const settingsItems = [
+const workspaceSettingsItems = [
     { tabName: 'general', icon: CogIcon, name: 'General' },
     { tabName: 'users', icon: UsersIcon, name: 'Users' },
     { tabName: 'billing', icon: WalletIcon, name: 'Billing' },
 ];
 
+const userSettingsItems = [
+    { tabName: 'userGeneral', icon: CogIcon, name: 'General' },
+];
+
 export default function SettingsPage() {
     const router = useRouter();
     const { slug } = useParams();
+    const session = useSession()
 
     const [workspaceName, setWorkspaceName] = useState('');
     const [workspaceSlug, setWorkspaceSlug] = useState('');
@@ -124,6 +130,10 @@ export default function SettingsPage() {
         }
     }
 
+    function isAdmin() {
+        return session.data?.user?.id === workspace?.ownerId
+    }
+
     return (
         <div className="flex flex-col h-full">
             <div className="flex justify-between items-center px-8 py-6">
@@ -131,10 +141,22 @@ export default function SettingsPage() {
             </div>
             <Separator />
             <div className="flex flex-grow gap-4 px-8 py-4 overflow-hidden">
-                <Tabs defaultValue="general" orientation="horizontal" className="flex gap-6 w-full h-full">
+                <Tabs defaultValue={isAdmin() ? `general` : `userGeneral`} orientation="horizontal" className="flex gap-6 w-full h-full">
                     <TabsList className="flex flex-col flex-shrink-0 justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">
-                        <p className="text-left text-muted-foreground text-sm">Workspace settings</p>
-                        {settingsItems.map((item) => (
+                        {isAdmin() && (
+                            <>
+                                <p className="text-left text-muted-foreground text-sm">Workspace settings</p>
+                                {workspaceSettingsItems.map((item) => (
+                                    <TabsTrigger value={item.tabName} key={item.name} className="flex justify-start gap-2 hover:bg-muted data-[state=active]:bg-muted py-2 w-full data-[state=active]:shadomw-none font-normal text-left text-primary">
+                                        <item.icon className="w-4 h-4" />
+                                        {item.name}
+                                    </TabsTrigger>
+                                ))}
+                                <Separator className="my-4" />
+                            </>
+                        )}
+                        <p className="text-left text-muted-foreground text-sm">User settings</p>
+                        {userSettingsItems.map((item) => (
                             <TabsTrigger value={item.tabName} key={item.name} className="flex justify-start gap-2 hover:bg-muted data-[state=active]:bg-muted py-2 w-full data-[state=active]:shadomw-none font-normal text-left text-primary">
                                 <item.icon className="w-4 h-4" />
                                 {item.name}
@@ -168,6 +190,10 @@ export default function SettingsPage() {
                             </TabsContent>
                             <TabsContent value="billing">
                                 <h2 className="font-bold text-lg">Billing</h2>
+                                <p>Manage the billing for your workspace here.</p>
+                            </TabsContent>
+                            <TabsContent value="userGeneral">
+                                <h2 className="font-bold text-lg">User settings</h2>
                                 <p>Manage the billing for your workspace here.</p>
                             </TabsContent>
                         </div>
