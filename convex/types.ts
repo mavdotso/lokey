@@ -180,6 +180,9 @@ export type User = {
     billingAddress?: any;
     paymentMethod?: any;
     updatedAt?: string;
+    twoFactorEnabled: boolean;
+    lastLogin?: string;
+    defaultWorkspace?: Id<'workspaces'>;
 };
 
 export type Session = {

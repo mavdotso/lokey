@@ -135,9 +135,9 @@ const userSchema = {
     billingAddress: v.optional(v.any()),
     paymentMethod: v.optional(v.any()),
     updatedAt: v.optional(v.string()),
-    planType: planTypes,
     twoFactorEnabled: v.boolean(),
     lastLogin: v.optional(v.string()),
+    defaultWorkspace: v.optional(v.id('workspaces')),
 };
 
 const sessionSchema = {

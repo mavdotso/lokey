@@ -52,7 +52,6 @@ export function UploadCard({ title, description, acceptedFileTypes = 'image/*', 
             setUploadedImagePath(URL.createObjectURL(selectedFile));
             setSelectedFile(null);
             if (fileInput.current) fileInput.current.value = '';
-            toast.success("File uploaded successfully");
         } catch (error) {
             console.error('Upload failed:', error);
             setError('Upload failed. Please try again.');

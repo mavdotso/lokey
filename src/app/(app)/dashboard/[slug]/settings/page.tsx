@@ -16,6 +16,7 @@ import { UploadCard } from "@/components/dashboard/settings/upload-card";
 import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { useSession } from "next-auth/react";
 import { signout } from "@/lib/server-actions";
+import { SelectCard } from "@/components/dashboard/settings/select-card";
 
 const workspaceSettingsItems = [
     { tabName: 'workspaceGeneral', icon: CogIcon, name: 'General' },
@@ -41,12 +42,16 @@ export default function SettingsPage() {
 
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
+    const [defaultWorkspace, setDefaultWorkspace] = useState('');
     const [confirmUserDelete, setConfirmUserDelete] = useState('');
     const [isUserDeleteDialogOpen, setIsUserDeleteDialogOpen] = useState(false);
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string })
     const users = useQuery(api.workspaces.getWorkspaceUsers, workspace ? { _id: workspace._id } : 'skip')
     const invites = useQuery(api.invites.getWorkspaceInvites, workspace ? { workspaceId: workspace._id } : 'skip')
+
+    const user = useQuery(api.users.getUser, { _id: session.data?.user?.id as Id<"users"> });
+    const userWorkspaces = useQuery(api.workspaces.getUserWorkspaces);
 
     const editWorkspace = useMutation(api.workspaces.editWorkspace);
     const updateWorkspaceLogo = useMutation(api.workspaces.updateWorkspaceLogo);
@@ -55,6 +60,8 @@ export default function SettingsPage() {
     const editUser = useMutation(api.users.editUser);
     const updateUserAvatar = useMutation(api.users.updateUserAvatar);
     const deleteUserMutation = useMutation(api.users.deleteUser);
+
+
 
     useEffect(() => {
         if (workspace) {
@@ -79,6 +86,16 @@ export default function SettingsPage() {
         }
     }, [session.data?.user]);
 
+    useEffect(() => {
+        if (user && userWorkspaces && userWorkspaces.length > 0) {
+            if (user.defaultWorkspace) {
+                setDefaultWorkspace(user.defaultWorkspace);
+            } else {
+                setDefaultWorkspace(userWorkspaces[0]._id);
+            }
+        }
+    }, [user, userWorkspaces]);
+
     if (!workspace) return <LoadingScreen />
 
     const workspaceGeneralSettings: SettingsCardProps[] = [
@@ -90,6 +107,11 @@ export default function SettingsPage() {
         { title: 'Account name', description: 'This is the name of your account on Lokey.', inputValue: userName, setInputValue: setUserName, inputPlaceholder: userName, isInputRequired: false, onSave: handleEditUser, },
         { title: 'Account email', description: 'This is an email address you use to sign in to Lokey.', inputValue: userEmail, setInputValue: setUserEmail, inputPlaceholder: userEmail, isInputRequired: false, onSave: handleEditUser, },
     ]
+
+    const workspaceOptions = userWorkspaces?.map(workspace => ({
+        value: workspace._id,
+        label: workspace.name
+    })) || [];
 
     async function handleEdit() {
         if (workspace) {
@@ -153,17 +175,36 @@ export default function SettingsPage() {
     }
 
     async function handleEditUser() {
-        const response = await editUser({
-            updates: {
-                name: userName,
-                email: userEmail
-            }
-        });
+        const updates: {
+            name?: string;
+            email?: string;
+            defaultWorkspace?: Id<"workspaces"> | undefined;
+        } = {};
 
-        if (response.success) {
-            toast.success('Successfully updated user profile');
+        if (userName !== session.data?.user?.name) {
+            updates.name = userName;
+        }
+
+        if (userEmail !== session.data?.user?.email) {
+            updates.email = userEmail;
+        }
+
+        if (defaultWorkspace) {
+            updates.defaultWorkspace = defaultWorkspace as Id<"workspaces">;
         } else {
-            toast.error('Something went wrong', { description: response.message });
+            updates.defaultWorkspace = undefined;
+        }
+
+        if (Object.keys(updates).length > 0) {
+            const response = await editUser({ updates });
+
+            if (response.success) {
+                toast.success('Successfully updated user profile');
+            } else {
+                toast.error('Something went wrong', { description: response.message });
+            }
+        } else {
+            toast.info('No changes to save');
         }
     }
 
@@ -268,6 +309,14 @@ export default function SettingsPage() {
                                 {userGeneralSettings.map((item, index) => (
                                     <SettingsCard key={index} {...item} />
                                 ))}
+                                <SelectCard
+                                    title="Default Workspace"
+                                    description="Select your default workspace. This workspace will be opened when you log in."
+                                    options={workspaceOptions}
+                                    selectedValue={defaultWorkspace}
+                                    onValueChange={setDefaultWorkspace}
+                                    onSave={handleEditUser}
+                                />
                                 <UploadCard
                                     title="User image"
                                     description="Upload your avatar. Recommended size: 200x200px."

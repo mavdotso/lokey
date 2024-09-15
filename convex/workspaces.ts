@@ -356,8 +356,14 @@ export const updateWorkspaceLogo = mutation({
             throw new Error('Unauthorized: You are not the owner of this workspace');
         }
 
+        const imageUrl = await ctx.storage.getUrl(args.storageId);
+
+        if (!imageUrl) {
+            return { success: false, message: 'Failed to get image URL' };
+        }
+
         await ctx.db.patch(args._id, {
-            logo: args.storageId,
+            logo: imageUrl,
         });
 
         return { success: true, message: 'Workspace logo updated successfully' };

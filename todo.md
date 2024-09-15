@@ -2,7 +2,8 @@
 
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
 -   [ ] Faster redirect after creating the first workspace
--   [ ] Remove workspace settings if 'member'
+-   [x] Remove workspace settings if 'member'
+-   [ ] User is not authenticated after avatar upload?
 
 ### What's needed for launch:
 
@@ -56,10 +57,11 @@
     -   General:
     -   [x] name
     -   [ ] picture
+        -   [ ] set as profile pic
     -   [ ] email
-        - [ ] Send an email change request
+        -   [ ] Send an email change request
     -   [ ] Default workspace
-    -   [ ] Delete account
+    -   [x] Delete account
     -   Security:
     -   [ ] Create password
     -   [ ] 2FA

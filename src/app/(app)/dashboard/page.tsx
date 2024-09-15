@@ -12,6 +12,7 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true)
 
     const workspaces = useQuery(api.workspaces.getUserWorkspaces);
+    const defaultWorkspace = useQuery(api.users.getUserDefaultWorkspace);
     const getInviteByCode = useQuery(api.invites.getInviteByCode, inviteCode ? { inviteCode } : "skip");
 
     const joinWorkspace = useMutation(api.invites.joinWorkspaceByInviteCode);
@@ -36,14 +37,26 @@ export default function Dashboard() {
     }, [inviteCode, joinWorkspace, router]);
 
     useEffect(() => {
-        if (workspaces !== undefined) {
+        if (workspaces !== undefined && defaultWorkspace !== undefined) {
             if (inviteCode && getInviteByCode !== undefined) {
                 handleInvite();
+            } else {
+                setIsLoading(false);
             }
-            setIsLoading(false);
         }
-    }, [workspaces, inviteCode, getInviteByCode, handleInvite]);
+    }, [workspaces, defaultWorkspace, inviteCode, getInviteByCode, handleInvite]);
 
+    useEffect(() => {
+        if (!isLoading && workspaces && workspaces.length > 0) {
+            let redirectWorkspace;
+            if (defaultWorkspace && defaultWorkspace.success && defaultWorkspace.workspace) {
+                redirectWorkspace = defaultWorkspace.workspace;
+            } else {
+                redirectWorkspace = workspaces[0];
+            }
+            router.push(`/dashboard/${redirectWorkspace.slug}/credentials`);
+        }
+    }, [isLoading, workspaces, defaultWorkspace, router]);
 
     if (isLoading) return <LoadingScreen />
 
@@ -53,8 +66,7 @@ export default function Dashboard() {
                 <CreateWorkspaceCard />
             </div>
         );
-    } else {
-        // TODO: Redirect to the default user's space, not the first
-        router.push(`/dashboard/${workspaces[0].slug}/credentials`);
     }
+
+    return <LoadingScreen />;
 }
