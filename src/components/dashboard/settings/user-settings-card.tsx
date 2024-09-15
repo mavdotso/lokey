@@ -37,7 +37,7 @@ export function UserSettingsCard({ users, workspace, invites }: UserSettingsCard
                         <TabsTrigger value="account">Members</TabsTrigger>
                         <TabsTrigger value="invites">Invites</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="account" className="space-y-4">
+                    <TabsContent value="account">
                         {users.map((user, index) => (
                             <WorkspaceMemberCard key={index} user={user} workspace={workspace} />
                         ))}
