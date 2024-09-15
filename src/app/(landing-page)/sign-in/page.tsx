@@ -7,14 +7,14 @@ export default function SignIn() {
         <div className="flex flex-col justify-center bg-background pt-20">
             <div className="space-y-4 w-full max-w-md">
                 <div>
-                    <h2 className="pt-6 font-bold text-3xl tracking-tight">
+                    <h2 className="pt-6 font-bold text-4xl tracking-tight">
                         Sign in to your account
                     </h2>
-                    <p className="pt-2 text-muted-foreground text-sm">
-                        Or start your 14-day free trial
+                    <p className="pt-2 text-md text-muted-foreground">
+                        Or enter your email to get started
                     </p>
                 </div>
-                <form action={signin} className="flex flex-row justify-center items-center gap-2 max-w-lg">
+                <form action={signin} className="flex flex-row justify-center items-center gap-2 py-4 max-w-lg">
                     <Input
                         type="email"
                         name="email"
@@ -23,9 +23,10 @@ export default function SignIn() {
                     />
                     <SubmitButton text='Sign in with Magic link' pendingText='Sending Magic Link...' />
                 </form>
-                <span className="pt-4 text-center text-muted-foreground text-xs">
-                    You will receive a sign-in link to your email address
-                </span>
+                <p className="text-muted-foreground text-xs">
+                    You will receive a sign-in link to your email address.<br />
+                    If you don&apos;t have an account yet, we&apos;ll create one for you automatically.
+                </p>
             </div>
         </div>
     )
