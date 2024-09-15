@@ -5,7 +5,6 @@ import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { CRUDCredentialsDialog } from './crud-credentials-dialog';
 
 interface RequestedCredentialCardProps {
     credentialRequest: CredentialRequest;

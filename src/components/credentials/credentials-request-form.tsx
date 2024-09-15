@@ -13,6 +13,7 @@ import { CredentialsType, credentialsTypes } from '@/convex/types'
 import { api } from '@/convex/_generated/api'
 import { DialogFooter } from '@/components/ui/dialog'
 import { ScrollArea } from '../ui/scroll-area'
+import { SubmitButton } from '../global/submit-button'
 
 interface CredentialRequestFormProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -89,7 +90,8 @@ export function CredentialRequestForm({ setIsOpen, onRequestCreated, onDialogClo
 
     return (
         <form onSubmit={handleSubmit} className='overflow-auto'>
-            <ScrollArea className='h-[400px]'>
+            <ScrollArea className='py-4 h-[400px]'>
+                <div className="top-0 right-0 left-0 absolute bg-gradient-to-b from-background to-transparent mx-auto pt-10" />
                 <div className='space-y-4 px-4 py-2'>
                     <div>
                         <Label htmlFor="name">Request Name</Label>
@@ -157,6 +159,7 @@ export function CredentialRequestForm({ setIsOpen, onRequestCreated, onDialogClo
                             </div>
                         </div>
                     ))}
+                    <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10" />
                 </div>
             </ScrollArea>
             <div className='pt-2'>
@@ -168,7 +171,7 @@ export function CredentialRequestForm({ setIsOpen, onRequestCreated, onDialogClo
                         setIsOpen(false);
                         onDialogClose && onDialogClose();
                     }}>Cancel</Button>
-                    <Button type="submit">Create Credential Request</Button>
+                    <SubmitButton text="Create Credential Request" pendingText="Creating new request..." />
                 </DialogFooter>
             </div>
         </form>
