@@ -3,23 +3,27 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
+import { useSession } from 'next-auth/react';
 
 export default function InvitePage() {
+    const session = useSession();
     const [inviteStatus, setInviteStatus] = useState<'loading' | 'pending' | 'error'>('loading');
     const [workspaceName, setWorkspaceName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    
+    const [isJoining, setIsJoining] = useState(false);
+
     const router = useRouter();
     const params = useParams();
-    
+
     const inviteCode = params.inviteCode as string;
 
     const getInviteDetails = useQuery(api.invites.getInviteByCode, { inviteCode });
-
     const getWorkspaceName = useQuery(api.workspaces.getWorkspaceName,
         getInviteDetails?.workspaceId ? { _id: getInviteDetails.workspaceId } : 'skip');
+
+    const joinWorkspace = useMutation(api.invites.joinWorkspaceByInviteCode);
 
     useEffect(() => {
         if (getInviteDetails === undefined) {
@@ -41,9 +45,22 @@ export default function InvitePage() {
         }
     }, [getWorkspaceName]);
 
-    function handleAcceptInvite() {
-        localStorage.setItem('inviteCode', inviteCode);
-        router.push('/sign-in');
+    async function handleAcceptInvite() {
+        if (session) {
+            setIsJoining(true);
+            try {
+                await joinWorkspace({ inviteCode });
+                router.push('/dashboard');
+            } catch (error) {
+                console.error('Error joining workspace:', error);
+                setErrorMessage('Failed to join workspace. Please try again.');
+                setInviteStatus('error');
+            }
+            setIsJoining(false);
+        } else {
+            localStorage.setItem('inviteCode', inviteCode);
+            router.push('/sign-in');
+        }
     }
 
     return (
@@ -82,7 +99,9 @@ export default function InvitePage() {
 
                 <div className="mt-8">
                     {inviteStatus === 'pending' && (
-                        <Button onClick={handleAcceptInvite}>Accept Invitation</Button>
+                        <Button onClick={handleAcceptInvite} disabled={isJoining}>
+                            {isJoining ? 'Joining...' : session ? 'Join Workspace' : 'Accept Invitation'}
+                        </Button>
                     )}
                     {inviteStatus === 'error' && (
                         <Link href="/">

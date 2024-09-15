@@ -4,7 +4,7 @@
 -   [ ] Add a popup with the 'Join' or Decline invitation instead of adding the user immediatelly
 -   [ ] Simplify the invitePage
     -   [ ] to only add inviteCode to localStorage, if the user clicks on "join"
-    -   [ ] expire the invitation (ONLY by email) if user declines
+    -   [x] expire the invitation (ONLY by email) if user declines
 
 ### Bugs
 
