@@ -10,6 +10,7 @@ export function UserCard({ session }: { session: Session }) {
             <aside className="flex flex-grow justify-center items-center gap-2 min-w-0">
                 {session.user && <UserAvatar user={session.user} />}
                 <div className="flex flex-col min-w-0">
+                    <p className="text-muted-foreground truncate">{session.user?.name}</p>
                     <small className="text-muted-foreground truncate">{session.user?.email}</small>
                 </div>
             </aside>
