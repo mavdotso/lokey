@@ -29,8 +29,8 @@ export function InviteCard({ invite }: InviteCardProps) {
                     description: `Removed the invite for ${invite.invitedEmail}`
                 })
             } else {
-                toast.error("Error", {
-                    description: response.message
+                toast.error("Something went wrong.", {
+                    description: "Please, try again"
                 })
             }
         } catch (error) {
