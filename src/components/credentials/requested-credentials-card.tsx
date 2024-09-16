@@ -58,20 +58,30 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
 
     const handleViewCredential = (index: number) => {
         if (!secretPhrase) {
+            console.log('Missing secret phrase');
             toast.error('Please enter the secret phrase to view the credential');
             return;
         }
 
+        console.log('Secret phrase entered:', secretPhrase);
+
         try {
             const currentRequest = updatedCredentialsRequest || credentialsRequest;
-            const { privateKey } = crypto.generateKeyPair(secretPhrase);
-            const decryptedPrivateKey = crypto.decrypt(currentRequest.privateKey, secretPhrase);
+            console.log('Current request:', currentRequest);
+
+            // Decrypt the stored secretKey
+            console.log('Encrypted secretKey:', currentRequest.encryptedSecretKey);
+            const secretKey = crypto.decrypt(currentRequest.encryptedSecretKey, secretPhrase);
+            console.log('Decrypted secretKey:', secretKey);
 
             if (currentRequest.status === 'fulfilled' && currentRequest.credentials[index].encryptedValue) {
+                console.log('Encrypted value:', currentRequest.credentials[index].encryptedValue);
                 const decryptedValue = crypto.decrypt(
                     currentRequest.credentials[index].encryptedValue,
-                    decryptedPrivateKey
+                    secretKey
                 );
+                console.log('Decrypted value:', decryptedValue);
+
                 setSelectedCredentials({
                     name: currentRequest.credentials[index].name,
                     type: currentRequest.credentials[index].type,
@@ -80,11 +90,12 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
                 });
                 setIsModalOpen(true);
             } else {
+                console.log('Credentials not fulfilled or missing encrypted value');
                 toast.error('Credentials have not been fulfilled yet');
             }
         } catch (error) {
-            toast.error('Failed to decrypt credential. Please check your secret phrase.');
             console.error('Decryption error:', error);
+            toast.error('Failed to decrypt credential. Please check your secret phrase.');
         }
     };
 

@@ -3,6 +3,7 @@ import { v } from 'convex/values';
 import { mutation } from './_generated/server';
 import { getViewerId } from './auth';
 import { credentialsTypeValidator } from './types';
+import { Id } from './_generated/dataModel';
 
 export const getCredentialsById = query({
     args: { credentialsId: v.id('credentials') },
@@ -240,25 +241,24 @@ export const createCredentialsRequest = mutation({
                 type: credentialsTypeValidator,
             })
         ),
-        privateKey: v.string(),
+        encryptedSecretKey: v.string(),
     },
     handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
+        const userId = await ctx.auth.getUserIdentity();
+        if (!userId) throw new Error('Not authenticated');
 
-        if (!identity) {
-            return { success: false, message: 'Log in to edit credentials' };
-        }
+        const { workspaceId, description, credentials, encryptedSecretKey } = args;
 
-        const requestId = await ctx.db.insert('credentialsRequests', {
-            workspaceId: args.workspaceId,
-            createdBy: identity,
-            description: args.description,
-            credentials: args.credentials,
+        const credentialsRequest = await ctx.db.insert('credentialsRequests', {
+            workspaceId,
+            createdBy: userId.subject as Id<'users'>,
+            description,
+            credentials,
             status: 'pending',
-            privateKey: args.privateKey,
+            encryptedSecretKey,
         });
 
-        return { requestId };
+        return { requestId: credentialsRequest };
     },
 });
 
@@ -277,8 +277,11 @@ export const getCredentialsRequests = query({
 export const getCredentialsRequestById = query({
     args: { _id: v.id('credentialsRequests') },
     handler: async (ctx, args) => {
+        console.log('Fetching credentials request:', args._id);
         const request = await ctx.db.get(args._id);
+        console.log('Retrieved request:', request);
         if (!request) {
+            console.log('Credential request not found');
             throw new Error('Credential request not found');
         }
         return request;
@@ -298,23 +301,24 @@ export const fulfillCredentialsRequest = mutation({
         ),
     },
     handler: async (ctx, args) => {
-        const request = await ctx.db.get(args.requestId);
-        if (!request || request.status !== 'pending') {
-            throw new Error('Invalid or already fulfilled request');
-        }
+        const userId = await ctx.auth.getUserIdentity();
+        if (!userId) throw new Error('Not authenticated');
 
-        if (args.fulfilledCredentials.length !== request.credentials.length) {
-            throw new Error('Mismatch in number of credentials');
-        }
+        const { requestId, fulfilledCredentials } = args;
 
-        // Update the existing credentials with the encrypted values
-        const updatedCredentials = request.credentials.map((cred, index) => ({
-            ...cred,
-            encryptedValue: args.fulfilledCredentials[index].encryptedValue,
-        }));
+        const request = await ctx.db.get(requestId);
+        if (!request) throw new Error('Credentials request not found');
 
-        await ctx.db.patch(args.requestId, {
+        if (request.status !== 'pending') throw new Error('Credentials request is not pending');
+
+        const updatedCredentials = request.credentials.map((cred) => {
+            const fulfilledCred = fulfilledCredentials.find((fc) => fc.name === cred.name);
+            return fulfilledCred ? { ...cred, encryptedValue: fulfilledCred.encryptedValue } : cred;
+        });
+
+        await ctx.db.patch(requestId, {
             status: 'fulfilled',
+            fulfilledBy: userId.subject as Id<'users'>,
             fulfilledAt: new Date().toISOString(),
             credentials: updatedCredentials,
         });

@@ -18,19 +18,34 @@ export const crypto = {
         return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Hex);
     },
 
+    generateSecretKey: (secretPhrase: string): string => {
+        return CryptoJS.SHA256(secretPhrase).toString();
+    },
+
     generateKeyPair: (secretPhrase: string) => {
-        const privateKey = crypto.hash(secretPhrase);
-        const publicKey = crypto.hash(privateKey);
+        console.log('Generating key pair from secret phrase:', secretPhrase);
+        const privateKey = CryptoJS.SHA256(secretPhrase).toString();
+        const publicKey = CryptoJS.SHA256(privateKey).toString();
+        console.log('Generated private key:', privateKey);
+        console.log('Generated public key:', publicKey);
         return { privateKey, publicKey };
     },
 
     encrypt: (data: string, key: string): string => {
-        return CryptoJS.AES.encrypt(data, key).toString();
+        console.log('Encrypting data:', data);
+        console.log('Using key:', key);
+        const encrypted = CryptoJS.AES.encrypt(data, key).toString();
+        console.log('Encrypted result:', encrypted);
+        return encrypted;
     },
 
     decrypt: (encryptedData: string, key: string): string => {
+        console.log('Decrypting data:', encryptedData);
+        console.log('Using key:', key);
         const bytes = CryptoJS.AES.decrypt(encryptedData, key);
-        return bytes.toString(CryptoJS.enc.Utf8);
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+        console.log('Decrypted result:', decrypted);
+        return decrypted;
     },
 
     hash: (data: string): string => {

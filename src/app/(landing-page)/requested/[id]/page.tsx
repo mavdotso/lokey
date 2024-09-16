@@ -15,7 +15,7 @@ import { crypto } from '@/lib/utils';
 export default function FillCredentialsRequestPage() {
     const { id } = useParams();
     const searchParams = useSearchParams();
-    const publicKey = searchParams.get('publicKey');
+    const secretKey = searchParams.get('secretKey');
     const [formData, setFormData] = useState<Record<string, string>>({});
 
     const credentialsRequest = useQuery(api.credentials.getCredentialsRequestById, {
@@ -36,41 +36,72 @@ export default function FillCredentialsRequestPage() {
 
     if (credentialsRequest === undefined) return <LoadingScreen />;
     if (credentialsRequest === null) return <div>Credential request not found</div>;
-    if (!publicKey) return <div>Invalid request: Missing public key</div>;
+    if (!secretKey) return <div>Invalid request: Missing secret key</div>;
 
     function handleInputChange(fieldName: string, value: string) {
         setFormData(prev => ({ ...prev, [fieldName]: value }));
     };
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
 
-        if (!credentialsRequest || !publicKey) {
-            toast.info("Credentials request not found");
+
+        if (!secretKey) {
+            console.log('Missing public key');
+            toast.error('Invalid request: Missing public key');
             return;
         }
 
-        try {
-            const fulfilledCredentials = credentialsRequest.credentials.map(cred => {
-                const encryptedValue = crypto.encrypt(formData[cred.name], publicKey);
-                return {
-                    name: cred.name,
-                    type: cred.type,
-                    encryptedValue,
-                };
-            });
+        console.log('Secret key:', secretKey);
 
-            await fulfillCredentialsRequest({
-                requestId: credentialsRequest._id,
-                fulfilledCredentials,
-            });
+        const formData = new FormData(event.currentTarget);
+        const credentials = credentialsRequest.credentials.map((cred) => {
+            const value = formData.get(cred.name) as string;
+            console.log(`Form value for ${cred.name}:`, value);
 
-            toast.success('Credential request fulfilled successfully');
-        } catch (error) {
-            toast.error('Failed to fulfill credential request');
-            console.error('Error:', error);
+            if (!value) {
+                console.error(`Missing value for ${cred.name}`);
+                return null;
+            }
+
+            console.log(`Encrypting value for ${cred.name}:`, value);
+            const encryptedValue = crypto.encrypt(value, secretKey);
+            console.log(`Encrypted value for ${cred.name}:`, encryptedValue);
+            return {
+                name: cred.name,
+                type: cred.type,
+                encryptedValue: encryptedValue
+            };
+        });
+
+        const validCredentials = credentials.filter((cred): cred is NonNullable<typeof cred> => cred !== null);
+
+        if (validCredentials.length !== credentialsRequest.credentials.length) {
+            toast.error('Please fill in all credential fields');
+            return;
         }
-    }
+
+        console.log('Sending credentials to server:', validCredentials);
+
+        try {
+            const result = await fulfillCredentialsRequest({
+                requestId: credentialsRequest._id,
+                fulfilledCredentials: validCredentials
+            });
+
+            console.log('Server response:', result);
+
+            if (result.success) {
+                toast.success('Credentials submitted successfully');
+                // Handle successful submission (e.g., redirect or update UI)
+            } else {
+                toast.error('Failed to submit credentials');
+            }
+        } catch (error) {
+            console.error('Error submitting credentials:', error);
+            toast.error('An error occurred while submitting credentials');
+        }
+    };
 
     return (
         <div className="flex flex-col h-full">
@@ -96,6 +127,7 @@ export default function FillCredentialsRequestPage() {
                                     type="password"
                                     id={field.name}
                                     value={formData[field.name] || ''}
+                                    name={field.name}
                                     onChange={(e) => handleInputChange(field.name, e.target.value)}
                                     required
                                 />
@@ -103,6 +135,7 @@ export default function FillCredentialsRequestPage() {
                                 <Textarea
                                     id={field.name}
                                     value={formData[field.name] || ''}
+                                    name={field.name}
                                     onChange={(e) => handleInputChange(field.name, e.target.value)}
                                     required
                                 />
@@ -110,6 +143,7 @@ export default function FillCredentialsRequestPage() {
                                 <Input
                                     type="text"
                                     id={field.name}
+                                    name={field.name}
                                     value={formData[field.name] || ''}
                                     onChange={(e) => handleInputChange(field.name, e.target.value)}
                                     required

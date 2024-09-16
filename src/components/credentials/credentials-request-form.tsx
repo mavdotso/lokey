@@ -64,8 +64,8 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
                 return;
             }
 
-            const { privateKey, publicKey } = crypto.generateKeyPair(secretPhrase);
-            const encryptedPrivateKey = crypto.encrypt(privateKey, secretPhrase);
+            const secretKey = crypto.generateSecretKey(secretPhrase);
+            const encryptedSecretKey = crypto.encrypt(secretKey, secretPhrase);
 
             const response = await createCredentialsRequest({
                 workspaceId: currentWorkspaceId._id,
@@ -75,10 +75,10 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
                     description: cred.description,
                     type: cred.type,
                 })),
-                privateKey: encryptedPrivateKey,
+                encryptedSecretKey: encryptedSecretKey,
             });
 
-            const requestLink = `/requested/${response.requestId}?publicKey=${encodeURIComponent(publicKey)}`;
+            const requestLink = `/requested/${response.requestId}?secretKey=${secretKey}`;
 
             console.log(requestLink);
 

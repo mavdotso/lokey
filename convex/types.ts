@@ -96,7 +96,7 @@ export type CredentialsRequest = {
     status: 'pending' | 'fulfilled' | 'rejected';
     fulfilledBy?: Id<'users'>;
     fulfilledAt?: string;
-    privateKey: string;
+    encryptedSecretKey: string;
 };
 
 export type WorkspaceInvite = {
