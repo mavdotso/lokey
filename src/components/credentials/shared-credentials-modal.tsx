@@ -20,11 +20,11 @@ interface SharedCredentialsModalProps {
 export function SharedCredentialsModal({ isOpen, setIsOpen, credentials }: SharedCredentialsModalProps) {
     const [showPassword, setShowPassword] = useState(false);
 
-    const togglePasswordVisibility = () => {
+    function togglePasswordVisibility() {
         setShowPassword(!showPassword);
     };
 
-    const copyToClipboard = (text: string) => {
+    function copyToClipboard(text: string) {
         navigator.clipboard.writeText(text).then(() => {
             toast.success('Copied to clipboard');
         }).catch(() => {

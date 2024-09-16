@@ -2,7 +2,6 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
 export function SearchInput() {
-
     return (
         <div className="relative bg-input my-6 rounded-md w-full max-w-md">
             <Input

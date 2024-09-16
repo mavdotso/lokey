@@ -1,6 +1,5 @@
-import { query } from './_generated/server';
+import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
-import { mutation } from './_generated/server';
 import { getViewerId } from './auth';
 import { credentialsTypeValidator } from './types';
 import { Id } from './_generated/dataModel';
@@ -19,12 +18,10 @@ export const getCredentialsById = query({
 export const getWorkspaceCredentials = query({
     args: { workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
-        const credentials = await ctx.db
+        return ctx.db
             .query('credentials')
             .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
             .collect();
-
-        return credentials;
     },
 });
 
@@ -41,7 +38,6 @@ export const createCredentials = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
         const credentialsId = await ctx.db.insert('credentials', {
             workspaceId: args.workspaceId,
             name: args.name,
@@ -62,11 +58,7 @@ export const createCredentials = mutation({
 export const incrementCredentialsViewCount = mutation({
     args: { _id: v.id('credentials') },
     handler: async (ctx, args) => {
-        const credential = await ctx.db
-            .query('credentials')
-            .filter((q) => q.eq(q.field('_id'), args._id))
-            .first();
-
+        const credential = await ctx.db.get(args._id);
         if (!credential) {
             throw new Error('Credential not found');
         }
@@ -77,12 +69,12 @@ export const incrementCredentialsViewCount = mutation({
             updatedAt: new Date().toISOString(),
         };
 
-        // Check if maxViews is set and has been exceeded
         if (credential.maxViews && newViewCount > credential.maxViews) {
             updates.expiresAt = new Date().toISOString();
         }
 
-        await ctx.db.patch(credential._id, updates);
+        await ctx.db.patch(args._id, updates);
+        return { success: true };
     },
 });
 
@@ -95,13 +87,11 @@ export const retrieveCredentials = query({
     },
     handler: async (ctx, args): Promise<RetrieveCredentialsResult> => {
         const credential = await ctx.db.get(args._id);
-
         if (!credential) {
             throw new Error('Credential not found');
         }
 
         const now = new Date();
-
         const isExpired = (credential.expiresAt && new Date(credential.expiresAt) <= now) || (credential.maxViews !== undefined && credential.viewCount >= credential.maxViews);
 
         if (isExpired) {
@@ -119,29 +109,22 @@ export const retrieveCredentials = query({
 export const removeCredentials = mutation({
     args: { _id: v.id('credentials') },
     handler: async (ctx, args) => {
-        try {
-            const identity = await getViewerId(ctx);
-
-            if (!identity) {
-                return { success: false, message: 'Log in to remove credentials' };
-            }
-
-            const credential = await ctx.db.get(args._id);
-
-            if (!credential) {
-                return { success: false, message: 'Credential not found' };
-            }
-
-            if (credential.createdBy !== identity) {
-                return { success: false, message: 'Unauthorized: You are not the owner of this credential' };
-            }
-
-            await ctx.db.delete(args._id);
-
-            return { success: true, message: 'Credential removed successfully' };
-        } catch (error: any) {
-            return { success: false, message: `An unexpected error occurred: ${error.message}` };
+        const identity = await getViewerId(ctx);
+        if (!identity) {
+            throw new Error('Log in to remove credentials');
         }
+
+        const credential = await ctx.db.get(args._id);
+        if (!credential) {
+            throw new Error('Credential not found');
+        }
+
+        if (credential.createdBy !== identity) {
+            throw new Error('Unauthorized: You are not the owner of this credential');
+        }
+
+        await ctx.db.delete(args._id);
+        return { success: true };
     },
 });
 
@@ -156,32 +139,26 @@ export const editCredentials = mutation({
         }),
     },
     handler: async (ctx, args) => {
-        try {
-            const identity = await getViewerId(ctx);
-
-            if (!identity) {
-                return { success: false, message: 'Log in to edit credentials' };
-            }
-
-            const credential = await ctx.db.get(args._id);
-
-            if (!credential) {
-                return { success: false, message: 'Credential not found' };
-            }
-
-            if (credential.createdBy !== identity) {
-                return { success: false, message: 'Unauthorized: You are not the owner of this credential' };
-            }
-
-            await ctx.db.patch(args._id, {
-                ...args.updates,
-                updatedAt: new Date().toISOString(),
-            });
-
-            return { success: true, message: 'Credential updated successfully' };
-        } catch (error: any) {
-            return { success: false, message: `An unexpected error occurred: ${error.message}` };
+        const identity = await getViewerId(ctx);
+        if (!identity) {
+            throw new Error('Log in to edit credentials');
         }
+
+        const credential = await ctx.db.get(args._id);
+        if (!credential) {
+            throw new Error('Credential not found');
+        }
+
+        if (credential.createdBy !== identity) {
+            throw new Error('Unauthorized: You are not the owner of this credential');
+        }
+
+        await ctx.db.patch(args._id, {
+            ...args.updates,
+            updatedAt: new Date().toISOString(),
+        });
+
+        return { success: true };
     },
 });
 
@@ -190,43 +167,36 @@ export const setExpired = mutation({
         _id: v.id('credentials'),
     },
     handler: async (ctx, args) => {
-        try {
-            const identity = await getViewerId(ctx);
-
-            if (!identity) {
-                return { success: false, message: 'Log in to edit credentials' };
-            }
-
-            const credential = await ctx.db.get(args._id);
-
-            if (!credential) {
-                return { success: false, message: 'Credential not found' };
-            }
-
-            if (credential.createdBy !== identity) {
-                return { success: false, message: 'Unauthorized: You are not the owner of this credential' };
-            }
-
-            await ctx.db.patch(args._id, {
-                expiresAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-            });
-
-            return { success: true, message: 'Credential expiration updated successfully' };
-        } catch (error: any) {
-            return { success: false, message: `An unexpected error occurred: ${error.message}` };
+        const identity = await getViewerId(ctx);
+        if (!identity) {
+            throw new Error('Log in to edit credentials');
         }
+
+        const credential = await ctx.db.get(args._id);
+        if (!credential) {
+            throw new Error('Credential not found');
+        }
+
+        if (credential.createdBy !== identity) {
+            throw new Error('Unauthorized: You are not the owner of this credential');
+        }
+
+        await ctx.db.patch(args._id, {
+            expiresAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        });
+
+        return { success: true };
     },
 });
 
 export const getWorkspaceCredentialsRequests = query({
     args: { workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
-        const requests = await ctx.db
+        return ctx.db
             .query('credentialsRequests')
             .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
             .collect();
-        return requests;
     },
 });
 
@@ -245,7 +215,9 @@ export const createCredentialsRequest = mutation({
     },
     handler: async (ctx, args) => {
         const userId = await ctx.auth.getUserIdentity();
-        if (!userId) throw new Error('Not authenticated');
+        if (!userId) {
+            throw new Error('Not authenticated');
+        }
 
         const { workspaceId, description, credentials, encryptedPrivateKey } = args;
 
@@ -265,30 +237,24 @@ export const createCredentialsRequest = mutation({
 export const getCredentialsRequests = query({
     args: { workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
-        const requests = await ctx.db
+        return ctx.db
             .query('credentialsRequests')
             .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
             .collect();
-
-        return requests;
     },
 });
 
 export const getCredentialsRequestById = query({
     args: { _id: v.id('credentialsRequests') },
     handler: async (ctx, args) => {
-        console.log('Fetching credentials request:', args._id);
         const request = await ctx.db.get(args._id);
-        console.log('Retrieved request:', request);
         if (!request) {
-            console.log('Credential request not found');
             throw new Error('Credential request not found');
         }
         return request;
     },
 });
 
-// TODO: I think this one is not right — I don't need the logged in user to fulfull the credentials
 export const fulfillCredentialsRequest = mutation({
     args: {
         requestId: v.id('credentialsRequests'),
@@ -301,15 +267,16 @@ export const fulfillCredentialsRequest = mutation({
         ),
     },
     handler: async (ctx, args) => {
-        const userId = await ctx.auth.getUserIdentity();
-        if (!userId) throw new Error('Not authenticated');
-
         const { requestId, fulfilledCredentials } = args;
 
         const request = await ctx.db.get(requestId);
-        if (!request) throw new Error('Credentials request not found');
+        if (!request) {
+            throw new Error('Credentials request not found');
+        }
 
-        if (request.status !== 'pending') throw new Error('Credentials request is not pending');
+        if (request.status !== 'pending') {
+            throw new Error('Credentials request is not pending');
+        }
 
         const updatedCredentials = request.credentials.map((cred) => {
             const fulfilledCred = fulfilledCredentials.find((fc) => fc.name === cred.name);
@@ -318,7 +285,6 @@ export const fulfillCredentialsRequest = mutation({
 
         await ctx.db.patch(requestId, {
             status: 'fulfilled',
-            fulfilledBy: userId.subject as Id<'users'>,
             fulfilledAt: new Date().toISOString(),
             credentials: updatedCredentials,
         });
@@ -331,9 +297,8 @@ export const rejectCredentialsRequest = mutation({
     args: { requestId: v.id('credentialsRequests') },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
         if (!identity) {
-            return { success: false, message: 'Log in to edit credentials' };
+            throw new Error('Log in to edit credentials');
         }
 
         const request = await ctx.db.get(args.requestId);

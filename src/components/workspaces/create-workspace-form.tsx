@@ -47,7 +47,7 @@ export function CreateWorkspaceForm() {
         }
     }, [formState.slug, isUnique])
 
-    async function handleSubmit(formData: FormData) {
+    async function handleSubmit() {
         if (formState.isSubmitting || !formState.isSlugUnique) {
             setFormState(prev => ({ ...prev, showSlugError: !formState.isSlugUnique }))
             return

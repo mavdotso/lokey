@@ -15,7 +15,6 @@ export function getURL() {
 }
 
 export const crypto = {
-    // Existing methods
     generateRandomString: (length: number): string => {
         return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Hex);
     },
@@ -33,20 +32,13 @@ export const crypto = {
     },
 
     encrypt: (data: string, key: string): string => {
-        console.log('Encrypting data:', data);
-        console.log('Using key:', key);
         const encrypted = CryptoJS.AES.encrypt(data, key).toString();
-        console.log('Encrypted result:', encrypted);
         return encrypted;
     },
 
     decrypt: (encryptedData: string, key: string): string => {
-        console.log('Decrypting data:', encryptedData);
-        console.log('Using key:', key);
         const bytes = CryptoJS.AES.decrypt(encryptedData, key);
-        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
-        console.log('Decrypted result:', decrypted);
-        return decrypted;
+        return bytes.toString(CryptoJS.enc.Utf8);
     },
 
     encryptWithPublicKey: (data: string, publicKey: string): string => {
@@ -84,20 +76,19 @@ export const crypto = {
     },
 };
 
-export function encryptData(data: string) {
+export function encryptData(data: string): { publicKey: string; privateKey: string; encryptedData: string } {
     const publicKey = crypto.generateRandomString(18);
     const privateKey = crypto.generateRandomString(18);
-    const encryptionKey = publicKey + privateKey;
+    const encryptionKey = crypto.generateSecretKey(publicKey + privateKey);
 
     const encryptedData = crypto.encrypt(data, encryptionKey);
 
     return { publicKey, privateKey, encryptedData };
 }
 
-export function decryptData(encryptedData: string, publicKey: string, privateKey: string) {
-    const decryptionKey = publicKey + privateKey;
-    const decryptedText = crypto.decrypt(encryptedData, decryptionKey);
-    return decryptedText;
+export function decryptData(encryptedData: string, publicKey: string, privateKey: string): string {
+    const decryptionKey = crypto.generateSecretKey(publicKey + privateKey);
+    return crypto.decrypt(encryptedData, decryptionKey);
 }
 
 export function generateShareLink(credentialsId: string, publicKey: string) {

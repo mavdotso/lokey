@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +10,7 @@ import { LoadingScreen } from '@/components/global/loading-screen';
 import { toast } from 'sonner';
 import { Id } from '@/convex/_generated/dataModel';
 import { crypto } from '@/lib/utils';
+import { SubmitButton } from '@/components/global/submit-button';
 
 export default function FillCredentialsRequestPage() {
     const { id } = useParams();
@@ -43,21 +43,19 @@ export default function FillCredentialsRequestPage() {
         setFormData(prev => ({ ...prev, [fieldName]: value }));
     };
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        if (!publicKey) {
-            console.log('Missing public key');
-            toast.error('Invalid request: Missing public key');
+        if (!publicKey || !credentialsRequest) {
+            console.log('Missing public key or credentials request');
+            toast.error('Invalid request: Missing required data');
             return;
         }
 
         const formData = new FormData(event.currentTarget);
         const credentials = credentialsRequest.credentials.map((cred) => {
             const value = formData.get(cred.name) as string;
-            console.log(`Encrypting value for ${cred.name}:`, value);
             const encryptedValue = crypto.encryptWithPublicKey(value, publicKey);
-            console.log(`Encrypted value for ${cred.name}:`, encryptedValue);
             return {
                 name: cred.name,
                 type: cred.type,
@@ -72,7 +70,6 @@ export default function FillCredentialsRequestPage() {
             return;
         }
 
-        console.log('Sending credentials to server:', validCredentials);
 
         try {
             const result = await fulfillCredentialsRequest({
@@ -80,11 +77,10 @@ export default function FillCredentialsRequestPage() {
                 fulfilledCredentials: credentials,
             });
 
-            console.log('Server response:', result);
 
             if (result.success) {
                 toast.success('Credentials submitted successfully');
-                // Handle successful submission (e.g., redirect or update UI)
+                // TODO: Handle successful submission (e.g., redirect or update UI)
             } else {
                 toast.error('Failed to submit credentials');
             }
@@ -142,7 +138,7 @@ export default function FillCredentialsRequestPage() {
                             )}
                         </div>
                     ))}
-                    <Button type="submit">Submit Credentials</Button>
+                    <SubmitButton text='Submit Credentials' pendingText='Submitting...' />
                 </form>
             </div>
         </div>

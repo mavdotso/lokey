@@ -46,7 +46,7 @@ export default function SharePage() {
                     await incrementCredentialsViewCount({ _id: id as Id<"credentials"> })
                     setCredentialsData(parsedData);
                 } else {
-                    throw new Error('Failed to retrieve encrypted data');
+                    setError('Failed to retrieve encrypted data');
                 }
             } catch (err) {
                 console.error('Error fetching credentials:', err);

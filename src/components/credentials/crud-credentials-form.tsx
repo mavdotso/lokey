@@ -123,7 +123,7 @@ export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredent
                     toast.success('Credentials were updated successfully');
                     onDialogClose && onDialogClose();
                 } else {
-                    toast.error('Error: something went wrong', { description: response.message });
+                    toast.error('Something went wrong ', { description: "Please, try again"});
                 }
             } else {
                 const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data));

@@ -2,7 +2,6 @@ import { CreditCard, Blocks } from 'lucide-react';
 import Link from 'next/link';
 
 const navItems = [
-
     { label: 'Features', href: '#', icon: Blocks },
     { label: 'Pricing', href: '#', icon: CreditCard },
 ];

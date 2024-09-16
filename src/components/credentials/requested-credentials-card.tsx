@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
-import { SharedCredentialsModal } from './shared-credentials';
+import { SharedCredentialsModal } from './shared-credentials-modal';
 import { Id } from '@/convex/_generated/dataModel';
 import { crypto } from '@/lib/utils';
 import { Input } from '../ui/input';
@@ -33,13 +33,13 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
         { _id: credentialsRequest._id as Id<"credentialsRequests"> }
     );
 
-    const handleReject = async () => {
+    async function handleReject() {
         try {
             const result = await rejectCredentialsRequest({ requestId: credentialsRequest._id as Id<"credentialsRequests"> });
             if (result.success) {
                 toast.success('Credential request rejected');
             } else {
-                toast.error(result.message || 'Failed to reject credential request');
+                toast.error('Failed to reject credential request');
             }
         } catch (error) {
             toast.error('Failed to reject credential request');
@@ -47,7 +47,7 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
         }
     };
 
-    const getStatusColor = (status: string) => {
+    function getStatusColor(status: string) {
         switch (status) {
             case 'pending': return 'bg-yellow-500';
             case 'fulfilled': return 'bg-green-500';
@@ -56,7 +56,7 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
         }
     };
 
-    const handleViewCredential = async (index: number) => {
+    async function handleViewCredential(index: number) {
         if (!secretPhrase) {
             console.log('Missing secret phrase');
             toast.error('Please enter the secret phrase to view the credential');
@@ -65,20 +65,14 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
 
         try {
             const currentRequest = updatedCredentialsRequest || credentialsRequest;
-            console.log('Current request:', currentRequest);
 
-            // Decrypt the stored private key
-            console.log('Encrypted private key:', currentRequest.encryptedPrivateKey);
-            const privateKey = await crypto.decryptPrivateKey(currentRequest.encryptedPrivateKey, secretPhrase);
-            console.log('Decrypted private key:', privateKey);
+            const privateKey = crypto.decryptPrivateKey(currentRequest.encryptedPrivateKey, secretPhrase);
 
             if (currentRequest.status === 'fulfilled' && currentRequest.credentials[index].encryptedValue) {
-                console.log('Encrypted value:', currentRequest.credentials[index].encryptedValue);
-                const decryptedValue = await crypto.decryptWithPrivateKey(
+                const decryptedValue = crypto.decryptWithPrivateKey(
                     currentRequest.credentials[index].encryptedValue,
                     privateKey
                 );
-                console.log('Decrypted value:', decryptedValue);
 
                 setSelectedCredentials({
                     name: currentRequest.credentials[index].name,
@@ -131,7 +125,6 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
             {currentRequest.status === 'pending' && (
                 <div className="flex justify-end space-x-2 mt-2">
                     <Button variant="outline" onClick={handleReject}>Reject</Button>
-                    {/* <Button onClick={redirect(`/requested/${currentRequest._id}`)}>Fulfill</Button> */}
                 </div>
             )}
             {currentRequest.status === 'fulfilled' && (

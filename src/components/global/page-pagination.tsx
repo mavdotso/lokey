@@ -22,7 +22,6 @@ export function PagePagination({
     return (
         <Pagination className="pb-4 text-primary/70">
             <PaginationContent>
-                {/* Previous Button */}
                 <PaginationItem className="hover:text-primary">
                     <PaginationPrevious
                         href="#"
@@ -30,7 +29,6 @@ export function PagePagination({
                     />
                 </PaginationItem>
 
-                {/* Page Numbers */}
                 {[...Array(totalPages)].map((_, index) => (
                     <PaginationItem key={index} className="hover:text-primary">
                         <PaginationLink
@@ -43,14 +41,12 @@ export function PagePagination({
                     </PaginationItem>
                 ))}
 
-                {/* Ellipsis (optional) */}
                 {totalPages > 5 && (
                     <PaginationItem className="hover:text-primary">
                         <PaginationEllipsis />
                     </PaginationItem>
                 )}
 
-                {/* Next Button */}
                 <PaginationItem className="hover:text-primary">
                     <PaginationNext
                         href="#"
