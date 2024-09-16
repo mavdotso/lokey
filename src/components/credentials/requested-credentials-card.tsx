@@ -56,29 +56,27 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
         }
     };
 
-    const handleViewCredential = (index: number) => {
+    const handleViewCredential = async (index: number) => {
         if (!secretPhrase) {
             console.log('Missing secret phrase');
             toast.error('Please enter the secret phrase to view the credential');
             return;
         }
 
-        console.log('Secret phrase entered:', secretPhrase);
-
         try {
             const currentRequest = updatedCredentialsRequest || credentialsRequest;
             console.log('Current request:', currentRequest);
 
-            // Decrypt the stored secretKey
-            console.log('Encrypted secretKey:', currentRequest.encryptedSecretKey);
-            const secretKey = crypto.decrypt(currentRequest.encryptedSecretKey, secretPhrase);
-            console.log('Decrypted secretKey:', secretKey);
+            // Decrypt the stored private key
+            console.log('Encrypted private key:', currentRequest.encryptedPrivateKey);
+            const privateKey = await crypto.decryptPrivateKey(currentRequest.encryptedPrivateKey, secretPhrase);
+            console.log('Decrypted private key:', privateKey);
 
             if (currentRequest.status === 'fulfilled' && currentRequest.credentials[index].encryptedValue) {
                 console.log('Encrypted value:', currentRequest.credentials[index].encryptedValue);
-                const decryptedValue = crypto.decrypt(
+                const decryptedValue = await crypto.decryptWithPrivateKey(
                     currentRequest.credentials[index].encryptedValue,
-                    secretKey
+                    privateKey
                 );
                 console.log('Decrypted value:', decryptedValue);
 

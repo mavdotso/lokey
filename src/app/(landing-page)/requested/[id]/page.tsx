@@ -15,7 +15,8 @@ import { crypto } from '@/lib/utils';
 export default function FillCredentialsRequestPage() {
     const { id } = useParams();
     const searchParams = useSearchParams();
-    const secretKey = searchParams.get('secretKey');
+    const encodedPublicKey = searchParams.get('publicKey');
+    const publicKey = encodedPublicKey ? crypto.decodePublicKey(encodedPublicKey) : null;
     const [formData, setFormData] = useState<Record<string, string>>({});
 
     const credentialsRequest = useQuery(api.credentials.getCredentialsRequestById, {
@@ -36,7 +37,7 @@ export default function FillCredentialsRequestPage() {
 
     if (credentialsRequest === undefined) return <LoadingScreen />;
     if (credentialsRequest === null) return <div>Credential request not found</div>;
-    if (!secretKey) return <div>Invalid request: Missing secret key</div>;
+    if (!publicKey) return <div>Invalid request: Missing secret key</div>;
 
     function handleInputChange(fieldName: string, value: string) {
         setFormData(prev => ({ ...prev, [fieldName]: value }));
@@ -45,27 +46,17 @@ export default function FillCredentialsRequestPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-
-        if (!secretKey) {
+        if (!publicKey) {
             console.log('Missing public key');
             toast.error('Invalid request: Missing public key');
             return;
         }
 
-        console.log('Secret key:', secretKey);
-
         const formData = new FormData(event.currentTarget);
         const credentials = credentialsRequest.credentials.map((cred) => {
             const value = formData.get(cred.name) as string;
-            console.log(`Form value for ${cred.name}:`, value);
-
-            if (!value) {
-                console.error(`Missing value for ${cred.name}`);
-                return null;
-            }
-
             console.log(`Encrypting value for ${cred.name}:`, value);
-            const encryptedValue = crypto.encrypt(value, secretKey);
+            const encryptedValue = crypto.encryptWithPublicKey(value, publicKey);
             console.log(`Encrypted value for ${cred.name}:`, encryptedValue);
             return {
                 name: cred.name,
@@ -86,7 +77,7 @@ export default function FillCredentialsRequestPage() {
         try {
             const result = await fulfillCredentialsRequest({
                 requestId: credentialsRequest._id,
-                fulfilledCredentials: validCredentials
+                fulfilledCredentials: credentials,
             });
 
             console.log('Server response:', result);

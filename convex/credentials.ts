@@ -241,13 +241,13 @@ export const createCredentialsRequest = mutation({
                 type: credentialsTypeValidator,
             })
         ),
-        encryptedSecretKey: v.string(),
+        encryptedPrivateKey: v.string(),
     },
     handler: async (ctx, args) => {
         const userId = await ctx.auth.getUserIdentity();
         if (!userId) throw new Error('Not authenticated');
 
-        const { workspaceId, description, credentials, encryptedSecretKey } = args;
+        const { workspaceId, description, credentials, encryptedPrivateKey } = args;
 
         const credentialsRequest = await ctx.db.insert('credentialsRequests', {
             workspaceId,
@@ -255,7 +255,7 @@ export const createCredentialsRequest = mutation({
             description,
             credentials,
             status: 'pending',
-            encryptedSecretKey,
+            encryptedPrivateKey,
         });
 
         return { requestId: credentialsRequest };

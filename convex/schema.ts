@@ -65,7 +65,7 @@ const credentialsRequestSchema = {
     status: v.union(v.literal('pending'), v.literal('fulfilled'), v.literal('rejected')),
     fulfilledBy: v.optional(v.id('users')),
     fulfilledAt: v.optional(v.string()),
-    encryptedSecretKey: v.string(), 
+    encryptedPrivateKey: v.string(),
 };
 
 const workspaceInviteSchema = {

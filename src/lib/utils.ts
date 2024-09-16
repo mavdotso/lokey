@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import CryptoJS from 'crypto-js';
+import JSEncrypt from 'jsencrypt';
 import { Credentials } from '@/convex/types';
 
 export function cn(...inputs: ClassValue[]) {
@@ -14,6 +15,7 @@ export function getURL() {
 }
 
 export const crypto = {
+    // Existing methods
     generateRandomString: (length: number): string => {
         return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Hex);
     },
@@ -22,13 +24,12 @@ export const crypto = {
         return CryptoJS.SHA256(secretPhrase).toString();
     },
 
-    generateKeyPair: (secretPhrase: string) => {
-        console.log('Generating key pair from secret phrase:', secretPhrase);
-        const privateKey = CryptoJS.SHA256(secretPhrase).toString();
-        const publicKey = CryptoJS.SHA256(privateKey).toString();
-        console.log('Generated private key:', privateKey);
-        console.log('Generated public key:', publicKey);
-        return { privateKey, publicKey };
+    generateKeyPair: () => {
+        const crypt = new JSEncrypt({ default_key_size: '2048' });
+        return {
+            publicKey: crypt.getPublicKey(),
+            privateKey: crypt.getPrivateKey(),
+        };
     },
 
     encrypt: (data: string, key: string): string => {
@@ -46,6 +47,36 @@ export const crypto = {
         const decrypted = bytes.toString(CryptoJS.enc.Utf8);
         console.log('Decrypted result:', decrypted);
         return decrypted;
+    },
+
+    encryptWithPublicKey: (data: string, publicKey: string): string => {
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(publicKey);
+        return encrypt.encrypt(data) || '';
+    },
+
+    decryptWithPrivateKey: (encryptedData: string, privateKey: string): string => {
+        const decrypt = new JSEncrypt();
+        decrypt.setPrivateKey(privateKey);
+        return decrypt.decrypt(encryptedData) || '';
+    },
+
+    encryptPrivateKey: (privateKey: string, password: string): string => {
+        return CryptoJS.AES.encrypt(privateKey, password).toString();
+    },
+
+    decryptPrivateKey: (encryptedPrivateKey: string, password: string): string => {
+        const bytes = CryptoJS.AES.decrypt(encryptedPrivateKey, password);
+        return bytes.toString(CryptoJS.enc.Utf8);
+    },
+
+    encodePublicKey: (publicKey: string): string => {
+        return Buffer.from(publicKey).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    },
+
+    decodePublicKey: (encodedPublicKey: string): string => {
+        const base64 = encodedPublicKey.replace(/-/g, '+').replace(/_/g, '/');
+        return Buffer.from(base64, 'base64').toString('ascii');
     },
 
     hash: (data: string): string => {
