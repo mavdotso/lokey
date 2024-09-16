@@ -15,8 +15,7 @@ export const createWorkspace = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
-        if (identity === null) {
+        if (!identity) {
             throw new Error('User is not authenticated');
         }
 
@@ -24,7 +23,6 @@ export const createWorkspace = mutation({
             .query('users')
             .filter((q) => q.eq(q.field('_id'), identity))
             .unique();
-
         if (!user) {
             throw new Error('User not found');
         }
@@ -37,7 +35,6 @@ export const createWorkspace = mutation({
         }
 
         const isUnique = await isSlugUnique(ctx, { slug: args.slug });
-
         if (!isUnique) {
             throw new Error('The slug is not unique');
         }
@@ -73,27 +70,22 @@ export const getUserWorkspaces = query({
     args: {},
     handler: async (ctx) => {
         const identity = await getViewerId(ctx);
-
-        if (identity === null) {
+        if (!identity) {
             throw new Error('User is not authenticated');
         }
 
-        // Get workspaces owned by the user
         const ownedWorkspaces = await ctx.db
             .query('workspaces')
             .filter((q) => q.eq(q.field('ownerId'), identity))
             .collect();
 
-        // Get workspaces where the user is a member
         const userWorkspaces = await ctx.db
             .query('userWorkspaces')
             .filter((q) => q.eq(q.field('userId'), identity))
             .collect();
 
-        // Fetch the actual workspace documents for user memberships
         const memberWorkspaces = await Promise.all(userWorkspaces.map(async (uw) => await ctx.db.get(uw.workspaceId)));
 
-        // Combine and deduplicate the results
         const allWorkspaces = [...ownedWorkspaces, ...memberWorkspaces];
         const uniqueWorkspaces = Array.from(new Set(allWorkspaces.map((w) => w?._id)))
             .map((id) => allWorkspaces.find((w) => w?._id === id))
@@ -121,11 +113,10 @@ export const getWorkspaceIdBySlug = query({
         slug: v.string(),
     },
     handler: async (ctx, args) => {
-        const workspace = await ctx.db
+        return ctx.db
             .query('workspaces')
             .filter((q) => q.eq(q.field('slug'), args.slug))
             .first();
-        return workspace;
     },
 });
 
@@ -134,11 +125,10 @@ export const getWorkspaceBySlug = query({
         slug: v.string(),
     },
     handler: async (ctx, args) => {
-        const workspace = await ctx.db
+        return ctx.db
             .query('workspaces')
             .filter((q) => q.eq(q.field('slug'), args.slug))
             .first();
-        return workspace;
     },
 });
 
@@ -149,56 +139,47 @@ export const inviteUserToWorkspace = mutation({
         role: roleTypeValidator,
     },
     handler: async (ctx, args) => {
-        try {
-            const inviterId = await getViewerId(ctx);
-
-            if (!inviterId) {
-                return { success: false, message: 'Log in to invite users' };
-            }
-
-            // Check if inviter has permission (admin only)
-            const inviterWorkspace = await ctx.db
-                .query('userWorkspaces')
-                .filter((q) => q.eq(q.field('userId'), inviterId))
-                .filter((q) => q.eq(q.field('workspaceId'), args._id))
-                .first();
-
-            if (!inviterWorkspace || inviterWorkspace.role !== 'admin') {
-                return { success: false, message: 'Unauthorized: Only admins can invite users to this workspace' };
-            }
-
-            // Check if the invited user exists
-            const invitedUser = await ctx.db
-                .query('users')
-                .filter((q) => q.eq(q.field('_id'), args.userId))
-                .first();
-
-            if (!invitedUser) {
-                return { success: false, message: 'Invited user not found' };
-            }
-
-            // Check if the invited user is already part of the workspace
-            const existingMembership = await ctx.db
-                .query('userWorkspaces')
-                .filter((q) => q.eq(q.field('userId'), args.userId))
-                .filter((q) => q.eq(q.field('workspaceId'), args._id))
-                .first();
-
-            if (existingMembership) {
-                return { success: false, message: 'User is already part of the workspace' };
-            }
-
-            // Add the invited user to the workspace
-            await ctx.db.insert('userWorkspaces', {
-                userId: args.userId,
-                workspaceId: args._id,
-                role: args.role,
-            });
-
-            return { success: true, message: 'User successfully invited to the workspace' };
-        } catch (error: any) {
-            return { success: false, message: `An error occurred: ${error.message}` };
+        const inviterId = await getViewerId(ctx);
+        if (!inviterId) {
+            throw new Error('Log in to invite users');
         }
+
+        const inviterWorkspace = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), inviterId))
+            .filter((q) => q.eq(q.field('workspaceId'), args._id))
+            .first();
+
+        if (!inviterWorkspace || inviterWorkspace.role !== 'admin') {
+            throw new Error('Unauthorized: Only admins can invite users to this workspace');
+        }
+
+        const invitedUser = await ctx.db
+            .query('users')
+            .filter((q) => q.eq(q.field('_id'), args.userId))
+            .first();
+
+        if (!invitedUser) {
+            throw new Error('Invited user not found');
+        }
+
+        const existingMembership = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), args.userId))
+            .filter((q) => q.eq(q.field('workspaceId'), args._id))
+            .first();
+
+        if (existingMembership) {
+            throw new Error('User is already part of the workspace');
+        }
+
+        await ctx.db.insert('userWorkspaces', {
+            userId: args.userId,
+            workspaceId: args._id,
+            role: args.role,
+        });
+
+        return { success: true, message: 'User successfully invited to the workspace' };
     },
 });
 
@@ -208,42 +189,33 @@ export const kickUserFromWorkspace = mutation({
         userId: v.id('users'),
     },
     handler: async (ctx, args) => {
-        try {
-            const requesterId = await getViewerId(ctx);
-
-            if (!requesterId) {
-                return { success: false, message: 'Log in to manage workspace members' };
-            }
-
-            // Check if the user to be kicked is in the workspace
-            const userWorkspace = await ctx.db
-                .query('userWorkspaces')
-                .filter((q) => q.eq(q.field('userId'), args.userId))
-                .filter((q) => q.eq(q.field('workspaceId'), args._id))
-                .first();
-
-            if (!userWorkspace) {
-                return { success: false, message: 'User is not a member of the workspace' };
-            }
-
-            // Prevent kicking the workspace owner
-            const workspace = await ctx.db.get(args._id);
-
-            if (!workspace) {
-                return { success: false, message: 'Cannot find the workspace' };
-            }
-
-            if (workspace.ownerId === args.userId) {
-                return { success: false, message: 'Cannot remove the workspace owner' };
-            }
-
-            // Remove the user from the workspace
-            await ctx.db.delete(userWorkspace._id);
-
-            return { success: true, message: 'User successfully removed from the workspace' };
-        } catch (error: any) {
-            return { success: false, message: `An error occurred: ${error.message}` };
+        const requesterId = await getViewerId(ctx);
+        if (!requesterId) {
+            throw new Error('Log in to manage workspace members');
         }
+
+        const userWorkspace = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), args.userId))
+            .filter((q) => q.eq(q.field('workspaceId'), args._id))
+            .first();
+
+        if (!userWorkspace) {
+            throw new Error('User is not a member of the workspace');
+        }
+
+        const workspace = await ctx.db.get(args._id);
+        if (!workspace) {
+            throw new Error('Cannot find the workspace');
+        }
+
+        if (workspace.ownerId === args.userId) {
+            throw new Error('Cannot remove the workspace owner');
+        }
+
+        await ctx.db.delete(userWorkspace._id);
+
+        return { success: true, message: 'User successfully removed from the workspace' };
     },
 });
 
@@ -258,31 +230,23 @@ export const editWorkspace = mutation({
         }),
     },
     handler: async (ctx, args) => {
-        try {
-            const identity = await getViewerId(ctx);
-
-            if (!identity) {
-                return { success: false, message: 'Log in to edit workspaces' };
-            }
-
-            const workspace = await ctx.db.get(args._id);
-
-            if (!workspace) {
-                return { success: false, message: 'Workspace not found' };
-            }
-
-            if (workspace.ownerId !== identity) {
-                return { success: false, message: 'Unauthorized: You are not the owner of this workspace' };
-            }
-
-            await ctx.db.patch(args._id, {
-                ...args.updates,
-            });
-
-            return { success: true, message: 'Workspace updated successfully' };
-        } catch (error: any) {
-            return { success: false, message: `An unexpected error occurred: ${error.message}` };
+        const identity = await getViewerId(ctx);
+        if (!identity) {
+            throw new Error('Log in to edit workspaces');
         }
+
+        const workspace = await ctx.db.get(args._id);
+        if (!workspace) {
+            throw new Error('Workspace not found');
+        }
+
+        if (workspace.ownerId !== identity) {
+            throw new Error('Unauthorized: You are not the owner of this workspace');
+        }
+
+        await ctx.db.patch(args._id, args.updates);
+
+        return { success: true, message: 'Workspace updated successfully' };
     },
 });
 
@@ -291,38 +255,29 @@ export const getWorkspaceUsers = query({
         _id: v.id('workspaces'),
     },
     handler: async (ctx, args) => {
-        try {
-            const workspace = await ctx.db.get(args._id);
-
-            if (!workspace) {
-                return { success: false, message: 'Workspace not found' };
-            }
-
-            // Get all user roles associated with the workspace
-            const associatedUsers = await ctx.db
-                .query('userWorkspaces')
-                .filter((q) => q.eq(q.field('workspaceId'), args._id))
-                .collect();
-
-            if (!associatedUsers || associatedUsers.length === 0) {
-                return { success: false, message: 'No users are associated with this workspace' };
-            }
-
-            const users = await Promise.all(
-                associatedUsers.map(async (associatedUser) => {
-                    const user = await ctx.db.get(associatedUser.userId);
-                    return user;
-                })
-            );
-
-            if (!users) {
-                return { success: false, message: 'No users found' };
-            }
-
-            return { success: true, users: users };
-        } catch (error: any) {
-            return { success: false, message: `An error occurred: ${error.message}` };
+        const workspace = await ctx.db.get(args._id);
+        if (!workspace) {
+            throw new Error('Workspace not found');
         }
+
+        const associatedUsers = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('workspaceId'), args._id))
+            .collect();
+
+        if (!associatedUsers || associatedUsers.length === 0) {
+            throw new Error('No users are associated with this workspace');
+        }
+
+        const users = await Promise.all(
+            associatedUsers.map(async (associatedUser) => {
+                return ctx.db.get(associatedUser.userId);
+            })
+        );
+
+        const validUsers = users.filter((user): user is NonNullable<typeof user> => user !== null);
+
+        return { success: true, users: validUsers };
     },
 });
 
@@ -341,13 +296,11 @@ export const updateWorkspaceLogo = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
-        if (identity === null) {
+        if (!identity) {
             throw new Error('User is not authenticated');
         }
 
         const workspace = await ctx.db.get(args._id);
-
         if (!workspace) {
             throw new Error('Workspace not found');
         }
@@ -357,14 +310,11 @@ export const updateWorkspaceLogo = mutation({
         }
 
         const imageUrl = await ctx.storage.getUrl(args.storageId);
-
         if (!imageUrl) {
-            return { success: false, message: 'Failed to get image URL' };
+            throw new Error('Failed to get image URL');
         }
 
-        await ctx.db.patch(args._id, {
-            logo: imageUrl,
-        });
+        await ctx.db.patch(args._id, { logo: imageUrl });
 
         return { success: true, message: 'Workspace logo updated successfully' };
     },
@@ -376,13 +326,11 @@ export const deleteWorkspace = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
-        if (identity === null) {
+        if (!identity) {
             throw new Error('User is not authenticated');
         }
 
         const workspace = await ctx.db.get(args._id);
-
         if (!workspace) {
             throw new Error('Workspace not found');
         }
@@ -391,10 +339,8 @@ export const deleteWorkspace = mutation({
             throw new Error('Unauthorized: Only the workspace owner can delete the workspace');
         }
 
-        // Delete the workspace
         await ctx.db.delete(args._id);
 
-        // Delete all associated userWorkspaces
         const userWorkspaces = await ctx.db
             .query('userWorkspaces')
             .filter((q) => q.eq(q.field('workspaceId'), args._id))
@@ -414,13 +360,11 @@ export const updateWorkspaceInviteCode = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
         if (!identity) {
             throw new Error('User is not authenticated');
         }
 
         const workspace = await ctx.db.get(args._id);
-
         if (!workspace) {
             throw new Error('Workspace not found');
         }
@@ -432,7 +376,7 @@ export const updateWorkspaceInviteCode = mutation({
         if (workspace.defaultInvite) {
             const expireResult = await setInviteExpired(ctx, { _id: workspace.defaultInvite });
             if (!expireResult.success) {
-                throw new Error(`Failed to expire previous invite: ${expireResult.message}`);
+                throw new Error(`Failed to expire previous invite.`);
             }
         }
 
@@ -441,12 +385,18 @@ export const updateWorkspaceInviteCode = mutation({
             role: 'member',
         });
 
-        if (newInvite.success && newInvite.data) {
-            await ctx.db.patch(args._id, {
-                defaultInvite: newInvite.data.inviteId,
-            });
+        if (!newInvite.success || !newInvite.data) {
+            throw new Error('Failed to create new invite');
         }
 
-        return { success: true, message: 'Workspace invite code updated successfully', inviteCode: newInvite.data?.inviteCode };
+        await ctx.db.patch(args._id, {
+            defaultInvite: newInvite.data.inviteId,
+        });
+
+        return {
+            success: true,
+            message: 'Workspace invite code updated successfully',
+            inviteCode: newInvite.data.inviteCode,
+        };
     },
 });

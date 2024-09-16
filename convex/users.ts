@@ -7,11 +7,9 @@ export const getUser = query({
     args: { _id: v.id('users') },
     handler: async (ctx, args) => {
         const user = await ctx.db.get(args._id);
-
         if (!user) {
             return null;
         }
-
         return {
             _id: user._id,
             name: user.name,
@@ -42,7 +40,6 @@ export const checkUserPermission = query({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
         if (!identity) {
             return { hasPermission: false, message: 'User is not authenticated' };
         }
@@ -74,18 +71,15 @@ export const editUser = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
         if (!identity) {
-            return { success: false, message: 'Log in to edit user profile' };
+            throw new Error('Log in to edit user profile');
         }
 
         const user = await ctx.db.get(identity);
-
         if (!user) {
-            return { success: false, message: 'User not found' };
+            throw new Error('User not found');
         }
 
-        // If defaultWorkspace is being updated, check if the user is a member of that workspace
         if (args.updates.defaultWorkspace) {
             const userWorkspace = await ctx.db
                 .query('userWorkspaces')
@@ -94,13 +88,11 @@ export const editUser = mutation({
                 .first();
 
             if (!userWorkspace) {
-                return { success: false, message: 'User is not a member of the selected default workspace' };
+                throw new Error('User is not a member of the selected default workspace');
             }
         }
 
-        await ctx.db.patch(identity, {
-            ...args.updates,
-        });
+        await ctx.db.patch(identity, args.updates);
 
         return { success: true, message: 'User profile updated successfully' };
     },
@@ -112,21 +104,16 @@ export const updateUserAvatar = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-
         if (!identity) {
-            return { success: false, message: 'User is not authenticated' };
+            throw new Error('User is not authenticated');
         }
 
         const imageUrl = await ctx.storage.getUrl(args.storageId);
-
         if (!imageUrl) {
-            return { success: false, message: 'Failed to get image URL' };
+            throw new Error('Failed to get image URL');
         }
 
-        // Update the user's image with the URL
-        await ctx.db.patch(identity, {
-            image: imageUrl,
-        });
+        await ctx.db.patch(identity, { image: imageUrl });
 
         return { success: true, message: 'User avatar updated successfully', imageUrl };
     },
@@ -136,15 +123,12 @@ export const deleteUser = mutation({
     args: {},
     handler: async (ctx) => {
         const identity = await getViewerId(ctx);
-
         if (!identity) {
-            return { success: false, message: 'User is not authenticated' };
+            throw new Error('User is not authenticated');
         }
 
-        // Delete the user
         await ctx.db.delete(identity);
 
-        // Delete all associated userWorkspaces
         const userWorkspaces = await ctx.db
             .query('userWorkspaces')
             .filter((q) => q.eq(q.field('userId'), identity))
@@ -162,25 +146,22 @@ export const getUserDefaultWorkspace = query({
     args: {},
     handler: async (ctx) => {
         const identity = await getViewerId(ctx);
-
         if (!identity) {
-            return { success: false, message: 'User is not authenticated' };
+            throw new Error('User is not authenticated');
         }
 
         const user = await ctx.db.get(identity);
-
         if (!user) {
-            return { success: false, message: 'User not found' };
+            throw new Error('User not found');
         }
 
         if (!user.defaultWorkspace) {
-            return { success: false, message: 'No default workspace set' };
+            throw new Error('No default workspace set');
         }
 
         const workspace = await ctx.db.get(user.defaultWorkspace);
-
         if (!workspace) {
-            return { success: false, message: 'Default workspace not found' };
+            throw new Error('Default workspace not found');
         }
 
         return { success: true, workspace };

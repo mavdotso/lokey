@@ -70,23 +70,25 @@ export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
                         role: email.role,
                     };
                 } else {
-                    throw new Error(`Failed to create invite for ${email.value}: ${result.message}`);
+                    toast.error(`Failed to create invite for ${email.value}`);
                 }
             });
 
             const invites = await Promise.all(invitePromises);
 
             for (const invite of invites) {
-                const response = await fetch('/api/emails/invite', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(invite),
-                });
+                if (invite) {
+                    const response = await fetch('/api/emails/invite', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(invite),
+                    });
 
-                if (!response.ok) {
-                    throw new Error(`Failed to send invitation to ${invite.to}`);
+                    if (!response.ok) {
+                        toast.error(`Failed to send invitation to ${invite.to}`);
+                    }
                 }
             }
 
