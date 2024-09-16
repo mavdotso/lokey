@@ -4,6 +4,17 @@ import { mutation } from './_generated/server';
 import { getViewerId } from './auth';
 import { credentialsTypeValidator } from './types';
 
+export const getCredentiaslById = query({
+    args: { credentialsId: v.id('credentials') },
+    handler: async (ctx, args) => {
+        const credentials = await ctx.db.get(args.credentialsId);
+        if (!credentials) {
+            throw new Error('Credentials not found');
+        }
+        return credentials;
+    },
+});
+
 export const getWorkspaceCredentials = query({
     args: { workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
@@ -207,42 +218,53 @@ export const setExpired = mutation({
     },
 });
 
-export const createCredentialRequest = mutation({
+export const getWorkspaceCredentialsRequests = query({
+    args: { workspaceId: v.id('workspaces') },
+    handler: async (ctx, args) => {
+        const requests = await ctx.db
+            .query('credentialsRequests')
+            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+            .collect();
+        return requests;
+    },
+});
+
+export const createCredentialsRequest = mutation({
     args: {
         workspaceId: v.id('workspaces'),
-        type: credentialsTypeValidator,
         description: v.string(),
-        fields: v.array(
+        credentials: v.array(
             v.object({
                 name: v.string(),
                 description: v.optional(v.string()),
+                type: credentialsTypeValidator,
             })
         ),
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
+
         if (!identity) {
-            throw new Error('Unauthorized');
+            return { success: false, message: 'Log in to edit credentials' };
         }
 
-        const credentialRequestId = await ctx.db.insert('credentialRequests', {
+        const requestId = await ctx.db.insert('credentialsRequests', {
             workspaceId: args.workspaceId,
             createdBy: identity,
-            type: args.type,
             description: args.description,
-            fields: args.fields,
+            credentials: args.credentials,
             status: 'pending',
         });
 
-        return { credentialRequestId };
+        return { requestId };
     },
 });
 
-export const getCredentialRequests = query({
+export const getCredentialsRequests = query({
     args: { workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
         const requests = await ctx.db
-            .query('credentialRequests')
+            .query('credentialsRequests')
             .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
             .collect();
 
@@ -250,71 +272,75 @@ export const getCredentialRequests = query({
     },
 });
 
-export const fulfillCredentialRequest = mutation({
-    args: {
-        requestId: v.id('credentialRequests'),
-        credentials: v.object({
-            name: v.string(),
-            description: v.optional(v.string()),
-            type: credentialsTypeValidator,
-            encryptedData: v.string(),
-            privateKey: v.string(),
-        }),
-    },
+export const getCredentialsRequestById = query({
+    args: { _id: v.id('credentialsRequests') },
     handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new Error('Unauthorized');
-        }
-
-        const request = await ctx.db.get(args.requestId);
+        const request = await ctx.db.get(args._id);
         if (!request) {
             throw new Error('Credential request not found');
         }
+        return request;
+    },
+});
 
-        if (request.status !== 'pending') {
-            throw new Error('Credential request is no longer pending');
+// TODO: I think this one is not right — I don't need the logged in user to fulfull the credentials
+export const fulfillCredentialsRequest = mutation({
+    args: {
+        requestId: v.id('credentialsRequests'),
+        fulfilledCredentials: v.array(
+            v.object({
+                name: v.string(),
+                type: credentialsTypeValidator,
+                encryptedData: v.string(),
+                publicKey: v.string(),
+                privateKey: v.string(),
+            })
+        ),
+    },
+    handler: async (ctx, args) => {
+        const identity = await getViewerId(ctx);
+
+        if (!identity) {
+            return { success: false, message: 'Log in to edit credentials' };
         }
 
-        // Create the new credential
-        const credentialId = await ctx.db.insert('credentials', {
-            workspaceId: request.workspaceId,
-            name: args.credentials.name,
-            description: args.credentials.description,
-            type: args.credentials.type,
-            encryptedData: args.credentials.encryptedData,
-            privateKey: args.credentials.privateKey,
-            updatedAt: new Date().toISOString(),
-            viewCount: 0,
-            createdBy: identity,
-        });
+        const request = await ctx.db.get(args.requestId);
+        if (!request || request.status !== 'pending') {
+            throw new Error('Invalid or already fulfilled request');
+        }
 
-        // Update the request status
+        if (args.fulfilledCredentials.length !== request.credentials.length) {
+            throw new Error('Mismatch in number of credentials');
+        }
+
+        const updatedCredentials = request.credentials.map((cred, index) => ({
+            ...cred,
+            ...args.fulfilledCredentials[index],
+        }));
+
         await ctx.db.patch(args.requestId, {
             status: 'fulfilled',
             fulfilledBy: identity,
             fulfilledAt: new Date().toISOString(),
+            credentials: updatedCredentials,
         });
 
-        return { credentialId };
+        return { success: true };
     },
 });
 
 export const rejectCredentialRequest = mutation({
-    args: { requestId: v.id('credentialRequests') },
+    args: { requestId: v.id('credentialsRequests') },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
+
         if (!identity) {
-            throw new Error('Unauthorized');
+            return { success: false, message: 'Log in to edit credentials' };
         }
 
         const request = await ctx.db.get(args.requestId);
-        if (!request) {
-            throw new Error('Credential request not found');
-        }
-
-        if (request.status !== 'pending') {
-            throw new Error('Credential request is no longer pending');
+        if (!request || request.status !== 'pending') {
+            throw new Error('Invalid or already processed request');
         }
 
         await ctx.db.patch(args.requestId, {

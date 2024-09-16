@@ -8,9 +8,9 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { useState } from "react"
-import { CredentialRequestForm } from "./credentials-request-form"
+import { CredentialsRequestForm } from "./credentials-request-form"
 
-export function CreateCredentialRequestDialog() {
+export function CreateCredentialsRequestDialog() {
     const [isOpen, setIsOpen] = useState(false)
 
     return (
@@ -25,7 +25,7 @@ export function CreateCredentialRequestDialog() {
                         Create a new credential request form. Add as many fields as you need.
                     </DialogDescription>
                 </DialogHeader>
-                <CredentialRequestForm
+                <CredentialsRequestForm
                     setIsOpen={setIsOpen}
                     onRequestCreated={() => setIsOpen(false)}
                     onDialogClose={() => setIsOpen(false)}

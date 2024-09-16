@@ -54,7 +54,7 @@ export default function Dashboard() {
             } else {
                 redirectWorkspace = workspaces[0];
             }
-            router.push(`/dashboard/${redirectWorkspace.slug}/credentials`);
+            router.replace(`/dashboard/${redirectWorkspace.slug}/credentials`, { scroll: false });
         }
     }, [isLoading, workspaces, defaultWorkspace, router]);
 

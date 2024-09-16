@@ -4,10 +4,16 @@
 -   [ ] Faster redirect after creating the first workspace
 -   [ ] User is not authenticated after avatar upload?
 
+-   [ ] See fulfilled credentials
+-   [ ] Share page UI
+    -   [ ] Hidden fields
+
 ### What's needed for launch:
+
 -   [ ] Change workspace owner
 -   [ ] Change credentials owner
 -   [ ] User roles
+
     -   [ ] Admin — access to everything
     -   [ ] Manager — access to everything (CRUD all credentials) except workspace settings
     -   [ ] Member — access ONLY to CRUD personal credentials

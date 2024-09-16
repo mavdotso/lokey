@@ -15,42 +15,41 @@ import { DialogFooter } from '@/components/ui/dialog'
 import { ScrollArea } from '../ui/scroll-area'
 import { SubmitButton } from '../global/submit-button'
 
-interface CredentialRequestFormProps {
+interface CredentialsRequestFormProps {
     setIsOpen: (isOpen: boolean) => void;
     onRequestCreated?: () => void;
     onDialogClose?: () => void;
 }
 
-interface CredentialField {
+interface CredentialsField {
     name: string;
     description: string;
     type: CredentialsType;
 }
 
-export function CredentialRequestForm({ setIsOpen, onRequestCreated, onDialogClose }: CredentialRequestFormProps) {
-    const [name, setName] = useState<string>('');
+export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogClose }: CredentialsRequestFormProps) {
     const [description, setDescription] = useState('');
-    const [fields, setFields] = useState<CredentialField[]>([{ name: '', description: '', type: 'password' }]);
+    const [credentials, setCredentials] = useState<CredentialsField[]>([{ name: '', description: '', type: 'password' }]);
 
     const { slug } = useParams();
 
-    const createCredentialRequest = useMutation(api.credentials.createCredentialRequest);
+    const createCredentialsRequest = useMutation(api.credentials.createCredentialsRequest);
     const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: slug as string });
 
-    function addField() {
-        setFields([...fields, { name: '', description: '', type: 'password' }]);
+    function addCredential() {
+        setCredentials([...credentials, { name: '', description: '', type: 'password' }]);
     }
 
-    function removeField(index: number) {
-        const newFields = [...fields];
-        newFields.splice(index, 1);
-        setFields(newFields);
+    function removeCredential(index: number) {
+        const newCredentials = [...credentials];
+        newCredentials.splice(index, 1);
+        setCredentials(newCredentials);
     }
 
-    function updateField(index: number, field: Partial<CredentialField>) {
-        const newFields = [...fields];
-        newFields[index] = { ...newFields[index], ...field };
-        setFields(newFields);
+    function updateCredential(index: number, field: Partial<CredentialsField>) {
+        const newCredentials = [...credentials];
+        newCredentials[index] = { ...newCredentials[index], ...field };
+        setCredentials(newCredentials);
     }
 
     async function handleSubmit(e: FormEvent) {
@@ -62,14 +61,17 @@ export function CredentialRequestForm({ setIsOpen, onRequestCreated, onDialogClo
                 return;
             }
 
-            const response = await createCredentialRequest({
+            const response = await createCredentialsRequest({
                 workspaceId: currentWorkspaceId._id,
-                type: fields[0].type, // Use the first field's type as the main type
                 description,
-                fields: fields.map(field => ({ name: field.name, description: field.description })),
+                credentials: credentials.map(cred => ({
+                    name: cred.name,
+                    description: cred.description,
+                    type: cred.type,
+                })),
             });
 
-            if (response.credentialRequestId) {
+            if (response.requestId) {
                 toast.success('Credential request created successfully!');
                 onRequestCreated && onRequestCreated();
                 resetForm();
@@ -83,9 +85,8 @@ export function CredentialRequestForm({ setIsOpen, onRequestCreated, onDialogClo
     }
 
     function resetForm() {
-        setName('');
         setDescription('');
-        setFields([{ name: '', description: '', type: 'password' }]);
+        setCredentials([{ name: '', description: '', type: 'password' }]);
     }
 
     return (
@@ -94,57 +95,47 @@ export function CredentialRequestForm({ setIsOpen, onRequestCreated, onDialogClo
                 <div className="top-0 right-0 left-0 absolute bg-gradient-to-b from-background to-transparent mx-auto pt-10" />
                 <div className='space-y-4 px-4 py-2'>
                     <div>
-                        <Label htmlFor="name">Request Name</Label>
-                        <Input
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder='Credential request name'
-                            required
-                        />
-                    </div>
-                    <div>
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             id="description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder='Provide instructions or context for the credential request'
+                            placeholder='Provide instructions or context for the credentials request'
                             required
                         />
                     </div>
-                    {fields.map((field, index) => (
+                    {credentials.map((cred, index) => (
                         <div key={index} className="space-y-2 p-4 border rounded-md">
                             <div className="flex justify-between items-center">
-                                <p>Field {index + 1}</p>
+                                <p>Credential {index + 1}</p>
                                 {index > 0 && (
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeField(index)}>
+                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeCredential(index)}>
                                         <TrashIcon className="w-4 h-4" />
                                     </Button>
                                 )}
                             </div>
                             <div>
-                                <Label htmlFor={`field-name-${index}`}>Field Name</Label>
+                                <Label htmlFor={`cred-name-${index}`}>Credentials Name</Label>
                                 <Input
-                                    id={`field-name-${index}`}
-                                    value={field.name}
-                                    onChange={(e) => updateField(index, { name: e.target.value })}
+                                    id={`cred-name-${index}`}
+                                    value={cred.name}
+                                    onChange={(e) => updateCredential(index, { name: e.target.value })}
                                     placeholder='e.g., API Key, Username'
                                     required
                                 />
                             </div>
                             <div>
-                                <Label htmlFor={`field-description-${index}`}>Field Description</Label>
+                                <Label htmlFor={`cred-description-${index}`}>Credentials Description</Label>
                                 <Input
-                                    id={`field-description-${index}`}
-                                    value={field.description}
-                                    onChange={(e) => updateField(index, { description: e.target.value })}
-                                    placeholder='Provide instructions for this field'
+                                    id={`cred-description-${index}`}
+                                    value={cred.description}
+                                    onChange={(e) => updateCredential(index, { description: e.target.value })}
+                                    placeholder='Provide instructions for this credentials'
                                 />
                             </div>
                             <div>
-                                <Label htmlFor={`field-type-${index}`}>Field Type</Label>
-                                <Select value={field.type} onValueChange={(value) => updateField(index, { type: value as CredentialsType })}>
+                                <Label htmlFor={`cred-type-${index}`}>Credential Type</Label>
+                                <Select value={cred.type} onValueChange={(value) => updateCredential(index, { type: value as CredentialsType })}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a type" />
                                     </SelectTrigger>
@@ -163,15 +154,15 @@ export function CredentialRequestForm({ setIsOpen, onRequestCreated, onDialogClo
                 </div>
             </ScrollArea>
             <div className='pt-2'>
-                <Button type="button" variant="outline" onClick={addField} className="w-full">
-                    <PlusIcon className="mr-2 w-4 h-4" /> Add Field
+                <Button type="button" variant="outline" onClick={addCredential} className="w-full">
+                    <PlusIcon className="mr-2 w-4 h-4" /> Add Credentials
                 </Button>
                 <DialogFooter className='flex justify-between pt-4'>
                     <Button variant='secondary' type="button" onClick={() => {
                         setIsOpen(false);
                         onDialogClose && onDialogClose();
                     }}>Cancel</Button>
-                    <SubmitButton text="Create Credential Request" pendingText="Creating new request..." />
+                    <SubmitButton text="Create Credentials Request" pendingText="Creating new request..." />
                 </DialogFooter>
             </div>
         </form>
