@@ -14,6 +14,8 @@ import { api } from '@/convex/_generated/api'
 import { DialogFooter } from '@/components/ui/dialog'
 import { ScrollArea } from '../ui/scroll-area'
 import { SubmitButton } from '../global/submit-button'
+import { Card } from '../ui/card'
+import { crypto } from '@/lib/utils'
 
 interface CredentialsRequestFormProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -30,6 +32,7 @@ interface CredentialsField {
 export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogClose }: CredentialsRequestFormProps) {
     const [description, setDescription] = useState('');
     const [credentials, setCredentials] = useState<CredentialsField[]>([{ name: '', description: '', type: 'password' }]);
+    const [secretPhrase, setSecretPhrase] = useState('');
 
     const { slug } = useParams();
 
@@ -61,6 +64,9 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
                 return;
             }
 
+            const { privateKey, publicKey } = crypto.generateKeyPair(secretPhrase);
+            const encryptedPrivateKey = crypto.encrypt(privateKey, secretPhrase);
+
             const response = await createCredentialsRequest({
                 workspaceId: currentWorkspaceId._id,
                 description,
@@ -69,7 +75,12 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
                     description: cred.description,
                     type: cred.type,
                 })),
+                privateKey: encryptedPrivateKey,
             });
+
+            const requestLink = `/requested/${response.requestId}?publicKey=${encodeURIComponent(publicKey)}`;
+
+            console.log(requestLink);
 
             if (response.requestId) {
                 toast.success('Credential request created successfully!');
@@ -87,13 +98,14 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
     function resetForm() {
         setDescription('');
         setCredentials([{ name: '', description: '', type: 'password' }]);
+        setSecretPhrase('');
     }
 
     return (
-        <form onSubmit={handleSubmit} className='overflow-auto'>
-            <ScrollArea className='py-4 h-[400px]'>
-                <div className="top-0 right-0 left-0 absolute bg-gradient-to-b from-background to-transparent mx-auto pt-10" />
-                <div className='space-y-4 px-4 py-2'>
+        <form onSubmit={handleSubmit}>
+            <ScrollArea className='bg-muted py-4 rounded-md h-[400px]'>
+                {/* <div className="top-0 right-0 left-0 absolute bg-gradient-to-b from-background to-transparent mx-auto pt-10" /> */}
+                <div className='space-y-4 px-4'>
                     <div>
                         <Label htmlFor="description">Description</Label>
                         <Textarea
@@ -103,9 +115,21 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
                             placeholder='Provide instructions or context for the credentials request'
                             required
                         />
+                        <div>
+                            <Label htmlFor="secretPhrase">Secret Phrase</Label>
+                            <Input
+                                className='bg-background'
+                                id="secretPhrase"
+                                type="password"
+                                value={secretPhrase}
+                                onChange={(e) => setSecretPhrase(e.target.value)}
+                                placeholder='Enter a secret phrase to secure your credentials'
+                                required
+                            />
+                        </div>
                     </div>
                     {credentials.map((cred, index) => (
-                        <div key={index} className="space-y-2 p-4 border rounded-md">
+                        <Card key={index} className="space-y-2 p-4 border rounded-md">
                             <div className="flex justify-between items-center">
                                 <p>Credential {index + 1}</p>
                                 {index > 0 && (
@@ -148,7 +172,7 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
                                     </SelectContent>
                                 </Select>
                             </div>
-                        </div>
+                        </Card>
                     ))}
                     <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10" />
                 </div>

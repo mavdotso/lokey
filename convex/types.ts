@@ -91,10 +91,12 @@ export type CredentialsRequest = {
         name: string;
         description?: string;
         type: CredentialsType;
+        encryptedValue?: string;
     }>;
     status: 'pending' | 'fulfilled' | 'rejected';
     fulfilledBy?: Id<'users'>;
     fulfilledAt?: string;
+    privateKey: string;
 };
 
 export type WorkspaceInvite = {

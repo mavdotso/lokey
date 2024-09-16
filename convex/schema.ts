@@ -59,11 +59,13 @@ const credentialsRequestSchema = {
             name: v.string(),
             description: v.optional(v.string()),
             type: credentialsType,
+            encryptedValue: v.optional(v.string()),
         })
     ),
     status: v.union(v.literal('pending'), v.literal('fulfilled'), v.literal('rejected')),
     fulfilledBy: v.optional(v.id('users')),
     fulfilledAt: v.optional(v.string()),
+    privateKey: v.string(),
 };
 
 const workspaceInviteSchema = {

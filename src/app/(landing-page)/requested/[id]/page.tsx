@@ -1,6 +1,7 @@
+"use client"
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from 'convex/react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { api } from '@/convex/_generated/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,10 +10,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { LoadingScreen } from '@/components/global/loading-screen';
 import { toast } from 'sonner';
 import { Id } from '@/convex/_generated/dataModel';
-import { encryptData } from '@/lib/utils';
+import { crypto } from '@/lib/utils';
 
-export default function FillCredentialRequestPage() {
+export default function FillCredentialsRequestPage() {
     const { id } = useParams();
+    const searchParams = useSearchParams();
+    const publicKey = searchParams.get('publicKey');
     const [formData, setFormData] = useState<Record<string, string>>({});
 
     const credentialsRequest = useQuery(api.credentials.getCredentialsRequestById, {
@@ -33,6 +36,7 @@ export default function FillCredentialRequestPage() {
 
     if (credentialsRequest === undefined) return <LoadingScreen />;
     if (credentialsRequest === null) return <div>Credential request not found</div>;
+    if (!publicKey) return <div>Invalid request: Missing public key</div>;
 
     function handleInputChange(fieldName: string, value: string) {
         setFormData(prev => ({ ...prev, [fieldName]: value }));
@@ -41,20 +45,18 @@ export default function FillCredentialRequestPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        if (!credentialsRequest) {
+        if (!credentialsRequest || !publicKey) {
             toast.info("Credentials request not found");
             return;
         }
 
         try {
             const fulfilledCredentials = credentialsRequest.credentials.map(cred => {
-                const { publicKey, privateKey, encryptedData } = encryptData(formData[cred.name]);
+                const encryptedValue = crypto.encrypt(formData[cred.name], publicKey);
                 return {
                     name: cred.name,
                     type: cred.type,
-                    encryptedData,
-                    publicKey,
-                    privateKey,
+                    encryptedValue,
                 };
             });
 
@@ -68,7 +70,7 @@ export default function FillCredentialRequestPage() {
             toast.error('Failed to fulfill credential request');
             console.error('Error:', error);
         }
-    };
+    }
 
     return (
         <div className="flex flex-col h-full">

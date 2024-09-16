@@ -18,6 +18,12 @@ export const crypto = {
         return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Hex);
     },
 
+    generateKeyPair: (secretPhrase: string) => {
+        const privateKey = crypto.hash(secretPhrase);
+        const publicKey = crypto.hash(privateKey);
+        return { privateKey, publicKey };
+    },
+
     encrypt: (data: string, key: string): string => {
         return CryptoJS.AES.encrypt(data, key).toString();
     },

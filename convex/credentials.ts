@@ -4,7 +4,7 @@ import { mutation } from './_generated/server';
 import { getViewerId } from './auth';
 import { credentialsTypeValidator } from './types';
 
-export const getCredentiaslById = query({
+export const getCredentialsById = query({
     args: { credentialsId: v.id('credentials') },
     handler: async (ctx, args) => {
         const credentials = await ctx.db.get(args.credentialsId);
@@ -240,6 +240,7 @@ export const createCredentialsRequest = mutation({
                 type: credentialsTypeValidator,
             })
         ),
+        privateKey: v.string(),
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
@@ -254,6 +255,7 @@ export const createCredentialsRequest = mutation({
             description: args.description,
             credentials: args.credentials,
             status: 'pending',
+            privateKey: args.privateKey,
         });
 
         return { requestId };
@@ -291,19 +293,11 @@ export const fulfillCredentialsRequest = mutation({
             v.object({
                 name: v.string(),
                 type: credentialsTypeValidator,
-                encryptedData: v.string(),
-                publicKey: v.string(),
-                privateKey: v.string(),
+                encryptedValue: v.string(),
             })
         ),
     },
     handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-
-        if (!identity) {
-            return { success: false, message: 'Log in to edit credentials' };
-        }
-
         const request = await ctx.db.get(args.requestId);
         if (!request || request.status !== 'pending') {
             throw new Error('Invalid or already fulfilled request');
@@ -313,14 +307,14 @@ export const fulfillCredentialsRequest = mutation({
             throw new Error('Mismatch in number of credentials');
         }
 
+        // Update the existing credentials with the encrypted values
         const updatedCredentials = request.credentials.map((cred, index) => ({
             ...cred,
-            ...args.fulfilledCredentials[index],
+            encryptedValue: args.fulfilledCredentials[index].encryptedValue,
         }));
 
         await ctx.db.patch(args.requestId, {
             status: 'fulfilled',
-            fulfilledBy: identity,
             fulfilledAt: new Date().toISOString(),
             credentials: updatedCredentials,
         });
@@ -329,7 +323,7 @@ export const fulfillCredentialsRequest = mutation({
     },
 });
 
-export const rejectCredentialRequest = mutation({
+export const rejectCredentialsRequest = mutation({
     args: { requestId: v.id('credentialsRequests') },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);

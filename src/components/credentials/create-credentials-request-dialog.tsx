@@ -20,9 +20,9 @@ export function CreateCredentialsRequestDialog() {
             </DialogTrigger>
             <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                 <DialogHeader>
-                    <DialogTitle>Create Credential Request</DialogTitle>
+                    <DialogTitle>Create Credentials Request</DialogTitle>
                     <DialogDescription>
-                        Create a new credential request form. Add as many fields as you need.
+                        Create a new credentials request form. Add as many fields as you need.
                     </DialogDescription>
                 </DialogHeader>
                 <CredentialsRequestForm
