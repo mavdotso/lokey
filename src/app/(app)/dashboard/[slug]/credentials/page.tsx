@@ -6,7 +6,7 @@ import { LoadingScreen } from '@/components/global/loading-screen';
 import { api } from '@/convex/_generated/api';
 import { Separator } from '@/components/ui/separator';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
-import { CRUDCredentialsDialog } from '@/components/credentials/crud-credentials-dialog';
+import { NewCredentialsDialog } from '@/components/credentials/new-credentials-dialog';
 import { PagePagination } from '@/components/global/page-pagination';
 import { isCredentialsActive } from '@/lib/utils';
 import { CredentialsType } from '@/convex/types';
@@ -143,12 +143,12 @@ interface CreateNewCredentialsDialogProps {
 function CreateNewCredentialsDialog({ isOpen, setIsOpen }: CreateNewCredentialsDialogProps) {
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <CRUDCredentialsDialog isOpen={isOpen} setIsOpen={setIsOpen}>
+            <NewCredentialsDialog isOpen={isOpen} setIsOpen={setIsOpen}>
                 <Button className='gap-2' variant={"outline"} >
                     <PlusIcon className='w-4 h-4' />
                     New credentials
                 </Button>
-            </CRUDCredentialsDialog>
+            </NewCredentialsDialog>
         </Dialog>
     )
 }

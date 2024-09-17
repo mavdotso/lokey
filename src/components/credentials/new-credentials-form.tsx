@@ -64,7 +64,7 @@ export const credentialFields = {
     other: [{ id: 'otherField', label: 'Other Field', type: 'text' }]
 };
 
-interface CRUDCredentialsFormProps {
+interface NewCredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;
     editId?: Id<"credentials">;
     existingData?: Credentials;
@@ -73,7 +73,7 @@ interface CRUDCredentialsFormProps {
     onDialogClose?: () => void;
 }
 
-export function CRUDCredentialsForm({ setIsOpen, editId, existingData, onCredentialsCreated, onCredentialsUpdated, onDialogClose }: CRUDCredentialsFormProps) {
+export function NewCredentialsForm({ setIsOpen, editId, existingData, onCredentialsCreated, onCredentialsUpdated, onDialogClose }: NewCredentialsFormProps) {
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState<Credentials['type']>('password');

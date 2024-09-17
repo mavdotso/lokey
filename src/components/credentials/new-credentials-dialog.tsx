@@ -1,10 +1,10 @@
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CRUDCredentialsForm } from '@/components/credentials/crud-credentials-form';
+import { NewCredentialsForm } from '@/components/credentials/crud-credentials-form';
 import { Id } from '@/convex/_generated/dataModel';
 import { Credentials } from '@/convex/types';
 
-interface CRUDCredentialsDialogProps {
+interface NewCredentialsDialogProps {
     isOpen: boolean,
     setIsOpen: Dispatch<SetStateAction<boolean>>,
     onCredentialsCreated?: () => void;
@@ -15,7 +15,7 @@ interface CRUDCredentialsDialogProps {
     children?: ReactNode;
 }
 
-export function CRUDCredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCreated, onCredentialsUpdated, onDialogClose, editId, existingData }: CRUDCredentialsDialogProps) {
+export function NewCredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCreated, onCredentialsUpdated, onDialogClose, editId, existingData }: NewCredentialsDialogProps) {
     return (
         <>
             <DialogTrigger asChild>
@@ -28,7 +28,7 @@ export function CRUDCredentialsDialog({ children, isOpen, setIsOpen, onCredentia
                         {editId ? 'Update the details for this credential.' : 'Fill in the details to create new credentials.'}
                     </DialogDescription>
                 </DialogHeader>
-                <CRUDCredentialsForm
+                <NewCredentialsForm
                     setIsOpen={setIsOpen}
                     editId={editId}
                     existingData={existingData}

@@ -7,7 +7,7 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Credentials } from "@/convex/types";
 import { toast } from "sonner";
-import { CRUDCredentialsDialog } from "@/components/credentials/crud-credentials-dialog";
+import { NewCredentialsDialog } from "@/components/credentials/new-credentials-dialog";
 import { Dialog } from "../ui/dialog";
 import { ConfirmationDialog } from "../global/confirmation-dialog";
 
@@ -72,7 +72,7 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
                     <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuGroup>
-                            <CRUDCredentialsDialog
+                            <NewCredentialsDialog
                                 isOpen={editDialogOpen}
                                 setIsOpen={setEditDialogOpen}
                                 editId={credentials._id}
@@ -87,7 +87,7 @@ export function CredentialsActions({ credentials }: CredentialsActionsProps) {
                                 <DropdownMenuItem onSelect={(e) => e.preventDefault()} >
                                     Edit
                                 </DropdownMenuItem>
-                            </CRUDCredentialsDialog>
+                            </NewCredentialsDialog>
                             <DropdownMenuItem onClick={handleSetExpired}>Set as expired</DropdownMenuItem>
                             <DropdownMenuItem>Assign to...</DropdownMenuItem>
                             <DropdownMenuSeparator />
