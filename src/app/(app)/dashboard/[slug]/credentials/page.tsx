@@ -1,5 +1,5 @@
 'use client'
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
@@ -13,9 +13,7 @@ import { CredentialsType } from '@/convex/types';
 import { EmptySearch } from '@/components/credentials/empty-search';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
-import { Dialog } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CreateCredentialsRequestDialog } from '@/components/credentials/requested/create-credentials-request-dialog';
 import { CredentialsList } from '@/components/credentials/shared/credentials-list';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
@@ -77,7 +75,10 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                         setIsOpen={setRequestDialogOpen}
                         formType="request"
                     >
-                        <Button variant="outline">New credentials request</Button>
+                        <Button className='gap-2' variant="outline">
+                            <PlusIcon className='w-4 h-4' />
+                            New credentials request
+                        </Button>
                     </NewCredentialsDialog>
                     <NewCredentialsDialog
                         isOpen={isCreateDialogOpen}
@@ -102,7 +103,16 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                         {credentials.length === 0 ? (
                             <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
                                 <p className='text-lg'>You don&apos;t have any credentials yet</p>
-                                {/* <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} /> */}
+                                <NewCredentialsDialog
+                                    isOpen={isCreateDialogOpen}
+                                    setIsOpen={setCreateDialogOpen}
+                                    formType="new"
+                                >
+                                    <Button className='gap-2' variant="outline">
+                                        <PlusIcon className='w-4 h-4' />
+                                        New credentials
+                                    </Button>
+                                </NewCredentialsDialog>
                             </div>
                         ) : (
                             <div className='flex flex-col flex-grow gap-4 pt-4'>
@@ -133,7 +143,16 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                         {credentialsRequests.length === 0 ? (
                             <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
                                 <p className='text-lg'>No credential requests yet</p>
-                                <CreateCredentialsRequestDialog />
+                                <NewCredentialsDialog
+                                    isOpen={isRequestDialogOpen}
+                                    setIsOpen={setRequestDialogOpen}
+                                    formType="request"
+                                >
+                                    <Button className='gap-2' variant="outline">
+                                        <PlusIcon className='w-4 h-4' />
+                                        New credentials request
+                                    </Button>
+                                </NewCredentialsDialog>
                             </div>
                         ) : (
                             <div className='flex flex-col flex-grow gap-4 pt-4'>

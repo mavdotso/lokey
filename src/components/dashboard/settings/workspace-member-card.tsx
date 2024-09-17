@@ -1,6 +1,6 @@
 'use client'
 import { LoadingSpinner } from "@/components/global/loading-spinner"
-import UserAvatar from "@/components/global/user-avatar"
+import { UserAvatar } from "@/components/global/user-avatar"
 import { Button } from "@/components/ui/button"
 import { api } from "@/convex/_generated/api"
 import { User, Workspace } from "@/convex/types"

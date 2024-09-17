@@ -11,7 +11,7 @@ import { NewCredentialsDialog } from "@/components/credentials/new-credentials-d
 import { Dialog } from "@/components/ui/dialog";
 import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
-import { PasswordPromptDialog } from "@/components/credentials/requested/password-prompt-dialog";
+import { PasswordPromptDialog } from "@/components/credentials/password-prompt-dialog";
 import { crypto } from "@/lib/utils";
 import { DecryptedCredential } from "../requested/requested-credentials-card";
 import { CredentialsDisplayDialog } from "../credentials-display-dialog";

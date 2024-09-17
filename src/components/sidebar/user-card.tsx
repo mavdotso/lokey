@@ -2,7 +2,7 @@ import { LogOut } from 'lucide-react';
 import { Session } from 'next-auth';
 import SignoutButton from '@/components/auth/signout-button';
 import ThemeToggle from '@/components/global/theme-toggle';
-import UserAvatar from '@/components/global/user-avatar';
+import { UserAvatar } from '@/components/global/user-avatar';
 
 export function UserCard({ session }: { session: Session }) {
     return (
