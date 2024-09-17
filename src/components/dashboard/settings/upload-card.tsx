@@ -9,7 +9,7 @@ import { ImageUpload } from "@/components/global/image-upload";
 import { toast } from 'sonner';
 import { MAX_WORKSPACE_LOGO_SIZE } from '@/lib/consts';
 
-export interface UploadCardProps {
+interface UploadCardProps {
     title: string;
     description: string;
     acceptedFileTypes?: string;

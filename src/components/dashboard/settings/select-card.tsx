@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export interface SelectCardProps {
+interface SelectCardProps {
     title: string;
     description: string;
     options: { value: string; label: string }[];
@@ -14,16 +14,7 @@ export interface SelectCardProps {
     buttonText?: string;
 }
 
-export function SelectCard({
-    title,
-    description,
-    options,
-    selectedValue,
-    onValueChange,
-    onSave,
-    isDangerous = false,
-    buttonText = "Save changes",
-}: SelectCardProps) {
+export function SelectCard({ title, description, options, selectedValue, onValueChange, onSave, isDangerous = false, buttonText = "Save changes" }: SelectCardProps) {
     return (
         <Card>
             <CardHeader>
