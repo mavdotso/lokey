@@ -11,9 +11,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Id } from '@/convex/_generated/dataModel'
 import { api } from '@/convex/_generated/api'
 import { SubmitButton } from '@/components/global/submit-button'
+import { DialogClose, DialogFooter } from '../ui/dialog'
+import { Button } from '../ui/button'
 
+interface CreateWorkspaceFormProps {
+    isCloseable?: boolean
+}
 
-export function CreateWorkspaceForm() {
+export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
+    const router = useRouter()
+
     const [formState, setFormState] = useState({
         name: '',
         slug: '',
@@ -24,9 +31,9 @@ export function CreateWorkspaceForm() {
         newWorkspaceId: null as Id<"workspaces"> | null,
     })
     const [isRedirecting, setIsRedirecting] = useState(false);
-    const createWorkspace = useMutation(api.workspaces.createWorkspace)
+
     const isUnique = useQuery(api.workspaces.isSlugUnique, { slug: formState.slug })
-    const router = useRouter()
+    const createWorkspace = useMutation(api.workspaces.createWorkspace)
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -99,7 +106,6 @@ export function CreateWorkspaceForm() {
                         onChange={(e) => setFormState(prev => ({ ...prev, name: e.target.value }))}
                         required
                         disabled={formState.isSubmitting}
-                        className='bg-primary-foreground'
                     />
                 </div>
             </div>
@@ -117,7 +123,7 @@ export function CreateWorkspaceForm() {
                 </Label>
                 <div className="relative flex shadow-sm rounded-md">
                     <span className="inline-flex items-center bg-muted shadow-sm px-5 border border-r-0 border-border rounded-l-md text-muted-foreground sm:text-sm">
-                        app.lokey.co/
+                        lokey.cc/
                     </span>
                     <Input
                         id="slug"
@@ -127,7 +133,7 @@ export function CreateWorkspaceForm() {
                         }}
                         required
                         disabled={formState.isSubmitting}
-                        className={`bg-primary-foreground rounded-l-none ${formState.slug && !formState.isSlugUnique && formState.showSlugError && !formState.isSubmitting && !isRedirecting ? 'focus-visible:ring-1 focus-visible:ring-destructive border-destructive' : ''}`}
+                        className={`rounded-l-none ${formState.slug && !formState.isSlugUnique && formState.showSlugError && !formState.isSubmitting && !isRedirecting ? 'focus-visible:ring-1 focus-visible:ring-destructive border-destructive' : ''}`}
                         placeholder="acme"
                         aria-invalid={!formState.isSlugUnique}
                         type="text"
@@ -138,7 +144,21 @@ export function CreateWorkspaceForm() {
                     <p className="mt-1 text-center text-destructive text-sm">The slug &quot;{formState.slug}&quot; is already in use.</p>
                 )}
             </div>
-            <SubmitButton disabled={!formState.isSlugUnique} text='Create workspace' size={"lg"} pendingText='Creating workspace...' className='w-full' />
+            <DialogFooter>
+                {isCloseable &&
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary" size={"lg"}>
+                            Close
+                        </Button>
+                    </DialogClose>
+                }
+                <SubmitButton
+                    disabled={!formState.isSlugUnique}
+                    text='Create workspace'
+                    size={"lg"}
+                    pendingText='Creating workspace...'
+                />
+            </DialogFooter>
         </form>
     )
 }

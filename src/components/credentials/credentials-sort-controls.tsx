@@ -1,5 +1,3 @@
-"use client"
-
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -20,17 +18,7 @@ interface CredentialsSortControlsProps {
     showHideExpired: boolean;
 }
 
-export function CredentialsSortControls({
-    searchTerm,
-    onSearchChange,
-    sortOption,
-    onSortChange,
-    selectedTypes,
-    onTypeChange,
-    hideExpired,
-    onHideExpiredChange,
-    showHideExpired
-}: CredentialsSortControlsProps) {
+export function CredentialsSortControls({ searchTerm, onSearchChange, sortOption, onSortChange, selectedTypes, onTypeChange, hideExpired, onHideExpiredChange, showHideExpired }: CredentialsSortControlsProps) {
 
     const credentialTypeOptions = credentialsTypes.map(type => ({
         value: type,

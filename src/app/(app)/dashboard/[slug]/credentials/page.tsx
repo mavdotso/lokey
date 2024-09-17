@@ -12,7 +12,7 @@ import { isCredentialsActive } from '@/lib/utils';
 import { Credentials, CredentialsRequest, CredentialsType } from '@/convex/types';
 import { EmptySearch } from '@/components/credentials/empty-search';
 import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
+import { InboxIcon,  Share2Icon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CredentialsList } from '@/components/credentials/credentials-list';
 
@@ -73,18 +73,8 @@ export default function CredentialsPage({ params }: CredentialsProps) {
 
     const renderContent = (type: TabType) => (
         (type === 'shared' ? credentials : credentialsRequests).length === 0 ? (
-            <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
-                <p className='text-lg'>{type === 'shared' ? "You don't have any credentials yet" : "No credential requests yet"}</p>
-                <CredentialsDialog
-                    isOpen={type === 'shared' ? isCreateDialogOpen : isRequestDialogOpen}
-                    setIsOpen={type === 'shared' ? setCreateDialogOpen : setRequestDialogOpen}
-                    formType={type === 'shared' ? "new" : "request"}
-                >
-                    <Button className='gap-2' variant="outline">
-                        <PlusIcon className='w-4 h-4' />
-                        {type === 'shared' ? "New credentials" : "New credentials request"}
-                    </Button>
-                </CredentialsDialog>
+            <div className='flex flex-grow justify-center items-center py-8'>
+                <p className='text-center text-muted-foreground'>{type === 'shared' ? "Share your first credentials to see them here" : "Request your first credentials to see them here"}</p>
             </div>
         ) : (
             <div className='flex flex-col flex-grow gap-4 pt-4'>
@@ -120,9 +110,9 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                         setIsOpen={setCreateDialogOpen}
                         formType="new"
                     >
-                        <Button className='gap-2' variant="outline">
-                            <PlusIcon className='w-4 h-4' />
-                            New credentials
+                        <Button className='gap-2' variant={"outline"} size={"lg"}>
+                            <Share2Icon className='w-4 h-4' />
+                            Share credentials
                         </Button>
                     </CredentialsDialog>
                     <CredentialsDialog
@@ -130,16 +120,16 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                         setIsOpen={setRequestDialogOpen}
                         formType="request"
                     >
-                        <Button className='gap-2' variant="outline">
-                            <PlusIcon className='w-4 h-4' />
-                            New credentials request
+                        <Button className='gap-2' size={"lg"}>
+                            <InboxIcon className='w-4 h-4' />
+                            Request credentials
                         </Button>
                     </CredentialsDialog>
                 </div>
             </div>
             <Separator />
-            <div className={`${totalPages > 1 && 'pb-10'} overflow-auto`}>
-                <Tabs defaultValue="shared" className='px-8 py-4' onValueChange={(value) => setActiveTab(value as TabType)}>
+            <div className={`${totalPages > 1 && 'pb-10'} overflow-auto flex-grow flex flex-col`}>
+                <Tabs defaultValue="shared" className='px-8 py-4 h-full' onValueChange={(value) => setActiveTab(value as TabType)}>
                     <TabsList>
                         <TabsTrigger value="shared">Shared</TabsTrigger>
                         <TabsTrigger value="requested">Requested</TabsTrigger>

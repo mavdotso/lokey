@@ -35,7 +35,7 @@ export function ConfirmationDialog({
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="sm:justify-start">
+                <DialogFooter>
                     <DialogClose asChild>
                         <Button variant="outline">
                             Cancel

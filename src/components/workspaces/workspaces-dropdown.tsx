@@ -5,12 +5,9 @@ import { Plus, RocketIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { useQuery } from 'convex/react';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { CardContent } from '@/components/ui/card';
+import { Dialog } from '@/components/ui/dialog';
 import { api } from '@/convex/_generated/api';
 import { LoadingScreen } from '@/components/global/loading-screen';
-import { CreateWorkspaceForm } from '@/components/workspaces/create-workspace-form';
-import { CreateWorkspaceHeader } from '@/components/workspaces/create-workspace-header';
 import { CreateWorkspaceDialog } from './create-workspace-dialog';
 
 export function WorkspacesDropdown() {
@@ -61,24 +58,14 @@ export function WorkspacesDropdown() {
                         </SelectItem>
                     ))}
                     <Separator className='my-1' />
-                    <DialogTrigger asChild>
-                        <CreateWorkspaceDialog trigger={
-                            <div
-                                className="flex flex-row items-center gap-2 hover:bg-muted p-2 rounded-md w-full text-sm transition-all cursor-pointer"
-                            >
-                                <Plus className="w-4 h-4" />
-                                Create new workspace
-                            </div>
-                        } />
-                    </DialogTrigger>
+                    <CreateWorkspaceDialog trigger={
+                        <div className="flex flex-row items-center gap-2 hover:bg-muted p-2 rounded-md w-full text-sm transition-all cursor-pointer">
+                            <Plus className="w-4 h-4" />
+                            Create new workspace
+                        </div>
+                    } />
                 </SelectContent>
             </Select>
-            <DialogContent className='p-0 overflow-hidden'>
-                <CreateWorkspaceHeader />
-                <CardContent className="bg-muted pt-8 border-t">
-                    <CreateWorkspaceForm />
-                </CardContent>
-            </DialogContent>
         </Dialog>
     );
 }

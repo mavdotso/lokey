@@ -185,12 +185,12 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
 
     const renderNewCredentialsForm = () => (
         <>
-            {credentialsFields[type].map((field) => (
+            {credentialsFields[type].map((field, index) => (
                 <div key={field.id}>
                     <Label htmlFor={field.id}>{field.label}</Label>
                     <div className="relative">
                         <Input
-                            id={field.id}
+                            id={field.id + index}
                             type={showData[field.id] ? 'text' : 'password'}
                             value={data[field.id] || ''}
                             onChange={(e) => setData({ ...data, [field.id]: e.target.value })}
