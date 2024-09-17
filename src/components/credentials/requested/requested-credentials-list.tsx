@@ -1,5 +1,5 @@
 import { CredentialsRequest } from '@/convex/types';
-import { RequestedCredentialsCard } from './requested-credentials-card';
+import { RequestedCredentialsCard } from '@/components/credentials/requested/requested-credentials-card';
 
 interface RequestedCredentialsListProps {
     credentialsRequests: Array<CredentialsRequest>;

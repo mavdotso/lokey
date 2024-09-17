@@ -1,11 +1,11 @@
 import { User, Workspace, WorkspaceInvite } from "@/convex/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { WorkspaceMemberCard } from "./workspace-member-card";
+import { WorkspaceMemberCard } from "@/components/dashboard/settings/workspace-member-card";
 import { Separator } from "@/components/ui/separator";
-import { InviteLinkDialog } from "./invite/invite-link-dialog";
-import { InviteEmailDialog } from "./invite/invite-email-dialog";
-import { InviteCard } from "./invite-card";
+import { InviteLinkDialog } from "@/components/dashboard/settings//invite/invite-link-dialog";
+import { InviteEmailDialog } from "@/components/dashboard/settings//invite/invite-email-dialog";
+import { InviteCard } from "@/components/dashboard/settings/invite-card";
 
 interface UserSettingsCardProps {
     workspace: Workspace

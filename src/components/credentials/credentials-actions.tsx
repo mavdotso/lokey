@@ -8,8 +8,8 @@ import { api } from "@/convex/_generated/api";
 import { Credentials } from "@/convex/types";
 import { toast } from "sonner";
 import { NewCredentialsDialog } from "@/components/credentials/new-credentials-dialog";
-import { Dialog } from "../ui/dialog";
-import { ConfirmationDialog } from "../global/confirmation-dialog";
+import { Dialog } from "@/components/ui/dialog";
+import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 
 const labels = [
     "feature",

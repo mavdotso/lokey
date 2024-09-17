@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { CredentialsRequest, CredentialsType } from '@/convex/types';
-import { useMutation, useQuery } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
 import { Id } from '@/convex/_generated/dataModel';
 import { crypto } from '@/lib/utils';
-import UserAvatar from '../global/user-avatar';
-import { HashtagBadge } from './hashtag-badge';
+import UserAvatar from '@/components/global/user-avatar';
+import { HashtagBadge } from '@/components/credentials/hashtag-badge';
 import { KeyIcon } from 'lucide-react';
-import { ScrollArea, ScrollBar } from '../ui/scroll-area';
-import { RequestedCredentialsActions } from './requested-credentials-actions';
-import { CredentialsDisplayDialog } from './credentials-display-dialog';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { RequestedCredentialsActions } from '@/components/credentials/requested/requested-credentials-actions';
+import { CredentialsDisplayDialog } from '@/components/credentials/credentials-display-dialog';
 
 interface RequestedCredentialsCardProps {
     credentialsRequest: CredentialsRequest;
@@ -24,13 +24,9 @@ export interface DecryptedCredential {
 }
 
 export function RequestedCredentialsCard({ credentialsRequest }: RequestedCredentialsCardProps) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedCredentials, setSelectedCredentials] = useState<DecryptedCredential | null>(null);
-    const [secretPhrase, setSecretPhrase] = useState('');
     const [decryptedCredentials, setDecryptedCredentials] = useState<DecryptedCredential[]>([]);
     const [isCredentialsDialogOpen, setIsCredentialsDialogOpen] = useState(false);
 
-    const rejectCredentialsRequest = useMutation(api.credentials.rejectCredentialsRequest);
 
     const updatedCredentialsRequest = useQuery(api.credentials.getCredentialsRequestById,
         { _id: credentialsRequest._id as Id<"credentialsRequests"> }
@@ -41,14 +37,18 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
         credentialsRequest.createdBy ? { _id: credentialsRequest.createdBy } : "skip"
     );
 
-    function getStatusColor(status: string) {
+    function getStatusStyles(status: string) {
         switch (status) {
-            case 'pending': return 'bg-yellow-500';
-            case 'fulfilled': return 'bg-green-500';
-            case 'rejected': return 'bg-red-500';
-            default: return 'bg-gray-500';
+            case 'pending':
+                return 'bg-yellow-500 shadow-[0px_0px_5px_3px_rgba(234,179,8,0.15)]';
+            case 'fulfilled':
+                return 'bg-green-500 shadow-[0px_0px_5px_3px_rgba(34,197,94,0.15)]';
+            case 'rejected':
+                return 'bg-red-500 shadow-[0px_0px_5px_3px_rgba(239,68,68,0.15)]';
+            default:
+                return 'bg-gray-500 shadow-[0px_0px_5px_3px_rgba(156,163,175,0.15)]';
         }
-    };
+    }
 
     async function handleViewCredentials(secretPhrase: string) {
         if (!secretPhrase) {
@@ -103,10 +103,7 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
                 </div>
                 <div className="flex flex-col justify-start space-y-2">
                     <div className="flex items-center gap-2 pl-1 text-md">
-                        <div className={`w-2 h-2 rounded-full ${currentRequest.status === "fulfilled" ? 'bg-green-500 shadow-[0px_0px_5px_3px_rgba(34,197,_94,_0.15)]' :
-                            currentRequest.status === "pending" ? 'bg-yellow-500 shadow-[0px_0px_5px_3px_rgba(234,179,_8,_0.15)]' :
-                                'bg-red-500 shadow-[0px_0px_5px_3px_rgba(239,68,_68,_0.15)]'
-                            }`}></div>
+                        <div className={`w-2 h-2 rounded-full ${getStatusStyles(currentRequest.status)}`}></div>
                         <span className='text-md capitalize'>{currentRequest.status}</span>
                     </div>
                     <div className="flex justify-start items-start gap-4 text-muted-foreground">

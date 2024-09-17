@@ -1,14 +1,7 @@
-import { Button } from "@/components/ui/button"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
 import { useState } from "react"
-import { CredentialsRequestForm } from "./credentials-request-form"
+import { Button } from "@/components/ui/button"
+import { CredentialsRequestForm } from "@/components/credentials/requested/credentials-request-form"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 export function CreateCredentialsRequestDialog() {
     const [isOpen, setIsOpen] = useState(false)

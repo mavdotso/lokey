@@ -7,7 +7,7 @@ import { formatRelative, parseISO } from 'date-fns';
 import { Credentials } from '@/convex/types';
 import { api } from '@/convex/_generated/api';
 import UserAvatar from '@/components/global/user-avatar';
-import { CredentialsActions } from './credentials-actions';
+import { CredentialsActions } from '@/components/credentials/credentials-actions';
 
 interface CredentialCardProps {
     credentials: Credentials;

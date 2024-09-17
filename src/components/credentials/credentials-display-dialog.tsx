@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { EyeIcon, EyeOffIcon, CopyIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { DecryptedCredential } from './requested-credentials-card';
+import { DecryptedCredential } from '@/components/credentials/requested/requested-credentials-card';
 
 interface CredentialsDisplayDialogProps {
     isOpen: boolean;

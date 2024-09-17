@@ -12,9 +12,9 @@ import { PlusIcon, TrashIcon } from 'lucide-react'
 import { CredentialsType, credentialsTypes } from '@/convex/types'
 import { api } from '@/convex/_generated/api'
 import { DialogFooter } from '@/components/ui/dialog'
-import { ScrollArea } from '../ui/scroll-area'
-import { SubmitButton } from '../global/submit-button'
-import { Card } from '../ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { SubmitButton } from '@/components/global/submit-button'
+import { Card } from '@/components/ui/card'
 import { crypto } from '@/lib/utils'
 
 interface CredentialsRequestFormProps {

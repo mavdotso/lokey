@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,7 +10,7 @@ import { Info } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Id } from '@/convex/_generated/dataModel'
 import { api } from '@/convex/_generated/api'
-import { SubmitButton } from '../global/submit-button'
+import { SubmitButton } from '@/components/global/submit-button'
 
 
 export function CreateWorkspaceForm() {

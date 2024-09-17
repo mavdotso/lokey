@@ -16,8 +16,8 @@ import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { Dialog } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CreateCredentialsRequestDialog } from '@/components/credentials/create-credentials-request-dialog';
-import { RequestedCredentialsList } from '@/components/credentials/requested-credentials-list';
+import { CreateCredentialsRequestDialog } from '@/components/credentials/requested/create-credentials-request-dialog';
+import { RequestedCredentialsList } from '@/components/credentials/requested/requested-credentials-list';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 

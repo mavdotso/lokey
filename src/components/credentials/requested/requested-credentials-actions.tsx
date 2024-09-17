@@ -6,9 +6,9 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { CredentialsRequest } from "@/convex/types";
 import { toast } from "sonner";
-import { ConfirmationDialog } from "../global/confirmation-dialog";
+import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
-import { PasswordPromptDialog } from "./password-prompt-dialog";
+import { PasswordPromptDialog } from "@/components/credentials/requested/password-prompt-dialog";
 
 interface RequestedCredentialsActionsProps {
     credentialsRequest: CredentialsRequest;
