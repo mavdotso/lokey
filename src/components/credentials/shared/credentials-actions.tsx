@@ -7,13 +7,14 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Credentials, CredentialsRequest } from "@/convex/types";
 import { toast } from "sonner";
-import { NewCredentialsDialog } from "@/components/credentials/new-credentials-dialog";
 import { Dialog } from "@/components/ui/dialog";
 import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
 import { PasswordPromptDialog } from "@/components/credentials/password-prompt-dialog";
 import { crypto } from "@/lib/utils";
 import { CredentialsDisplayDialog, DecryptedCredential } from "../credentials-display-dialog";
+import { CredentialsDialog } from "./credentials-dialog";
+import { PlusIcon } from "lucide-react";
 
 const labels = [
     "feature",
@@ -144,20 +145,17 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
                         {isShared ? (
                             <>
                                 <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                                    <NewCredentialsDialog
+                                    <CredentialsDialog
                                         isOpen={editDialogOpen}
                                         setIsOpen={setEditDialogOpen}
+                                        existingData={credentials ?? undefined}
                                         editId={credentials?._id}
-                                        existingData={credentials!}
-                                        onDialogClose={() => {
-                                            setMenuOpen(false);
-                                            setEditDialogOpen(false);
-                                        }}
+                                        formType="new"
                                     >
                                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                             Edit
                                         </DropdownMenuItem>
-                                    </NewCredentialsDialog>
+                                    </CredentialsDialog>
                                 </Dialog>
                                 <DropdownMenuItem onClick={handleSetExpired}>Set as expired</DropdownMenuItem>
                                 <DropdownMenuItem>Assign to...</DropdownMenuItem>

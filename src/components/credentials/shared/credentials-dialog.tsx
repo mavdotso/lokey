@@ -4,7 +4,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Credentials } from "@/convex/types";
 import { CredentialsForm } from "./credentials-form";
 
-interface NewCredentialsDialogProps {
+interface CredentialsDialogProps {
     isOpen: boolean,
     setIsOpen: Dispatch<SetStateAction<boolean>>,
     onCredentialsCreated?: () => void;
@@ -16,7 +16,7 @@ interface NewCredentialsDialogProps {
     formType: 'new' | 'request';
 }
 
-export function NewCredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCreated, onCredentialsUpdated, onDialogClose, editId, existingData, formType }: NewCredentialsDialogProps) {
+export function CredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCreated, onCredentialsUpdated, onDialogClose, editId, existingData, formType }: CredentialsDialogProps) {
 
     function handleDialogClose() {
         setIsOpen(false);

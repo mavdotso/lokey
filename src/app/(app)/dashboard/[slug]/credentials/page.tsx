@@ -6,7 +6,7 @@ import { LoadingScreen } from '@/components/global/loading-screen';
 import { api } from '@/convex/_generated/api';
 import { Separator } from '@/components/ui/separator';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
-import { NewCredentialsDialog } from '@/components/credentials/shared/credentials-dialog';
+import { CredentialsDialog } from '@/components/credentials/shared/credentials-dialog';
 import { PagePagination } from '@/components/global/page-pagination';
 import { isCredentialsActive } from '@/lib/utils';
 import { Credentials, CredentialsRequest, CredentialsType } from '@/convex/types';
@@ -75,7 +75,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
         (type === 'shared' ? credentials : credentialsRequests).length === 0 ? (
             <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
                 <p className='text-lg'>{type === 'shared' ? "You don't have any credentials yet" : "No credential requests yet"}</p>
-                <NewCredentialsDialog
+                <CredentialsDialog
                     isOpen={type === 'shared' ? isCreateDialogOpen : isRequestDialogOpen}
                     setIsOpen={type === 'shared' ? setCreateDialogOpen : setRequestDialogOpen}
                     formType={type === 'shared' ? "new" : "request"}
@@ -84,7 +84,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                         <PlusIcon className='w-4 h-4' />
                         {type === 'shared' ? "New credentials" : "New credentials request"}
                     </Button>
-                </NewCredentialsDialog>
+                </CredentialsDialog>
             </div>
         ) : (
             <div className='flex flex-col flex-grow gap-4 pt-4'>
@@ -115,7 +115,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
             <div className='flex justify-between items-center px-8 py-6'>
                 <h1 className='font-bold text-2xl'>Credentials</h1>
                 <div className='flex gap-2'>
-                    <NewCredentialsDialog
+                    <CredentialsDialog
                         isOpen={isCreateDialogOpen}
                         setIsOpen={setCreateDialogOpen}
                         formType="new"
@@ -124,8 +124,8 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                             <PlusIcon className='w-4 h-4' />
                             New credentials
                         </Button>
-                    </NewCredentialsDialog>
-                    <NewCredentialsDialog
+                    </CredentialsDialog>
+                    <CredentialsDialog
                         isOpen={isRequestDialogOpen}
                         setIsOpen={setRequestDialogOpen}
                         formType="request"
@@ -134,7 +134,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                             <PlusIcon className='w-4 h-4' />
                             New credentials request
                         </Button>
-                    </NewCredentialsDialog>
+                    </CredentialsDialog>
                 </div>
             </div>
             <Separator />
