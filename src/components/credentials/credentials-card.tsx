@@ -1,7 +1,7 @@
 import { api } from "@/convex/_generated/api";
 import { Credentials, CredentialsRequest } from "@/convex/types";
 import { useQuery } from "convex/react";
-import { HashtagBadge } from "../hashtag-badge";
+import { HashtagBadge } from "./hashtag-badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { formatTimestamp } from "@/lib/utils";
 import { UserAvatar } from "@/components/global/user-avatar";
@@ -89,7 +89,7 @@ export function CredentialsStatusInfo({ credentials }: CredentialsStatusInfoProp
             <div className="flex justify-start items-start gap-4 text-muted-foreground">
                 <div className='flex items-center gap-1'>
                     <TimerIcon className='w-4 h-4' />
-                    <span>{credentials.expiresAt ? formatTimestamp(credentials.expiresAt) : 'No expiration'}</span>
+                    <span>{credentials.expiresAt ? new Date(credentials.expiresAt).toLocaleDateString() : 'No expiration'}</span>
                 </div>
                 <div className='flex items-center gap-1'>
                     <EyeIcon className='w-4 h-4' />

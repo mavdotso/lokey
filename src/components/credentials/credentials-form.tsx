@@ -11,13 +11,13 @@ import { EyeIcon, EyeOffIcon, PlusIcon, TrashIcon } from 'lucide-react'
 import { Credentials, CredentialsType, credentialsTypes } from '@/convex/types'
 import { api } from '@/convex/_generated/api'
 import { encryptData, generateShareLink, crypto, getURL } from '@/lib/utils'
-import { CopyCredentialsLink } from '@/components/credentials/shared/copy-credentials-link'
+import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Id } from '@/convex/_generated/dataModel'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
-import { credentialFields } from '../new-credentials-form'
+import { credentialsFields } from '@/lib/credentialsFields'
 
 interface CredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -185,7 +185,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
 
     const renderNewCredentialsForm = () => (
         <>
-            {credentialFields[type].map((field) => (
+            {credentialsFields[type].map((field) => (
                 <div key={field.id}>
                     <Label htmlFor={field.id}>{field.label}</Label>
                     <div className="relative">

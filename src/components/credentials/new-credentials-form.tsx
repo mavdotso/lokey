@@ -12,7 +12,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { Credentials, credentialsTypes } from '@/convex/types'
 import { api } from '@/convex/_generated/api'
 import { encryptData, generateShareLink } from '@/lib/utils'
-import { CopyCredentialsLink } from '@/components/credentials/shared/copy-credentials-link'
+import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Id } from '@/convex/_generated/dataModel'
 

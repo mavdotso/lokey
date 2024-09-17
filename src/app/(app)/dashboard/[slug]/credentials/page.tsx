@@ -6,7 +6,7 @@ import { LoadingScreen } from '@/components/global/loading-screen';
 import { api } from '@/convex/_generated/api';
 import { Separator } from '@/components/ui/separator';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
-import { CredentialsDialog } from '@/components/credentials/shared/credentials-dialog';
+import { CredentialsDialog } from '@/components/credentials/credentials-dialog';
 import { PagePagination } from '@/components/global/page-pagination';
 import { isCredentialsActive } from '@/lib/utils';
 import { Credentials, CredentialsRequest, CredentialsType } from '@/convex/types';
@@ -14,7 +14,7 @@ import { EmptySearch } from '@/components/credentials/empty-search';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CredentialsList } from '@/components/credentials/shared/credentials-list';
+import { CredentialsList } from '@/components/credentials/credentials-list';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 

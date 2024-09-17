@@ -12,9 +12,8 @@ import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
 import { PasswordPromptDialog } from "@/components/credentials/password-prompt-dialog";
 import { crypto } from "@/lib/utils";
-import { CredentialsDisplayDialog, DecryptedCredential } from "../credentials-display-dialog";
+import { CredentialsDisplayDialog, DecryptedCredential } from "./credentials-display-dialog";
 import { CredentialsDialog } from "./credentials-dialog";
-import { PlusIcon } from "lucide-react";
 
 const labels = [
     "feature",
