@@ -13,8 +13,7 @@ import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
 import { PasswordPromptDialog } from "@/components/credentials/password-prompt-dialog";
 import { crypto } from "@/lib/utils";
-import { DecryptedCredential } from "../requested/requested-credentials-card";
-import { CredentialsDisplayDialog } from "../credentials-display-dialog";
+import { CredentialsDisplayDialog, DecryptedCredential } from "../credentials-display-dialog";
 
 const labels = [
     "feature",
