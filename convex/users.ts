@@ -147,23 +147,15 @@ export const getUserDefaultWorkspace = query({
     handler: async (ctx) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('User is not authenticated');
+            return null;
         }
 
         const user = await ctx.db.get(identity);
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        if (!user.defaultWorkspace) {
-            throw new Error('No default workspace set');
+        if (!user || !user.defaultWorkspace) {
+            return null;
         }
 
         const workspace = await ctx.db.get(user.defaultWorkspace);
-        if (!workspace) {
-            throw new Error('Default workspace not found');
-        }
-
-        return { success: true, workspace };
+        return workspace || null;
     },
 });

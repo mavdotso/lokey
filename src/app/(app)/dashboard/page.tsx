@@ -1,10 +1,10 @@
 "use client"
 import { useMutation, useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
-import { CreateWorkspaceCard } from '@/components/workspaces/create-workspace-card';
 import { api } from '@/convex/_generated/api';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { CreateWorkspaceDialog } from '@/components/workspaces/create-workspace-dialog';
 
 export default function Dashboard() {
     const router = useRouter();
@@ -49,8 +49,8 @@ export default function Dashboard() {
     useEffect(() => {
         if (!isLoading && workspaces && workspaces.length > 0) {
             let redirectWorkspace;
-            if (defaultWorkspace && defaultWorkspace.success && defaultWorkspace.workspace) {
-                redirectWorkspace = defaultWorkspace.workspace;
+            if (defaultWorkspace) {
+                redirectWorkspace = defaultWorkspace;
             } else {
                 redirectWorkspace = workspaces[0];
             }
@@ -63,7 +63,7 @@ export default function Dashboard() {
     if (!workspaces || workspaces.length === 0) {
         return (
             <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-sm w-screen h-screen">
-                <CreateWorkspaceCard />
+                <CreateWorkspaceDialog isOpen={true} />
             </div>
         );
     }

@@ -11,6 +11,7 @@ import { api } from '@/convex/_generated/api';
 import { LoadingScreen } from '@/components/global/loading-screen';
 import { CreateWorkspaceForm } from '@/components/workspaces/create-workspace-form';
 import { CreateWorkspaceHeader } from '@/components/workspaces/create-workspace-header';
+import { CreateWorkspaceDialog } from './create-workspace-dialog';
 
 export function WorkspacesDropdown() {
     const router = useRouter();
@@ -61,13 +62,14 @@ export function WorkspacesDropdown() {
                     ))}
                     <Separator className='my-1' />
                     <DialogTrigger asChild>
-                        <div
-                            className="flex flex-row items-center gap-2 hover:bg-muted p-2 rounded-md w-full text-sm transition-all cursor-pointer"
-                            onClick={() => setIsDialogOpen(true)}
-                        >
-                            <Plus className="w-4 h-4" />
-                            Create new workspace
-                        </div>
+                        <CreateWorkspaceDialog trigger={
+                            <div
+                                className="flex flex-row items-center gap-2 hover:bg-muted p-2 rounded-md w-full text-sm transition-all cursor-pointer"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Create new workspace
+                            </div>
+                        } />
                     </DialogTrigger>
                 </SelectContent>
             </Select>
