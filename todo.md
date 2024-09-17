@@ -3,6 +3,8 @@
 -   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
 -   [ ] Faster redirect after creating the first workspace
 -   [ ] User is not authenticated after avatar upload?
+-   [ ] Can't click anything after editing credentials in popup, maybe something with the clickOutside
+- [ ] submit cred page — all of the fields with the same names fill out at the same time
 
 -   [ ] See fulfilled credentials
 -   [ ] Share page UI

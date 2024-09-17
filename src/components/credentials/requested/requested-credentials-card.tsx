@@ -133,7 +133,6 @@ export function RequestedCredentialsCard({ credentialsRequest }: RequestedCreden
                         )}
                         <RequestedCredentialsActions
                             credentialsRequest={credentialsRequest}
-                            handleViewCredentials={handleViewCredentials}
                         />
                     </div>
                 </div>

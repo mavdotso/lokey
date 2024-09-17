@@ -6,18 +6,17 @@ import { LoadingScreen } from '@/components/global/loading-screen';
 import { api } from '@/convex/_generated/api';
 import { Separator } from '@/components/ui/separator';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
-import { NewCredentialsDialog } from '@/components/credentials/new-credentials-dialog';
+import { NewCredentialsDialog } from '@/components/credentials/shared/credentials-dialog';
 import { PagePagination } from '@/components/global/page-pagination';
 import { isCredentialsActive } from '@/lib/utils';
 import { CredentialsType } from '@/convex/types';
 import { EmptySearch } from '@/components/credentials/empty-search';
-import { CredentialsList } from '@/components/credentials/credentials-list';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { Dialog } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreateCredentialsRequestDialog } from '@/components/credentials/requested/create-credentials-request-dialog';
-import { RequestedCredentialsList } from '@/components/credentials/requested/requested-credentials-list';
+import { CredentialsList } from '@/components/credentials/shared/credentials-list';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
@@ -33,7 +32,9 @@ export default function CredentialsPage({ params }: CredentialsProps) {
     const [selectedTypes, setSelectedTypes] = useState<CredentialsType[]>([]);
     const [hideExpired, setHideExpired] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
+    const [isRequestDialogOpen, setRequestDialogOpen] = useState(false);
 
     const workspace = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
@@ -71,8 +72,23 @@ export default function CredentialsPage({ params }: CredentialsProps) {
             <div className='flex justify-between items-center px-8 py-6'>
                 <h1 className='font-bold text-2xl'>Credentials</h1>
                 <div className='flex gap-2'>
-                    <CreateCredentialsRequestDialog />
-                    <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
+                    <NewCredentialsDialog
+                        isOpen={isRequestDialogOpen}
+                        setIsOpen={setRequestDialogOpen}
+                        formType="request"
+                    >
+                        <Button variant="outline">New credentials request</Button>
+                    </NewCredentialsDialog>
+                    <NewCredentialsDialog
+                        isOpen={isCreateDialogOpen}
+                        setIsOpen={setCreateDialogOpen}
+                        formType="new"
+                    >
+                        <Button className='gap-2' variant="outline">
+                            <PlusIcon className='w-4 h-4' />
+                            New credentials
+                        </Button>
+                    </NewCredentialsDialog>
                 </div>
             </div>
             <Separator />
@@ -86,7 +102,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                         {credentials.length === 0 ? (
                             <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
                                 <p className='text-lg'>You don&apos;t have any credentials yet</p>
-                                <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} />
+                                {/* <CreateNewCredentialsDialog isOpen={isCreateDialogOpen} setIsOpen={setCreateDialogOpen} /> */}
                             </div>
                         ) : (
                             <div className='flex flex-col flex-grow gap-4 pt-4'>
@@ -103,7 +119,12 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                                 {paginatedCredentials.length === 0 && isFiltered ? (
                                     <EmptySearch onResetFilters={resetFilters} />
                                 ) : (
-                                    <CredentialsList credentials={paginatedCredentials} />
+                                    <CredentialsList
+                                        items={filteredCredentials}
+                                        type="shared"
+                                        currentPage={currentPage}
+                                        itemsPerPage={itemsPerPage}
+                                    />
                                 )}
                             </div >
                         )}
@@ -116,39 +137,28 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                             </div>
                         ) : (
                             <div className='flex flex-col flex-grow gap-4 pt-4'>
-                                <RequestedCredentialsList credentialsRequests={credentialsRequests} />
+                                <CredentialsList
+                                    items={credentialsRequests}
+                                    type="requested"
+                                    currentPage={currentPage}
+                                    itemsPerPage={itemsPerPage}
+                                />
                             </div>
                         )}
                     </TabsContent>
                 </Tabs>
             </div>
-            {totalPages > 1 && (
-                <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10">
-                    <PagePagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        setCurrentPage={setCurrentPage}
-                    />
-                </div>
-            )}
-        </div>
+            {
+                totalPages > 1 && (
+                    <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10">
+                        <PagePagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            setCurrentPage={setCurrentPage}
+                        />
+                    </div>
+                )
+            }
+        </div >
     );
-}
-
-interface CreateNewCredentialsDialogProps {
-    isOpen: boolean,
-    setIsOpen: Dispatch<SetStateAction<boolean>>,
-}
-
-function CreateNewCredentialsDialog({ isOpen, setIsOpen }: CreateNewCredentialsDialogProps) {
-    return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <NewCredentialsDialog isOpen={isOpen} setIsOpen={setIsOpen}>
-                <Button className='gap-2' variant={"outline"} >
-                    <PlusIcon className='w-4 h-4' />
-                    New credentials
-                </Button>
-            </NewCredentialsDialog>
-        </Dialog>
-    )
 }

@@ -53,7 +53,9 @@ const credentialsSchema = {
 const credentialsRequestSchema = {
     workspaceId: v.id('workspaces'),
     createdBy: v.id('users'),
+    name: v.string(),
     description: v.string(),
+    updatedAt: v.string(),
     credentials: v.array(
         v.object({
             name: v.string(),

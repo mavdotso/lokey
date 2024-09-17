@@ -9,16 +9,20 @@ import { toast } from "sonner";
 import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
 import { PasswordPromptDialog } from "@/components/credentials/requested/password-prompt-dialog";
+import { DecryptedCredential } from "./requested-credentials-card";
+import { crypto } from "@/lib/utils";
+import { CredentialsDisplayDialog } from "../credentials-display-dialog";
 
 interface RequestedCredentialsActionsProps {
     credentialsRequest: CredentialsRequest;
-    handleViewCredentials: (secretPhrase: string) => Promise<void>;
 }
 
-export function RequestedCredentialsActions({ credentialsRequest, handleViewCredentials }: RequestedCredentialsActionsProps) {
+export function RequestedCredentialsActions({ credentialsRequest }: RequestedCredentialsActionsProps) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
     const [passwordPromptOpen, setPasswordPromptOpen] = useState(false);
+    const [decryptedCredentials, setDecryptedCredentials] = useState<DecryptedCredential[]>([]);
+    const [isCredentialsDialogOpen, setIsCredentialsDialogOpen] = useState(false);
 
     const rejectCredentialsRequest = useMutation(api.credentials.rejectCredentialsRequest);
 
@@ -39,6 +43,42 @@ export function RequestedCredentialsActions({ credentialsRequest, handleViewCred
     function openPasswordPrompt() {
         setPasswordPromptOpen(true);
         setMenuOpen(false);
+    }
+
+    async function handleViewCredentials(secretPhrase: string) {
+        if (!secretPhrase) {
+            console.log('Missing secret phrase');
+            toast.error('Please enter the secret phrase to view the credentials');
+            return;
+        }
+
+        try {
+            const privateKey = crypto.decryptPrivateKey(credentialsRequest.encryptedPrivateKey, secretPhrase);
+
+            if (credentialsRequest.status === 'fulfilled') {
+                const decrypted = credentialsRequest.credentials.map(cred => {
+                    if (cred.encryptedValue) {
+                        const decryptedValue = crypto.decryptWithPrivateKey(cred.encryptedValue, privateKey);
+                        return {
+                            name: cred.name,
+                            type: cred.type,
+                            description: cred.description,
+                            value: decryptedValue
+                        };
+                    }
+                    return null;
+                }).filter((cred): cred is DecryptedCredential => cred !== null);
+
+                setDecryptedCredentials(decrypted);
+                setIsCredentialsDialogOpen(true);
+            } else {
+                console.log('Credentials not fulfilled');
+                toast.error('Credentials have not been fulfilled yet');
+            }
+        } catch (error) {
+            console.error('Decryption error:', error);
+            toast.error('Failed to decrypt credentials. Please check your secret phrase.');
+        }
     }
 
     return (
@@ -78,6 +118,11 @@ export function RequestedCredentialsActions({ credentialsRequest, handleViewCred
                 isOpen={passwordPromptOpen}
                 setIsOpen={setPasswordPromptOpen}
                 handleViewCredentials={handleViewCredentials}
+            />
+            <CredentialsDisplayDialog
+                isOpen={isCredentialsDialogOpen}
+                setIsOpen={setIsCredentialsDialogOpen}
+                decryptedCredentials={decryptedCredentials}
             />
         </>
     );

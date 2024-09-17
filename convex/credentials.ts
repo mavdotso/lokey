@@ -203,6 +203,7 @@ export const getWorkspaceCredentialsRequests = query({
 export const createCredentialsRequest = mutation({
     args: {
         workspaceId: v.id('workspaces'),
+        name: v.string(),
         description: v.string(),
         credentials: v.array(
             v.object({
@@ -224,9 +225,11 @@ export const createCredentialsRequest = mutation({
         const credentialsRequest = await ctx.db.insert('credentialsRequests', {
             workspaceId,
             createdBy: userId.subject as Id<'users'>,
+            name: args.name,
             description,
             credentials,
             status: 'pending',
+            updatedAt: new Date().toISOString(),
             encryptedPrivateKey,
         });
 

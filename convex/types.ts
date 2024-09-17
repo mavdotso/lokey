@@ -86,6 +86,7 @@ export type CredentialsRequest = {
     _creationTime?: number;
     workspaceId: Id<'workspaces'>;
     createdBy: Id<'users'>;
+    name: string;
     description: string;
     credentials: Array<{
         name: string;
@@ -94,6 +95,7 @@ export type CredentialsRequest = {
         encryptedValue?: string;
     }>;
     status: 'pending' | 'fulfilled' | 'rejected';
+    updatedAt: string;
     fulfilledBy?: Id<'users'>;
     fulfilledAt?: string;
     encryptedPrivateKey: string;

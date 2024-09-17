@@ -30,6 +30,7 @@ interface CredentialsField {
 }
 
 export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogClose }: CredentialsRequestFormProps) {
+    const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [credentials, setCredentials] = useState<CredentialsField[]>([{ name: '', description: '', type: 'password' }]);
     const [secretPhrase, setSecretPhrase] = useState('');
@@ -70,6 +71,7 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
 
             const response = await createCredentialsRequest({
                 workspaceId: currentWorkspaceId._id,
+                name,
                 description,
                 credentials: credentials.map(cred => ({
                     name: cred.name,
@@ -108,6 +110,16 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
                 {/* <div className="top-0 right-0 left-0 absolute bg-gradient-to-b from-background to-transparent mx-auto pt-10" /> */}
                 <div className='space-y-4 px-4'>
                     <div>
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                            className='bg-background'
+                            id="secretPhrase"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder='Enter a credentials request name'
+                            required
+                        />
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             id="description"
@@ -116,18 +128,16 @@ export function CredentialsRequestForm({ setIsOpen, onRequestCreated, onDialogCl
                             placeholder='Provide instructions or context for the credentials request'
                             required
                         />
-                        <div>
-                            <Label htmlFor="secretPhrase">Secret Phrase</Label>
-                            <Input
-                                className='bg-background'
-                                id="secretPhrase"
-                                type="password"
-                                value={secretPhrase}
-                                onChange={(e) => setSecretPhrase(e.target.value)}
-                                placeholder='Enter a secret phrase to secure your credentials'
-                                required
-                            />
-                        </div>
+                        <Label htmlFor="secretPhrase">Secret Phrase</Label>
+                        <Input
+                            className='bg-background'
+                            id="secretPhrase"
+                            type="password"
+                            value={secretPhrase}
+                            onChange={(e) => setSecretPhrase(e.target.value)}
+                            placeholder='Enter a secret phrase to secure your credentials'
+                            required
+                        />
                     </div>
                     {credentials.map((cred, index) => (
                         <Card key={index} className="space-y-2 p-4 border rounded-md">
