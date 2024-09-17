@@ -20,6 +20,7 @@ export function CredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCr
 
     function handleDialogClose() {
         setIsOpen(false);
+        onDialogClose && onDialogClose()
     }
 
     return (

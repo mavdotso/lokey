@@ -149,6 +149,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
                                         isOpen={editDialogOpen}
                                         setIsOpen={setEditDialogOpen}
                                         existingData={credentials ?? undefined}
+                                        onDialogClose={() => setMenuOpen(!menuOpen)}
                                         editId={credentials?._id}
                                         formType="new"
                                     >
