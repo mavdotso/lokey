@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { NewCredentialsForm } from '@/components/credentials/crud-credentials-form';
+import { NewCredentialsForm } from '@/components/credentials/new-credentials-form';
 import { Id } from '@/convex/_generated/dataModel';
 import { Credentials } from '@/convex/types';
 
