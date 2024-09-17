@@ -244,8 +244,8 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                     required
                 />
             </div>
-            <ScrollArea className='bg-muted my-4 rounded-md h-[400px]'>
-                <div className='space-y-4 px-4'>
+            <ScrollArea className='bg-muted my-4 rounded-md'>
+                <div className='px-4 max-h-[30vh]'>
                     {credentials.map((cred, index) => (
                         <Card key={index} className="space-y-2 my-4 p-4 border rounded-md">
                             <div className="flex justify-between items-center mb-2">

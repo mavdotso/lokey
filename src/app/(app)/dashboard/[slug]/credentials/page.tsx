@@ -116,16 +116,6 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                 <h1 className='font-bold text-2xl'>Credentials</h1>
                 <div className='flex gap-2'>
                     <NewCredentialsDialog
-                        isOpen={isRequestDialogOpen}
-                        setIsOpen={setRequestDialogOpen}
-                        formType="request"
-                    >
-                        <Button className='gap-2' variant="outline">
-                            <PlusIcon className='w-4 h-4' />
-                            New credentials request
-                        </Button>
-                    </NewCredentialsDialog>
-                    <NewCredentialsDialog
                         isOpen={isCreateDialogOpen}
                         setIsOpen={setCreateDialogOpen}
                         formType="new"
@@ -133,6 +123,16 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                         <Button className='gap-2' variant="outline">
                             <PlusIcon className='w-4 h-4' />
                             New credentials
+                        </Button>
+                    </NewCredentialsDialog>
+                    <NewCredentialsDialog
+                        isOpen={isRequestDialogOpen}
+                        setIsOpen={setRequestDialogOpen}
+                        formType="request"
+                    >
+                        <Button className='gap-2' variant="outline">
+                            <PlusIcon className='w-4 h-4' />
+                            New credentials request
                         </Button>
                     </NewCredentialsDialog>
                 </div>
