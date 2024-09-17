@@ -17,6 +17,7 @@ interface CredentialsSortControlsProps {
     onTypeChange: (types: string[]) => void;
     hideExpired: boolean;
     onHideExpiredChange: (checked: boolean) => void;
+    showHideExpired: boolean;
 }
 
 export function CredentialsSortControls({
@@ -28,6 +29,7 @@ export function CredentialsSortControls({
     onTypeChange,
     hideExpired,
     onHideExpiredChange,
+    showHideExpired
 }: CredentialsSortControlsProps) {
 
     const credentialTypeOptions = credentialsTypes.map(type => ({
@@ -59,25 +61,27 @@ export function CredentialsSortControls({
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="name">Sort by name</SelectItem>
-                        <SelectItem value="createdAtAsc">Sort by nate created (asc)</SelectItem>
+                        <SelectItem value="createdAtAsc">Sort by date created (asc)</SelectItem>
                         <SelectItem value="createdAtDesc">Sort by date created (desc)</SelectItem>
                         <SelectItem value="updatedAt">Sort by date updated</SelectItem>
                     </SelectContent>
                 </Select>
-                <div className="flex items-center space-x-2 whitespace-nowrap">
-                    <Checkbox
-                        id="hideExpired"
-                        checked={hideExpired}
-                        onCheckedChange={(checked) => onHideExpiredChange(checked as boolean)}
-                        className='rounded-[5px]'
-                    />
-                    <Label
-                        htmlFor="hideExpired"
-                        className="peer-disabled:opacity-70 font-medium text-sm leading-none peer-disabled:cursor-not-allowed"
-                    >
-                        Hide expired
-                    </Label>
-                </div>
+                {showHideExpired && (
+                    <div className="flex items-center space-x-2 whitespace-nowrap">
+                        <Checkbox
+                            id="hideExpired"
+                            checked={hideExpired}
+                            onCheckedChange={(checked) => onHideExpiredChange(checked as boolean)}
+                            className='rounded-[5px]'
+                        />
+                        <Label
+                            htmlFor="hideExpired"
+                            className="peer-disabled:opacity-70 font-medium text-sm leading-none peer-disabled:cursor-not-allowed"
+                        >
+                            Hide expired
+                        </Label>
+                    </div>
+                )}
             </div>
         </>
     );

@@ -9,7 +9,7 @@ import { CredentialsSortControls } from '@/components/credentials/credentials-so
 import { NewCredentialsDialog } from '@/components/credentials/shared/credentials-dialog';
 import { PagePagination } from '@/components/global/page-pagination';
 import { isCredentialsActive } from '@/lib/utils';
-import { CredentialsType } from '@/convex/types';
+import { Credentials, CredentialsRequest, CredentialsType } from '@/convex/types';
 import { EmptySearch } from '@/components/credentials/empty-search';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
@@ -18,19 +18,22 @@ import { CredentialsList } from '@/components/credentials/shared/credentials-lis
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
+type TabType = 'shared' | 'requested';
+
 interface CredentialsProps {
     params: { slug: string };
 }
 
 export default function CredentialsPage({ params }: CredentialsProps) {
     const session = useSession();
-
-    const [searchTerm, setSearchTerm] = useState('');
-    const [sortOption, setSortOption] = useState<CredentialsSortOption>('name');
-    const [selectedTypes, setSelectedTypes] = useState<CredentialsType[]>([]);
-    const [hideExpired, setHideExpired] = useState(false);
+    const [activeTab, setActiveTab] = useState<TabType>('shared');
+    const [filters, setFilters] = useState({
+        searchTerm: '',
+        sortOption: 'name' as CredentialsSortOption,
+        selectedTypes: [] as CredentialsType[],
+        hideExpired: false,
+    });
     const [currentPage, setCurrentPage] = useState(1);
-
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const [isRequestDialogOpen, setRequestDialogOpen] = useState(false);
 
@@ -41,29 +44,71 @@ export default function CredentialsPage({ params }: CredentialsProps) {
     if (credentials === undefined || credentialsRequests === undefined) return <LoadingScreen />;
     if (!session || !session.data || !session.data.user) return <LoadingScreen />;
 
-    const filteredCredentials = credentials
-        .filter(cred =>
-            cred.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            (selectedTypes.length === 0 || selectedTypes.includes(cred.type as CredentialsType)) &&
-            (!hideExpired || isCredentialsActive(cred))
-        )
-        .sort((a, b) => {
-            if (sortOption === 'createdAtAsc') return Number(a._creationTime) - Number(b._creationTime);
-            if (sortOption === 'createdAtDesc') return Number(b._creationTime) - Number(a._creationTime);
-            if (sortOption === 'updatedAt') return Number(a.updatedAt ?? 0) - Number(b.updatedAt ?? 0);
+    const filterItems = <T extends Credentials | CredentialsRequest>(items: T[], isCredentials: boolean): T[] => {
+        return items.filter(item =>
+            item.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) &&
+            (filters.selectedTypes.length === 0 || filters.selectedTypes.includes((isCredentials ? (item as Credentials).type : (item as CredentialsRequest).credentials[0]?.type) as CredentialsType)) &&
+            (isCredentials ? (!filters.hideExpired || isCredentialsActive(item as Credentials)) : true)
+        ).sort((a, b) => {
+            if (filters.sortOption === 'createdAtAsc') return Number(a._creationTime) - Number(b._creationTime);
+            if (filters.sortOption === 'createdAtDesc') return Number(b._creationTime) - Number(a._creationTime);
+            if (filters.sortOption === 'updatedAt') return Number(a.updatedAt ?? 0) - Number(b.updatedAt ?? 0);
             return a.name.localeCompare(b.name);
         });
-
-    const isFiltered = searchTerm || selectedTypes.length > 0 || hideExpired;
-    const itemsPerPage = 14;
-    const totalPages = Math.ceil(filteredCredentials.length / itemsPerPage);
-    const paginatedCredentials = filteredCredentials.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-    function resetFilters() {
-        setSearchTerm('');
-        setSelectedTypes([]);
-        setHideExpired(false);
     };
+
+    const filteredItems = activeTab === 'shared' ? filterItems(credentials, true) : filterItems(credentialsRequests, false);
+
+    const isFiltered = filters.searchTerm || filters.selectedTypes.length > 0 || (activeTab === 'shared' && filters.hideExpired);
+    const itemsPerPage = 14;
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const resetFilters = () => setFilters({
+        searchTerm: '',
+        sortOption: 'name',
+        selectedTypes: [],
+        hideExpired: false,
+    });
+
+    const renderContent = (type: TabType) => (
+        (type === 'shared' ? credentials : credentialsRequests).length === 0 ? (
+            <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
+                <p className='text-lg'>{type === 'shared' ? "You don't have any credentials yet" : "No credential requests yet"}</p>
+                <NewCredentialsDialog
+                    isOpen={type === 'shared' ? isCreateDialogOpen : isRequestDialogOpen}
+                    setIsOpen={type === 'shared' ? setCreateDialogOpen : setRequestDialogOpen}
+                    formType={type === 'shared' ? "new" : "request"}
+                >
+                    <Button className='gap-2' variant="outline">
+                        <PlusIcon className='w-4 h-4' />
+                        {type === 'shared' ? "New credentials" : "New credentials request"}
+                    </Button>
+                </NewCredentialsDialog>
+            </div>
+        ) : (
+            <div className='flex flex-col flex-grow gap-4 pt-4'>
+                <CredentialsSortControls
+                    {...filters}
+                    onSearchChange={(searchTerm) => setFilters({ ...filters, searchTerm })}
+                    onSortChange={(sortOption) => setFilters({ ...filters, sortOption: sortOption as CredentialsSortOption })}
+                    onTypeChange={(types) => setFilters({ ...filters, selectedTypes: types as CredentialsType[] })}
+                    onHideExpiredChange={(hideExpired) => setFilters({ ...filters, hideExpired })}
+                    showHideExpired={type === 'shared'}
+                />
+                {paginatedItems.length === 0 && isFiltered ? (
+                    <EmptySearch onResetFilters={resetFilters} />
+                ) : (
+                    <CredentialsList
+                        items={paginatedItems}
+                        type={type}
+                        currentPage={currentPage}
+                        itemsPerPage={itemsPerPage}
+                    />
+                )}
+            </div>
+        )
+    );
 
     return (
         <div className="flex flex-col h-full">
@@ -94,90 +139,28 @@ export default function CredentialsPage({ params }: CredentialsProps) {
             </div>
             <Separator />
             <div className={`${totalPages > 1 && 'pb-10'} overflow-auto`}>
-                <Tabs defaultValue="shared" className='px-8 py-4'>
+                <Tabs defaultValue="shared" className='px-8 py-4' onValueChange={(value) => setActiveTab(value as TabType)}>
                     <TabsList>
                         <TabsTrigger value="shared">Shared</TabsTrigger>
                         <TabsTrigger value="requested">Requested</TabsTrigger>
                     </TabsList>
                     <TabsContent value="shared">
-                        {credentials.length === 0 ? (
-                            <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
-                                <p className='text-lg'>You don&apos;t have any credentials yet</p>
-                                <NewCredentialsDialog
-                                    isOpen={isCreateDialogOpen}
-                                    setIsOpen={setCreateDialogOpen}
-                                    formType="new"
-                                >
-                                    <Button className='gap-2' variant="outline">
-                                        <PlusIcon className='w-4 h-4' />
-                                        New credentials
-                                    </Button>
-                                </NewCredentialsDialog>
-                            </div>
-                        ) : (
-                            <div className='flex flex-col flex-grow gap-4 pt-4'>
-                                <CredentialsSortControls
-                                    searchTerm={searchTerm}
-                                    onSearchChange={setSearchTerm}
-                                    sortOption={sortOption}
-                                    onSortChange={(value: string) => setSortOption(value as CredentialsSortOption)}
-                                    selectedTypes={selectedTypes}
-                                    onTypeChange={types => setSelectedTypes(types as CredentialsType[])}
-                                    hideExpired={hideExpired}
-                                    onHideExpiredChange={setHideExpired}
-                                />
-                                {paginatedCredentials.length === 0 && isFiltered ? (
-                                    <EmptySearch onResetFilters={resetFilters} />
-                                ) : (
-                                    <CredentialsList
-                                        items={filteredCredentials}
-                                        type="shared"
-                                        currentPage={currentPage}
-                                        itemsPerPage={itemsPerPage}
-                                    />
-                                )}
-                            </div >
-                        )}
+                        {renderContent('shared')}
                     </TabsContent>
                     <TabsContent value="requested">
-                        {credentialsRequests.length === 0 ? (
-                            <div className='flex flex-col justify-center items-center gap-4 w-full h-full'>
-                                <p className='text-lg'>No credential requests yet</p>
-                                <NewCredentialsDialog
-                                    isOpen={isRequestDialogOpen}
-                                    setIsOpen={setRequestDialogOpen}
-                                    formType="request"
-                                >
-                                    <Button className='gap-2' variant="outline">
-                                        <PlusIcon className='w-4 h-4' />
-                                        New credentials request
-                                    </Button>
-                                </NewCredentialsDialog>
-                            </div>
-                        ) : (
-                            <div className='flex flex-col flex-grow gap-4 pt-4'>
-                                <CredentialsList
-                                    items={credentialsRequests}
-                                    type="requested"
-                                    currentPage={currentPage}
-                                    itemsPerPage={itemsPerPage}
-                                />
-                            </div>
-                        )}
+                        {renderContent('requested')}
                     </TabsContent>
                 </Tabs>
             </div>
-            {
-                totalPages > 1 && (
-                    <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10">
-                        <PagePagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            setCurrentPage={setCurrentPage}
-                        />
-                    </div>
-                )
-            }
-        </div >
+            {totalPages > 1 && (
+                <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10">
+                    <PagePagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        setCurrentPage={setCurrentPage}
+                    />
+                </div>
+            )}
+        </div>
     );
 }
