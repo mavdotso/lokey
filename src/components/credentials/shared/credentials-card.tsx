@@ -5,9 +5,9 @@ import { HashtagBadge } from "../hashtag-badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { formatTimestamp } from "@/lib/utils";
 import UserAvatar from "@/components/global/user-avatar";
-import { CredentialsActions } from "../credentials-actions";
 import { RequestedCredentialsActions } from "../requested/requested-credentials-actions";
 import { EyeIcon, KeyIcon, TimerIcon } from "lucide-react";
+import { CredentialsActions } from "./credentials-actions";
 
 interface CredentialsCardProps {
     item: Credentials | CredentialsRequest;
@@ -71,13 +71,7 @@ export function CredentialsCard({ item, type, onViewCredentials }: CredentialsCa
                             <UserAvatar user={creator} />
                         </div>
                     )}
-                    {isCredentials ? (
-                        <CredentialsActions credentials={item as Credentials} />
-                    ) : (
-                        <RequestedCredentialsActions
-                            credentialsRequest={item as CredentialsRequest}
-                        />
-                    )}
+                    <CredentialsActions item={item} type={type} />
                 </div>
             </div>
         </div>

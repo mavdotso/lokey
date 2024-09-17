@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useMutation } from 'convex/react';
 import { encryptData, generateShareLink } from '@/lib/utils';
 import { api } from '@/convex/_generated/api';
-import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link';
+import { CopyCredentialsLink } from '@/components/credentials/shared/copy-credentials-link';
 import { SubmitButton } from '@/components/global/submit-button';
 
 export default function LandingPage() {
