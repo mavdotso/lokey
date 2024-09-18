@@ -15,6 +15,7 @@ export const createWorkspace = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
+        
         if (!identity) {
             throw new Error('User is not authenticated');
         }

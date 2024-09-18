@@ -1,7 +1,7 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { currencyValidator, planTypeValidator, pricesValidator, pricingTypeValidator } from './schema';
+import { currencyValidator, intervalValidator, planTypeValidator, pricingTypeValidator, subscriptionStatusValidator } from './schema';
 
 export const getWorkspaceSubscriptionStatus = query({
     args: { workspaceId: v.id('workspaces') },
@@ -28,9 +28,9 @@ export const createSubscription = mutation({
     args: {
         workspaceId: v.id('workspaces'),
         priceId: v.id('prices'),
-        status: v.union(v.literal('active'), v.literal('unpaid'), v.literal('past_due'), v.literal('incomplete_expired'), v.literal('incomplete'), v.literal('canceled'), v.literal('trialing')),
-        currentPeriodStart: v.string(),
-        currentPeriodEnd: v.string(),
+        status: subscriptionStatusValidator,
+        currentPeriodStart: v.number(),
+        currentPeriodEnd: v.number(),
         cancelAtPeriodEnd: v.boolean(),
         planType: planTypeValidator,
     },
@@ -56,9 +56,7 @@ export const createSubscription = mutation({
             currentPeriodStart: args.currentPeriodStart,
             currentPeriodEnd: args.currentPeriodEnd,
             cancelAtPeriodEnd: args.cancelAtPeriodEnd,
-            planType: args.planType,
             created: new Date().toISOString(),
-            // TODO: fix this wtf
             usageLimits: {
                 secretsPerMonth: 0,
                 secretRequestsAndChats: 0,
@@ -67,11 +65,8 @@ export const createSubscription = mutation({
                 teamSize: 1,
                 apiAccess: false,
             },
+            quantity: 1,
             stripeId: '',
-            currency: 'USD',
-            interval: 'MONTH',
-            planId: '',
-            priceStripeId: '',
         });
         return { subscriptionId };
     },
@@ -82,11 +77,9 @@ export const updateSubscription = mutation({
         subscriptionId: v.id('subscriptions'),
         updates: v.object({
             priceId: v.optional(v.id('prices')),
-            status: v.optional(
-                v.union(v.literal('active'), v.literal('unpaid'), v.literal('past_due'), v.literal('incomplete_expired'), v.literal('incomplete'), v.literal('canceled'), v.literal('trialing'))
-            ),
-            currentPeriodStart: v.optional(v.string()),
-            currentPeriodEnd: v.optional(v.string()),
+            status: subscriptionStatusValidator,
+            currentPeriodStart: v.optional(v.number()),
+            currentPeriodEnd: v.optional(v.number()),
             cancelAtPeriodEnd: v.optional(v.boolean()),
         }),
     },
@@ -164,16 +157,13 @@ export const getAllPrices = query({
 export const createPrice = mutation({
     args: {
         productId: v.id('products'),
-        // TODO: type here or in the schema may be incorrect
-        type: pricesValidator,
+        type: pricingTypeValidator,
         unitAmount: v.number(),
         currency: currencyValidator,
-        recurring: v.optional(
-            v.object({
-                interval: v.string(),
-                intervalCount: v.number(),
-            })
-        ),
+        recurring: v.object({
+            interval: intervalValidator,
+            intervalCount: v.number(),
+        }),
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
@@ -186,6 +176,9 @@ export const createPrice = mutation({
             type: args.type,
             unitAmount: args.unitAmount,
             currency: args.currency,
+            active: true,
+            stripeId: '',
+            interval: args.recurring.interval,
         });
 
         return { priceId };

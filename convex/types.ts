@@ -1,14 +1,14 @@
 import { Id } from './_generated/dataModel';
 import { CREDENTIALS_TYPES, CURRENCIES, INTERVALS, INVITES, PLANS, PRICING, ROLES, SUBSCRIPTION_STATUS } from './schema';
 
-export type CredentialsType = keyof typeof CREDENTIALS_TYPES;
-export type RoleType = keyof typeof ROLES;
-export type PlanType = keyof typeof PLANS;
-export type InviteType = keyof typeof INVITES;
-export type CurrencyType = keyof typeof CURRENCIES;
-export type IntervalType = keyof typeof INTERVALS;
-export type PricingType = keyof typeof PRICING;
-export type SubscriptionStatusType = keyof typeof SUBSCRIPTION_STATUS;
+export type CredentialsType = (typeof CREDENTIALS_TYPES)[keyof typeof CREDENTIALS_TYPES];
+export type RoleType = (typeof ROLES)[keyof typeof ROLES];
+export type PlanType = (typeof PLANS)[keyof typeof PLANS];
+export type InviteType = (typeof INVITES)[keyof typeof INVITES];
+export type CurrencyType = (typeof CURRENCIES)[keyof typeof CURRENCIES];
+export type IntervalType = (typeof INTERVALS)[keyof typeof INTERVALS];
+export type PricingType = (typeof PRICING)[keyof typeof PRICING];
+export type SubscriptionStatusType = (typeof SUBSCRIPTION_STATUS)[keyof typeof SUBSCRIPTION_STATUS];
 
 /* APP TYPES */
 export type Workspace = {
@@ -22,6 +22,7 @@ export type Workspace = {
     defaultInvite?: Id<'workspaceInvites'>;
     planType: PlanType;
     customer?: Id<'customers'>;
+    currentSubscription?: Id<'subscriptions'>;
 };
 
 export type UserWorkspace = {
@@ -102,40 +103,35 @@ export type UsageTracking = {
 };
 
 /* STRIPE TYPES */
-
 export type Customer = {
     _id?: Id<'customers'>;
     _creationTime?: number;
-    stripeCustomerId?: string;
+    stripeCustomerId: string;
 };
 
 export type Product = {
     _id?: Id<'products'>;
     _creationTime?: number;
-    active?: boolean;
-    name?: string;
+    stripeId: string;
+    active: boolean;
+    name: string;
     description?: string;
     image?: string;
     metadata?: any;
-    key: PlanType;
-    stripeId: string;
-    prices: {
-        [K in IntervalType]: {
-            [C in CurrencyType]: number;
-        };
-    };
+    prices?: Id<'prices'>[];
 };
 
 export type Price = {
     _id?: Id<'prices'>;
     _creationTime?: number;
-    productId?: Id<'products'>;
-    active?: boolean;
+    stripeId: string;
+    productId: Id<'products'>;
+    active: boolean;
     description?: string;
-    unitAmount?: number;
-    currency?: string;
-    type?: PricingType;
-    interval?: IntervalType;
+    unitAmount: number;
+    currency: CurrencyType;
+    type: PricingType;
+    interval: IntervalType;
     intervalCount?: number;
     trialPeriodDays?: number;
     metadata?: any;
@@ -145,30 +141,23 @@ export type Subscription = {
     _id?: Id<'subscriptions'>;
     _creationTime?: number;
     workspaceId: Id<'workspaces'>;
-    status?: SubscriptionStatusType;
-    metadata?: any;
-    priceId?: Id<'prices'>;
-    quantity?: number;
-    cancelAtPeriodEnd?: boolean;
+    status: SubscriptionStatusType;
+    priceId: Id<'prices'>;
+    quantity: number;
+    cancelAtPeriodEnd: boolean;
     created: string;
-    currentPeriodStart: string;
-    currentPeriodEnd: string;
+    currentPeriodStart: number;
+    currentPeriodEnd: number;
     endedAt?: string;
     cancelAt?: string;
     canceledAt?: string;
     trialStart?: string;
     trialEnd?: string;
-    planType: PlanType;
     usageLimits: UsageLimit;
-    planId: Id<'products'>;
-    priceStripeId: string;
     stripeId: string;
-    currency: CurrencyType;
-    interval: IntervalType;
 };
 
 /* NEXTAUTH TYPES */
-
 export type User = {
     _id?: Id<'users'>;
     _creationTime?: number;
@@ -182,7 +171,7 @@ export type User = {
     twoFactorEnabled: boolean;
     lastLogin?: string;
     defaultWorkspace?: Id<'workspaces'>;
-    customerId?: string;
+    customerId?: Id<'customers'>;
 };
 
 export type Session = {

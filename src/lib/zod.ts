@@ -24,3 +24,11 @@ export const CreateSpaceFormSchema = z.object({
 export const UploadBannerFormSchema = z.object({
     banner: z.string().describe('Banner Image'),
 });
+
+export const username = z
+    .string()
+    .min(3)
+    .max(20)
+    .toLowerCase()
+    .trim()
+    .regex(/^[a-zA-Z0-9]+$/, 'Username may only contain alphanumeric characters.');
