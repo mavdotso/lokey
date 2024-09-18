@@ -34,6 +34,7 @@ export const CURRENCIES = { USD: 'usd', EUR: 'eur' } as const;
 export const INTERVALS = { DAY: 'day', WEEK: 'week', MONTH: 'month', YEAR: 'year' } as const;
 export const PRICING = { RECURRING: 'recurring', ONE_TIME: 'one_time' } as const;
 export const SUBSCRIPTION_STATUS = {
+    PAUSED: 'paused',
     UNPAID: 'unpaid',
     PAST_DUE: 'past_due',
     INCOMPLETE_EXPIRED: 'incomplete_expired',

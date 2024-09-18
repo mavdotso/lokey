@@ -5,6 +5,7 @@ import { Price, Product, Subscription } from './types';
 import { internal } from './_generated/api';
 import { subscriptionSchema } from './schema';
 import Stripe from 'stripe';
+import { getURL } from '@/lib/utils';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
     apiVersion: '2024-06-20',
@@ -210,6 +211,93 @@ export const manageSubscriptionStatusChange = action({
                 });
             }
         }
+    },
+});
+
+export const createBillingPortalSession = mutation({
+    args: { userId: v.id('users') },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+        if (!user || !user.customerId) {
+            throw new Error('User not found or has no associated customer');
+        }
+
+        const customer = await ctx.db.get(user.customerId);
+        if (!customer) {
+            throw new Error('Customer not found');
+        }
+
+        const { url } = await stripe.billingPortal.sessions.create({
+            customer: customer.stripeCustomerId as string,
+            return_url: `${getURL()}/dashboard`,
+        });
+
+        return { url };
+    },
+});
+
+export const createCheckoutSession = mutation({
+    args: {
+        userId: v.id('users'),
+        priceId: v.string(),
+        quantity: v.optional(v.number()),
+        metadata: v.optional(v.any()),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const customerIdOrUndefined = await createOrRetrieveCustomer(ctx, { email: user.email, userId: args.userId });
+
+        if (!customerIdOrUndefined) {
+            throw new Error('Failed to create or retrieve customer');
+        }
+
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            billing_address_collection: 'required',
+            customer: customerIdOrUndefined,
+            line_items: [
+                {
+                    price: args.priceId,
+                    quantity: args.quantity || 1,
+                },
+            ],
+            mode: 'subscription',
+            allow_promotion_codes: true,
+            subscription_data: { metadata: args.metadata },
+            success_url: `${getURL()}/dashboard`,
+            cancel_url: `${getURL()}/dashboard`,
+        });
+
+        return { sessionId: session.id };
+    },
+});
+
+export const getWorkspaceIdByCustomerId = internalQuery({
+    args: { customerId: v.string() },
+    handler: async (ctx, args) => {
+        const customer = await ctx.db
+            .query('customers')
+            .withIndex('stripeCustomerId', (q) => q.eq('stripeCustomerId', args.customerId))
+            .unique();
+
+        if (!customer) {
+            throw new Error('Customer not found');
+        }
+
+        const workspace = await ctx.db
+            .query('workspaces')
+            .filter((q) => q.eq(q.field('customer'), customer._id))
+            .unique();
+
+        if (!workspace) {
+            throw new Error('Workspace not found for customer');
+        }
+
+        return workspace._id;
     },
 });
 
