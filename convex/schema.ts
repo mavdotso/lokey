@@ -1,5 +1,5 @@
 import { defineSchema, defineTable } from 'convex/server';
-import { v } from 'convex/values';
+import { v, Validator } from 'convex/values';
 
 /* APP */
 export const CREDENTIALS_TYPES = {
@@ -211,7 +211,7 @@ const accountSchema = {
     refresh_token: v.optional(v.string()),
     access_token: v.optional(v.string()),
     expires_at: v.optional(v.number()),
-    token_type: v.optional(v.string()),
+    token_type: v.optional(v.string() as Validator<Lowercase<string>>),
     scope: v.optional(v.string()),
     id_token: v.optional(v.string()),
     session_state: v.optional(v.string()),
