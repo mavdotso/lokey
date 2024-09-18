@@ -5,17 +5,15 @@ import { MAX_FREE_WORKSPACES } from '@/lib/consts';
 
 // Helper function to get the current subscription and usage limits
 async function getCurrentSubscription(db: DatabaseReader, workspaceId: Id<'workspaces'>): Promise<{ planType: PlanType; usageLimits: UsageLimit } | null> {
-    const subscription = await db
-        .query('subscriptions')
-        .filter((q) => q.eq(q.field('workspaceId'), workspaceId))
-        .order('desc')
-        .first();
+    const workspace = await db.get(workspaceId);
 
-    if (!subscription) return null;
+    if (!workspace) return null;
+
+    const subscription = workspace.currentSubscription ? await db.get(workspace.currentSubscription) : null;
 
     return {
-        planType: subscription.planType,
-        usageLimits: subscription.usageLimits,
+        planType: workspace.planType,
+        usageLimits: subscription?.usageLimits ?? getDefaultUsageLimits(workspace.planType),
     };
 }
 
@@ -100,4 +98,29 @@ export async function canCreateWorkspace(db: DatabaseReader, userId: Id<'users'>
     }
 
     return true;
+}
+
+function getDefaultUsageLimits(planType: PlanType): UsageLimit {
+    switch (planType) {
+        case 'FREE':
+            return {
+                secretsPerMonth: 10,
+                secretRequestsAndChats: 50,
+                secretAttachmentSize: 1024 * 1024, // 1 MB
+                customDomain: false,
+                teamSize: 3,
+                apiAccess: false,
+            };
+        case 'TEAM':
+            return {
+                secretsPerMonth: 1000,
+                secretRequestsAndChats: 5000,
+                secretAttachmentSize: 10 * 1024 * 1024, // 10 MB
+                customDomain: true,
+                teamSize: 25,
+                apiAccess: true,
+            };
+        default:
+            throw new Error(`Invalid plan type: ${planType}`);
+    }
 }
