@@ -20,7 +20,7 @@ export function CredentialsCard({ item, type }: CredentialsCardProps) {
     function getCredentialsTags(item: Credentials | CredentialsRequest) {
         if (isCredentials) {
             const tags: string[] = [(item as Credentials).type];
-            if ((item as Credentials).type === 'custom') {
+            if ((item as Credentials).type === 'CUSTOM') {
                 tags.push('custom');
             }
             return tags;

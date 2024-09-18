@@ -1,9 +1,9 @@
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { planTypeValidator, roleTypeValidator } from './types';
 import { canCreateWorkspace } from './limits';
 import { createInvite, setInviteExpired } from './invites';
+import { planTypeValidator, roleTypeValidator } from './schema';
 
 export const createWorkspace = mutation({
     args: {
@@ -47,7 +47,7 @@ export const createWorkspace = mutation({
 
         const newInvite = await createInvite(ctx, {
             workspaceId,
-            role: 'member',
+            role: 'MEMBER',
         });
 
         if (newInvite.success && newInvite.data) {
@@ -59,7 +59,7 @@ export const createWorkspace = mutation({
         await ctx.db.insert('userWorkspaces', {
             userId: user._id,
             workspaceId: workspaceId,
-            role: 'admin',
+            role: 'ADMIN',
         });
 
         return { workspaceId };
@@ -150,7 +150,7 @@ export const inviteUserToWorkspace = mutation({
             .filter((q) => q.eq(q.field('workspaceId'), args._id))
             .first();
 
-        if (!inviterWorkspace || inviterWorkspace.role !== 'admin') {
+        if (!inviterWorkspace || inviterWorkspace.role !== 'ADMIN') {
             throw new Error('Unauthorized: Only admins can invite users to this workspace');
         }
 
@@ -382,7 +382,7 @@ export const updateWorkspaceInviteCode = mutation({
 
         const newInvite = await createInvite(ctx, {
             workspaceId: args._id,
-            role: 'member',
+            role: 'MEMBER',
         });
 
         if (!newInvite.success || !newInvite.data) {

@@ -1,8 +1,8 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { credentialsTypeValidator } from './types';
 import { Id } from './_generated/dataModel';
+import { credentialsTypeValidator } from './schema';
 
 export const getCredentialsById = query({
     args: { credentialsId: v.id('credentials') },
@@ -58,7 +58,9 @@ export const createCredentials = mutation({
 export const incrementCredentialsViewCount = mutation({
     args: { _id: v.id('credentials') },
     handler: async (ctx, args) => {
+        
         const credential = await ctx.db.get(args._id);
+
         if (!credential) {
             throw new Error('Credential not found');
         }

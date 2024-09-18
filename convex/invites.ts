@@ -4,13 +4,14 @@ import { nanoid } from 'nanoid';
 import { getViewerId } from './auth';
 import { getUser } from './users';
 import { getURL } from '@/lib/utils';
+import { inviteTypeValidator, roleTypeValidator } from './schema';
 
 export const createInvite = mutation({
     args: {
         workspaceId: v.id('workspaces'),
         invitedUserId: v.optional(v.id('users')),
         invitedEmail: v.optional(v.string()),
-        role: v.union(v.literal('manager'), v.literal('member')),
+        role: roleTypeValidator,
         expiresAt: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
@@ -32,7 +33,7 @@ export const createInvite = mutation({
             invitedUserId: args.invitedUserId,
             invitedEmail: args.invitedEmail,
             role: args.role,
-            status: 'pending',
+            status: 'PENDING',
             expiresAt: args.expiresAt,
             inviteCode,
         });
@@ -44,7 +45,7 @@ export const createInvite = mutation({
 export const respondToInvite = mutation({
     args: {
         _id: v.id('workspaceInvites'),
-        response: v.union(v.literal('accepted'), v.literal('rejected')),
+        response: inviteTypeValidator,
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
@@ -71,7 +72,7 @@ export const respondToInvite = mutation({
 
         await ctx.db.patch(args._id, { status: args.response });
 
-        if (args.response === 'accepted') {
+        if (args.response === 'ACCEPTED') {
             await ctx.db.insert('userWorkspaces', {
                 userId: user._id,
                 workspaceId: invite.workspaceId,
@@ -86,7 +87,7 @@ export const respondToInvite = mutation({
 export const generateInviteLink = mutation({
     args: {
         workspaceId: v.id('workspaces'),
-        role: v.union(v.literal('manager'), v.literal('member')),
+        role: roleTypeValidator,
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
@@ -107,7 +108,7 @@ export const generateInviteLink = mutation({
             workspaceId: args.workspaceId,
             invitedBy: user._id,
             role: args.role,
-            status: 'pending',
+            status: 'PENDING',
             expiresAt: expiresAt.toISOString(),
             inviteCode,
         });
@@ -173,7 +174,7 @@ export const joinWorkspaceByInviteCode = mutation({
             throw new Error('Invalid invite code');
         }
 
-        if (invite.status !== 'pending') {
+        if (invite.status !== 'PENDING') {
             throw new Error('This invite has already been processed');
         }
 
@@ -194,7 +195,7 @@ export const joinWorkspaceByInviteCode = mutation({
         });
 
         if (invite.invitedEmail) {
-            await ctx.db.patch(invite._id, { status: 'accepted' });
+            await ctx.db.patch(invite._id, { status: 'ACCEPTED' });
         }
 
         return { success: true };
@@ -227,7 +228,7 @@ export const setInviteExpired = mutation({
             throw new Error('Invite not found');
         }
 
-        await ctx.db.patch(args._id, { status: 'expired' });
+        await ctx.db.patch(args._id, { status: 'EXPIRED' });
         return { success: true };
     },
 });

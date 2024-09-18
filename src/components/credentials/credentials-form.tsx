@@ -8,9 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner'
 import { DatePicker } from '@/components/global/date-picker'
 import { EyeIcon, EyeOffIcon, PlusIcon, TrashIcon } from 'lucide-react'
-import { Credentials, CredentialsType, credentialsTypes } from '@/convex/types'
+import { Credentials, CredentialsType } from '@/convex/types'
 import { api } from '@/convex/_generated/api'
-import { encryptData, generateShareLink, crypto, getURL } from '@/lib/utils'
+import { encryptData, generateShareLink, crypto, getURL, formatConstantToTitleCase } from '@/lib/utils'
 import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Id } from '@/convex/_generated/dataModel'
@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
 import { credentialsFields } from '@/lib/credentialsFields'
+import { CREDENTIALS_TYPES } from '@/convex/schema'
 
 interface CredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -32,7 +33,7 @@ interface CredentialsFormProps {
 export function CredentialsForm({ setIsOpen, editId, existingData, onCredentialsCreated, onCredentialsUpdated, onDialogClose, formType }: CredentialsFormProps) {
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState('');
-    const [type, setType] = useState<CredentialsType>('password');
+    const [type, setType] = useState<CredentialsType>('PASSWORD');
     const [data, setData] = useState<{ [key: string]: string }>({});
     const [expiresAt, setExpiresAt] = useState<Date | undefined>();
     const [maxViews, setMaxViews] = useState<number>(1);
@@ -42,7 +43,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
     const [secretPhrase, setSecretPhrase] = useState('');
     const [isCompleted, setIsCompleted] = useState(false);
     const [credentials, setCredentials] = useState<Array<{ name: string; description: string; type: CredentialsType }>>(
-        formType === 'request' ? [{ name: '', description: '', type: 'password' }] : []
+        formType === 'request' ? [{ name: '', description: '', type: 'PASSWORD' }] : []
     );
 
     const { slug } = useParams();
@@ -63,7 +64,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
     }, [existingData]);
 
     function addCredential() {
-        setCredentials([...credentials, { name: '', description: '', type: 'password' }]);
+        setCredentials([...credentials, { name: '', description: '', type: 'PASSWORD' }]);
     }
 
     function removeCredential(index: number) {
@@ -164,7 +165,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
     function resetForm() {
         setName('');
         setDescription('');
-        setType('password');
+        setType('PASSWORD');
         setData({});
         setExpiresAt(undefined);
         setMaxViews(1);
@@ -286,9 +287,9 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                                         <SelectValue placeholder="Select a type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {credentialsTypes.map((credType) => (
+                                        {Object.values(CREDENTIALS_TYPES).map((credType) => (
                                             <SelectItem key={credType} value={credType}>
-                                                {credType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                {credentialsFields[credType][0].label}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -325,9 +326,9 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                                 <SelectValue placeholder="Select a type" />
                             </SelectTrigger>
                             <SelectContent>
-                                {credentialsTypes.map((credType) => (
+                                {Object.values(CREDENTIALS_TYPES).map((credType) => (
                                     <SelectItem key={credType} value={credType}>
-                                        {credType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                        {credentialsFields[credType][0].label}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

@@ -3,8 +3,9 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
-import { CredentialsType, credentialsTypes } from '@/convex/types';
-import { capitalizeFirstLetter } from '@/lib/utils';
+import { CredentialsType } from '@/convex/types';
+import { CREDENTIALS_TYPES } from '@/convex/schema';
+import { credentialsFields } from '@/lib/credentialsFields';
 
 interface CredentialsSortControlsProps {
     searchTerm: string;
@@ -20,9 +21,9 @@ interface CredentialsSortControlsProps {
 
 export function CredentialsSortControls({ searchTerm, onSearchChange, sortOption, onSortChange, selectedTypes, onTypeChange, hideExpired, onHideExpiredChange, showHideExpired }: CredentialsSortControlsProps) {
 
-    const credentialTypeOptions = credentialsTypes.map(type => ({
+    const credentialTypeOptions = Object.values(CREDENTIALS_TYPES).map(type => ({
         value: type,
-        label: capitalizeFirstLetter(type).replace('_', ' ')
+        label: credentialsFields[type][0]?.label
     }));
 
     return (

@@ -127,3 +127,7 @@ export function capitalizeFirstLetter(str: string) {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function formatConstantToTitleCase(type: string): string {
+    return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase().replace(/_/g, ' ');
+}

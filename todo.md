@@ -1,12 +1,12 @@
 ### Bugs
 
--   [ ] Fix the DialogContent / CardContent on create-workspace-header.tsx
+-   [x] Fix the DialogContent / CardContent on create-workspace-header.tsx
 -   [ ] Faster redirect after creating the first workspace
 -   [ ] User is not authenticated after avatar upload?
 -   [ ] Can't click anything after editing credentials in popup, maybe something with the clickOutside
 - [ ] submit cred page — all of the fields with the same names fill out at the same time
 
--   [ ] See fulfilled credentials
+-   [x] See fulfilled credentials
 -   [ ] Share page UI
     -   [ ] Hidden fields
 
@@ -20,11 +20,12 @@
     -   [ ] Manager — access to everything (CRUD all credentials) except workspace settings
     -   [ ] Member — access ONLY to CRUD personal credentials
 
--   [ ] Request credentials from clients
+-   [x] Request credentials from clients
 
-    -   [ ] Form builder
+    -   [x] Form builder
     -   [ ] Share via link / email
     -   [ ] Page to input
+        - [ ] UI
 
 -   [ ] Share link via email / text
 

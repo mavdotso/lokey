@@ -16,17 +16,17 @@ interface InviteEmailDialogProps {
     workspace: Workspace;
 }
 
-type InvitableRoleType = Exclude<RoleType, "admin">;
+type InvitableRoleType = Exclude<RoleType, "ADMIN">;
 
 export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
-    const [emails, setEmails] = useState([{ id: 1, value: '', role: 'member' as InvitableRoleType }]);
+    const [emails, setEmails] = useState([{ id: 1, value: '', role: 'MEMBER' as InvitableRoleType }]);
     const createInvite = useMutation(api.invites.createInvite);
     const [isLoading, setIsLoading] = useState(false);
     const baseUrl = getURL();
 
     function addEmailField() {
         const newId = emails.length > 0 ? Math.max(...emails.map(e => e.id)) + 1 : 1;
-        setEmails([...emails, { id: newId, value: '', role: 'member' }]);
+        setEmails([...emails, { id: newId, value: '', role: 'MEMBER' }]);
     };
 
     function removeEmailField(id: number) {

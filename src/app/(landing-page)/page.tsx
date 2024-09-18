@@ -30,7 +30,7 @@ export default function LandingPage() {
             const { credentialsId } = await createCredentials({
                 name: 'Shared Password',
                 description: 'One-time shared password',
-                type: 'password',
+                type: 'PASSWORD',
                 encryptedData: encryptedData,
                 privateKey: privateKey,
                 expiresAt: new Date(Date.now() + parseInt(expiration) * 24 * 60 * 60 * 1000).toISOString(),

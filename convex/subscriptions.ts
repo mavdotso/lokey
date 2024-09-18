@@ -1,7 +1,7 @@
 import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { planTypeValidator } from './types';
+import { currencyValidator, planTypeValidator, pricesValidator, pricingTypeValidator } from './schema';
 
 export const getWorkspaceSubscriptionStatus = query({
     args: { workspaceId: v.id('workspaces') },
@@ -67,6 +67,11 @@ export const createSubscription = mutation({
                 teamSize: 1,
                 apiAccess: false,
             },
+            stripeId: '',
+            currency: 'USD',
+            interval: 'MONTH',
+            planId: '',
+            priceStripeId: '',
         });
         return { subscriptionId };
     },
@@ -159,9 +164,10 @@ export const getAllPrices = query({
 export const createPrice = mutation({
     args: {
         productId: v.id('products'),
-        type: v.union(v.literal('recurring'), v.literal('one_time')),
+        // TODO: type here or in the schema may be incorrect
+        type: pricesValidator,
         unitAmount: v.number(),
-        currency: v.string(),
+        currency: currencyValidator,
         recurring: v.optional(
             v.object({
                 interval: v.string(),

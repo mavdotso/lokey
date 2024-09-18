@@ -64,7 +64,7 @@ export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProp
                 <p className="text-left text-muted-foreground text-sm">
                     {userRole && capitalizeFirstLetter(userRole.toString())}
                 </p>
-                {userRole !== "admin" &&
+                {userRole !== "ADMIN" &&
                     <Button
                         variant="ghost"
                         size="icon"

@@ -1,47 +1,14 @@
-import { v } from 'convex/values';
 import { Id } from './_generated/dataModel';
+import { CREDENTIALS_TYPES, CURRENCIES, INTERVALS, INVITES, PLANS, PRICING, ROLES, SUBSCRIPTION_STATUS } from './schema';
 
-/* CREDENTIALS TYPES */
-export const credentialsTypes = [
-    'password',
-    'login_password',
-    'api_key',
-    'oauth_token',
-    'ssh_key',
-    'ssl_certificate',
-    'env_variable',
-    'database_credentials',
-    'access_key',
-    'encryption_key',
-    'jwt_token',
-    'two_factor_secret',
-    'webhook_secret',
-    'smtp_credentials',
-    'ftp_credentials',
-    'vpn_credentials',
-    'dns_credentials',
-    'device_key',
-    'key_value',
-    'custom',
-    'other',
-] as const;
-export type CredentialsType = (typeof credentialsTypes)[number];
-export const credentialsTypeValidator = v.union(...credentialsTypes.map(v.literal));
-
-/* USER ROLES TYPES */
-export const roleTypes = ['admin', 'manager', 'member'] as const;
-export type RoleType = (typeof roleTypes)[number];
-export const roleTypeValidator = v.union(...roleTypes.map(v.literal));
-
-/* PLAN TYPES */
-export const planTypes = ['FREE', 'TEAM'] as const;
-export type PlanType = (typeof planTypes)[number];
-export const planTypeValidator = v.union(...planTypes.map(v.literal));
-
-/* INVITE TYPES */
-export const inviteTypes = ['accepted', 'rejected', 'expired', 'pending'] as const;
-export type InviteType = (typeof inviteTypes)[number];
-export const inviteTypeValidator = v.union(...inviteTypes.map(v.literal));
+export type CredentialsType = keyof typeof CREDENTIALS_TYPES;
+export type RoleType = keyof typeof ROLES;
+export type PlanType = keyof typeof PLANS;
+export type InviteType = keyof typeof INVITES;
+export type CurrencyType = keyof typeof CURRENCIES;
+export type IntervalType = keyof typeof INTERVALS;
+export type PricingType = keyof typeof PRICING;
+export type SubscriptionStatusType = keyof typeof SUBSCRIPTION_STATUS;
 
 /* APP TYPES */
 export type Workspace = {
@@ -150,6 +117,13 @@ export type Product = {
     description?: string;
     image?: string;
     metadata?: any;
+    key: PlanType;
+    stripeId: string;
+    prices: {
+        [K in IntervalType]: {
+            [C in CurrencyType]: number;
+        };
+    };
 };
 
 export type Price = {
@@ -160,8 +134,8 @@ export type Price = {
     description?: string;
     unitAmount?: number;
     currency?: string;
-    type?: 'recurring' | 'one_time';
-    interval?: 'year' | 'month' | 'week' | 'day';
+    type?: PricingType;
+    interval?: IntervalType;
     intervalCount?: number;
     trialPeriodDays?: number;
     metadata?: any;
@@ -171,7 +145,7 @@ export type Subscription = {
     _id?: Id<'subscriptions'>;
     _creationTime?: number;
     workspaceId: Id<'workspaces'>;
-    status?: 'unpaid' | 'past_due' | 'incomplete_expired' | 'incomplete' | 'canceled' | 'active' | 'trialing';
+    status?: SubscriptionStatusType;
     metadata?: any;
     priceId?: Id<'prices'>;
     quantity?: number;
@@ -186,6 +160,11 @@ export type Subscription = {
     trialEnd?: string;
     planType: PlanType;
     usageLimits: UsageLimit;
+    planId: Id<'products'>;
+    priceStripeId: string;
+    stripeId: string;
+    currency: CurrencyType;
+    interval: IntervalType;
 };
 
 /* NEXTAUTH TYPES */
@@ -203,6 +182,7 @@ export type User = {
     twoFactorEnabled: boolean;
     lastLogin?: string;
     defaultWorkspace?: Id<'workspaces'>;
+    customerId?: string;
 };
 
 export type Session = {

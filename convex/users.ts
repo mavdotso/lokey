@@ -1,7 +1,7 @@
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
-import { roleTypeValidator } from './types';
+import { roleTypeValidator } from './schema';
 
 export const getUser = query({
     args: { _id: v.id('users') },
@@ -54,7 +54,7 @@ export const checkUserPermission = query({
             return { hasPermission: false, message: 'User is not a member of this workspace' };
         }
 
-        const roleHierarchy = { admin: 3, manager: 2, member: 1 };
+        const roleHierarchy = { ADMIN: 3, MANAGER: 2, MEMBER: 1 };
         const hasPermission = roleHierarchy[userWorkspace.role] >= roleHierarchy[args.requiredRole];
 
         return { hasPermission, userRole: userWorkspace.role };

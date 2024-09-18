@@ -1,23 +1,58 @@
 import { defineSchema, defineTable } from 'convex/server';
-import { v, Validator } from 'convex/values';
-import { credentialsTypeValidator, inviteTypeValidator, planTypeValidator, roleTypeValidator } from './types';
+import { v } from 'convex/values';
 
-const userRole = roleTypeValidator;
-const credentialsType = credentialsTypeValidator;
-const planTypes = planTypeValidator;
-const inviteTypes = inviteTypeValidator;
+export const CREDENTIALS_TYPES = {
+    PASSWORD: 'PASSWORD',
+    LOGIN_PASSWORD: 'LOGIN_PASSWORD',
+    API_KEY: 'API_KEY',
+    OAUTH_TOKEN: 'OAUTH_TOKEN',
+    SSH_KEY: 'SSH_KEY',
+    SSL_CERTIFICATE: 'SSL_CERTIFICATE',
+    ENV_VARIABLE: 'ENV_VARIABLE',
+    DATABASE_CREDENTIALS: 'DATABASE_CREDENTIALS',
+    ACCESS_KEY: 'ACCESS_KEY',
+    ENCRYPTION_KEY: 'ENCRYPTION_KEY',
+    JWT_TOKEN: 'JWT_TOKEN',
+    TWO_FACTOR_SECRET: 'TWO_FACTOR_SECRET',
+    WEBHOOK_SECRET: 'WEBHOOK_SECRET',
+    SMTP_CREDENTIALS: 'SMTP_CREDENTIALS',
+    FTP_CREDENTIALS: 'FTP_CREDENTIALS',
+    VPN_CREDENTIALS: 'VPN_CREDENTIALS',
+    DNS_CREDENTIALS: 'DNS_CREDENTIALS',
+    DEVICE_KEY: 'DEVICE_KEY',
+    KEY_VALUE: 'KEY_VALUE',
+    CUSTOM: 'CUSTOM',
+    OTHER: 'OTHER',
+} as const;
 
-const pricingType = v.union(v.literal('recurring'), v.literal('one_time'));
-const pricingPlanInterval = v.union(v.literal('year'), v.literal('month'), v.literal('week'), v.literal('day'));
-const subscriptionStatus = v.union(
-    v.literal('unpaid'),
-    v.literal('past_due'),
-    v.literal('incomplete_expired'),
-    v.literal('incomplete'),
-    v.literal('canceled'),
-    v.literal('active'),
-    v.literal('trialing')
-);
+export const ROLES = { ADMIN: 'ADMIN', MANAGER: 'MANAGER', MEMBER: 'MEMBER' } as const;
+export const INVITES = { ACCEPTED: 'ACCEPTED', REJECTED: 'REJECTED', EXPIRED: 'EXPIRED', PENDING: 'PENDING' } as const;
+
+export const CURRENCIES = { USD: 'USD', EUR: 'EUR' } as const;
+export const INTERVALS = { MONTH: 'MONTH', YEAR: 'YEAR' } as const;
+export const PLANS = { FREE: 'FREE', TEAM: 'TEAM' } as const;
+export const PRICING = { RECURRING: 'RECCURING', ONE_TIME: 'ONE_TIME' };
+
+export const SUBSCRIPTION_STATUS = {
+    UNPAID: 'unpaid',
+    PAST_DUE: 'past_due',
+    INCOMPLETE_EXPIRED: 'incomplete_expired',
+    INCOMPLETE: 'incomplete',
+    CANCELED: 'canceled',
+    ACTIVE: 'active',
+    TRIALING: 'trialing',
+} as const;
+
+export const roleTypeValidator = v.union(...Object.values(ROLES).map(v.literal));
+export const credentialsTypeValidator = v.union(...Object.values(CREDENTIALS_TYPES).map(v.literal));
+export const inviteTypeValidator = v.union(...Object.values(INVITES).map(v.literal));
+export const currencyValidator = v.union(...Object.values(CURRENCIES).map(v.literal));
+export const intervalValidator = v.union(...Object.values(INTERVALS).map(v.literal));
+export const planTypeValidator = v.union(...Object.values(PLANS).map(v.literal));
+export const pricesValidator = v.object(Object.fromEntries(Object.values(CURRENCIES).map((currency) => [currency, v.number()])));
+export const subscriptionStatusValidator = v.union(...Object.values(SUBSCRIPTION_STATUS).map(v.literal));
+export const pricingTypeValidator = v.union(...Object.values(PRICING).map(v.literal));
+
 
 const workspaceSchema = {
     ownerId: v.id('users'),
@@ -26,14 +61,14 @@ const workspaceSchema = {
     iconId: v.string(),
     logo: v.optional(v.string()),
     defaultInvite: v.optional(v.id('workspaceInvites')),
-    planType: planTypes,
+    planType: planTypeValidator,
     customer: v.optional(v.id('customers')),
 };
 
 const userWorkspaceSchema = {
     userId: v.id('users'),
     workspaceId: v.id('workspaces'),
-    role: userRole,
+    role: roleTypeValidator,
 };
 
 const credentialsSchema = {
@@ -41,7 +76,7 @@ const credentialsSchema = {
     name: v.string(),
     description: v.optional(v.string()),
     createdBy: v.optional(v.id('users')),
-    type: credentialsType,
+    type: credentialsTypeValidator,
     encryptedData: v.string(),
     privateKey: v.string(),
     updatedAt: v.string(),
@@ -60,7 +95,7 @@ const credentialsRequestSchema = {
         v.object({
             name: v.string(),
             description: v.optional(v.string()),
-            type: credentialsType,
+            type: credentialsTypeValidator,
             encryptedValue: v.optional(v.string()),
         })
     ),
@@ -75,8 +110,8 @@ const workspaceInviteSchema = {
     invitedBy: v.id('users'),
     invitedUserId: v.optional(v.id('users')),
     invitedEmail: v.optional(v.string()),
-    role: userRole,
-    status: inviteTypes,
+    role: roleTypeValidator,
+    status: inviteTypeValidator,
     expiresAt: v.optional(v.string()),
     inviteCode: v.optional(v.string()),
 };
@@ -93,7 +128,7 @@ const usageLimitSchema = {
 const usageTrackingSchema = {
     userId: v.id('users'),
     workspaceId: v.id('workspaces'),
-    month: v.string(), // Format: "YYYY-MM"
+    month: v.string(),
     secretsCreated: v.number(),
     secretRequestsAndChats: v.number(),
     largestAttachmentSize: v.number(),
@@ -110,6 +145,12 @@ const productSchema = {
     description: v.optional(v.string()),
     image: v.optional(v.string()),
     metadata: v.optional(v.any()),
+    key: planTypeValidator,
+    stripeId: v.string(),
+    prices: v.object({
+        [INTERVALS.MONTH]: pricesValidator,
+        [INTERVALS.YEAR]: pricesValidator,
+    }),
 };
 
 const priceSchema = {
@@ -118,8 +159,8 @@ const priceSchema = {
     description: v.optional(v.string()),
     unitAmount: v.optional(v.number()),
     currency: v.optional(v.string()),
-    type: v.optional(pricingType),
-    interval: v.optional(pricingPlanInterval),
+    type: v.optional(pricesValidator),
+    interval: v.optional(intervalValidator),
     intervalCount: v.optional(v.number()),
     trialPeriodDays: v.optional(v.number()),
     metadata: v.optional(v.any()),
@@ -127,7 +168,7 @@ const priceSchema = {
 
 const subscriptionSchema = {
     workspaceId: v.id('workspaces'),
-    status: v.optional(subscriptionStatus),
+    status: v.optional(subscriptionStatusValidator),
     metadata: v.optional(v.any()),
     priceId: v.optional(v.id('prices')),
     quantity: v.optional(v.number()),
@@ -140,13 +181,16 @@ const subscriptionSchema = {
     canceledAt: v.optional(v.string()),
     trialStart: v.optional(v.string()),
     trialEnd: v.optional(v.string()),
-    // Custom limits
-    planType: planTypes,
+    planType: planTypeValidator,
     usageLimits: v.object(usageLimitSchema),
+    planId: v.id('products'),
+    priceStripeId: v.string(),
+    stripeId: v.string(),
+    currency: currencyValidator,
+    interval: intervalValidator,
 };
 
 /* NEXTAUTH SCHEMA*/
-
 const userSchema = {
     email: v.string(),
     name: v.optional(v.string()),
@@ -158,6 +202,7 @@ const userSchema = {
     twoFactorEnabled: v.boolean(),
     lastLogin: v.optional(v.string()),
     defaultWorkspace: v.optional(v.id('workspaces')),
+    customerId: v.optional(v.string()),
 };
 
 const sessionSchema = {
@@ -174,7 +219,7 @@ const accountSchema = {
     refresh_token: v.optional(v.string()),
     access_token: v.optional(v.string()),
     expires_at: v.optional(v.number()),
-    token_type: v.optional(v.string() as Validator<Lowercase<string>>),
+    token_type: v.optional(v.string()),
     scope: v.optional(v.string()),
     id_token: v.optional(v.string()),
     session_state: v.optional(v.string()),
@@ -197,10 +242,9 @@ const authenticatorSchema = {
     transports: v.optional(v.string()),
 };
 
-// Define tables
 const schema = defineSchema({
     workspaces: defineTable(workspaceSchema),
-    users: defineTable(userSchema).index('email', ['email']),
+    users: defineTable(userSchema).index('email', ['email']).index('customerId', ['customerId']),
     sessions: defineTable(sessionSchema).index('sessionToken', ['sessionToken']).index('userId', ['userId']),
     accounts: defineTable(accountSchema).index('providerAndAccountId', ['provider', 'providerAccountId']).index('userId', ['userId']),
     userWorkspaces: defineTable(userWorkspaceSchema),
@@ -208,9 +252,9 @@ const schema = defineSchema({
     credentialsRequests: defineTable(credentialsRequestSchema).index('workspaceId', ['workspaceId']).index('createdBy', ['createdBy']).index('status', ['status']),
     workspaceInvites: defineTable(workspaceInviteSchema).index('workspaceId', ['workspaceId']).index('invitedUserId', ['invitedUserId']).index('invitedEmail', ['invitedEmail']),
     customers: defineTable(customerSchema),
-    products: defineTable(productSchema),
+    products: defineTable(productSchema).index('key', ['key']).index('stripeId', ['stripeId']),
     prices: defineTable(priceSchema),
-    subscriptions: defineTable(subscriptionSchema),
+    subscriptions: defineTable(subscriptionSchema).index('workspaceId', ['workspaceId']).index('stripeId', ['stripeId']),
     usageTracking: defineTable(usageTrackingSchema).index('userIdAndMonth', ['userId', 'month']).index('workspaceIdAndMonth', ['workspaceId', 'month']),
     authenticators: defineTable(authenticatorSchema).index('userId', ['userId']).index('credentialID', ['credentialID']),
     verificationTokens: defineTable(verificationTokenSchema).index('identifierToken', ['identifier', 'token']),
