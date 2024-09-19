@@ -7,7 +7,7 @@ import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { ImageUpload } from "@/components/global/image-upload";
 import { toast } from 'sonner';
-import { MAX_WORKSPACE_LOGO_SIZE } from '@/lib/consts';
+import { MAX_WORKSPACE_LOGO_SIZE } from '@/lib/config/plan-limits';
 
 interface UploadCardProps {
     title: string;
