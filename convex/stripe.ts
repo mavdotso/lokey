@@ -6,7 +6,7 @@ import { internal } from './_generated/api';
 import { subscriptionSchema } from './schema';
 import Stripe from 'stripe';
 import { getURL } from '@/lib/utils';
-import { getPlanLimits, WORKSPACE_PLAN_LIMITS } from '@/lib/plan-limits';
+import { getPlanLimits, WORKSPACE_PLAN_LIMITS } from '@/lib/config/plan-limits';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
     apiVersion: '2024-06-20',

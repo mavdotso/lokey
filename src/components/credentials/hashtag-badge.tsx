@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { credentialsFields } from '@/lib/credentials-fields';
+import { credentialsFields } from '@/lib/config/credentials-fields';
 
 interface HashtagBadgeProps {
     text: string;

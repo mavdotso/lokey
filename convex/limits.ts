@@ -1,7 +1,7 @@
 import { DatabaseReader } from './_generated/server';
 import { Id } from './_generated/dataModel';
 import { PlanType, UsageLimit } from './types';
-import { getPlanLimits, MAX_FREE_WORKSPACES } from '@/lib/plan-limits';
+import { getPlanLimits, MAX_FREE_WORKSPACES } from '@/lib/config/plan-limits';
 
 // Helper function to get the current subscription and usage limits
 async function getCurrentSubscription(db: DatabaseReader, workspaceId: Id<'workspaces'>): Promise<{ planType: PlanType; usageLimits: UsageLimit } | null> {
@@ -19,7 +19,7 @@ async function getCurrentSubscription(db: DatabaseReader, workspaceId: Id<'works
 
 // Helper function to get current month's usage
 async function getCurrentMonthUsage(db: DatabaseReader, workspaceId: Id<'workspaces'>) {
-    const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+    const currentMonth = new Date().toISOString().slice(0, 7); 
     return await db
         .query('usageTracking')
         .filter((q) => q.eq(q.field('workspaceId'), workspaceId))

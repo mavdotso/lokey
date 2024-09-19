@@ -1,4 +1,4 @@
-import { WORKSPACE_PLAN_LIMITS } from '@/lib/plan-limits';
+import { WORKSPACE_PLAN_LIMITS } from '@/lib/config/plan-limits';
 import { Id } from './_generated/dataModel';
 import { CREDENTIALS_TYPES, CURRENCIES, INTERVALS, INVITES, PLANS, PRICING, ROLES, SUBSCRIPTION_STATUS } from './schema';
 

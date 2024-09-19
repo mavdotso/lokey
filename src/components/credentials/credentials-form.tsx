@@ -17,7 +17,7 @@ import { Id } from '@/convex/_generated/dataModel'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
-import { credentialsFields } from '@/lib/credentials-fields'
+import { credentialsFields } from '@/lib/config/credentials-fields'
 import { CREDENTIALS_TYPES } from '@/convex/schema'
 
 interface CredentialsFormProps {
