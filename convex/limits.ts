@@ -1,7 +1,7 @@
 import { DatabaseReader } from './_generated/server';
 import { Id } from './_generated/dataModel';
 import { PlanType, UsageLimit } from './types';
-import { MAX_FREE_WORKSPACES } from '@/lib/consts';
+import { getPlanLimits, MAX_FREE_WORKSPACES } from '@/lib/plan-limits';
 
 // Helper function to get the current subscription and usage limits
 async function getCurrentSubscription(db: DatabaseReader, workspaceId: Id<'workspaces'>): Promise<{ planType: PlanType; usageLimits: UsageLimit } | null> {
@@ -13,7 +13,7 @@ async function getCurrentSubscription(db: DatabaseReader, workspaceId: Id<'works
 
     return {
         planType: workspace.planType,
-        usageLimits: subscription?.usageLimits ?? getDefaultUsageLimits(workspace.planType),
+        usageLimits: subscription?.usageLimits ?? getPlanLimits(workspace.planType),
     };
 }
 
@@ -98,29 +98,4 @@ export async function canCreateWorkspace(db: DatabaseReader, userId: Id<'users'>
     }
 
     return true;
-}
-
-function getDefaultUsageLimits(planType: PlanType): UsageLimit {
-    switch (planType) {
-        case 'FREE':
-            return {
-                secretsPerMonth: 10,
-                secretRequestsAndChats: 50,
-                secretAttachmentSize: 1024 * 1024, // 1 MB
-                customDomain: false,
-                teamSize: 3,
-                apiAccess: false,
-            };
-        case 'TEAM':
-            return {
-                secretsPerMonth: 1000,
-                secretRequestsAndChats: 5000,
-                secretAttachmentSize: 10 * 1024 * 1024, // 10 MB
-                customDomain: true,
-                teamSize: 25,
-                apiAccess: true,
-            };
-        default:
-            throw new Error(`Invalid plan type: ${planType}`);
-    }
 }

@@ -1,12 +1,8 @@
 import { httpRouter } from 'convex/server';
-import { ActionCtx, httpAction } from './_generated/server';
+import { httpAction } from './_generated/server';
 import Stripe from 'stripe';
 import { stripe } from './stripe';
-import { Doc } from './_generated/dataModel';
-import { CurrencyType, IntervalType } from './types';
 import { api, internal } from './_generated/api';
-import { z } from 'zod';
-import { PLANS } from './schema';
 
 const http = httpRouter();
 

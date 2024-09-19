@@ -1,3 +1,4 @@
+import { WORKSPACE_PLAN_LIMITS } from '@/lib/plan-limits';
 import { Id } from './_generated/dataModel';
 import { CREDENTIALS_TYPES, CURRENCIES, INTERVALS, INVITES, PLANS, PRICING, ROLES, SUBSCRIPTION_STATUS } from './schema';
 
@@ -9,6 +10,9 @@ export type CurrencyType = (typeof CURRENCIES)[keyof typeof CURRENCIES];
 export type IntervalType = (typeof INTERVALS)[keyof typeof INTERVALS];
 export type PricingType = (typeof PRICING)[keyof typeof PRICING];
 export type SubscriptionStatusType = (typeof SUBSCRIPTION_STATUS)[keyof typeof SUBSCRIPTION_STATUS];
+
+export type PlanName = keyof typeof WORKSPACE_PLAN_LIMITS;
+export type PlanLimits = (typeof WORKSPACE_PLAN_LIMITS)[PlanName];
 
 /* APP TYPES */
 export type Workspace = {
@@ -82,25 +86,18 @@ export type WorkspaceInvite = {
     inviteCode?: string;
 };
 
-export type UsageLimit = {
-    secretsPerMonth: number;
-    secretRequestsAndChats: number;
-    secretAttachmentSize: number;
-    customDomain: boolean;
-    teamSize: number;
-    apiAccess: boolean;
-};
-
 export type UsageTracking = {
     _id?: Id<'usageTracking'>;
     _creationTime?: number;
     userId: Id<'users'>;
     workspaceId: Id<'workspaces'>;
-    month: string; // Format: "YYYY-MM"
+    month: string;
     secretsCreated: number;
     secretRequestsAndChats: number;
     largestAttachmentSize: number;
 };
+
+export type UsageLimit = PlanLimits;
 
 /* STRIPE TYPES */
 export type Customer = {

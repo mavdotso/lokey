@@ -17,6 +17,7 @@ import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { useSession } from "next-auth/react";
 import { signout } from "@/lib/server-actions";
 import { SelectCard } from "@/components/dashboard/settings/select-card";
+import BillingSettings from "@/components/dashboard/settings/billing/billing-settings";
 
 const workspaceSettingsItems = [
     { tabName: 'workspaceGeneral', icon: CogIcon, name: 'General' },
@@ -66,8 +67,6 @@ export default function SettingsPage() {
     const editUser = useMutation(api.users.editUser);
     const updateUserAvatar = useMutation(api.users.updateUserAvatar);
     const deleteUserMutation = useMutation(api.users.deleteUser);
-
-
 
     useEffect(() => {
         if (workspace) {
@@ -320,8 +319,7 @@ export default function SettingsPage() {
                                 <UserSettingsCard users={workspaceUsers} workspace={workspace} invites={invites ?? []} />
                             </TabsContent>
                             <TabsContent value="workspaceBilling">
-                                <h2 className="font-bold text-lg">Billing</h2>
-                                <p>Manage the billing for your workspace here.</p>
+                                {user && <BillingSettings user={user} workspace={workspace} />}
                             </TabsContent>
                             <TabsContent value="userGeneral" className="space-y-4">
                                 {userGeneralSettings.map((item, index) => (

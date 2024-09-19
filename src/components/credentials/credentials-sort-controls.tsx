@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { CredentialsType } from '@/convex/types';
 import { CREDENTIALS_TYPES } from '@/convex/schema';
-import { credentialsFields } from '@/lib/credentialsFields';
+import { credentialsFields } from '@/lib/credentials-fields';
 
 interface CredentialsSortControlsProps {
     searchTerm: string;
