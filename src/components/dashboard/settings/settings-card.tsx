@@ -6,14 +6,16 @@ import { Dispatch, SetStateAction } from "react";
 
 export interface SettingsCardProps {
     title: string,
-    description: string,
-    inputValue: string,
-    setInputValue: Dispatch<SetStateAction<string>>
+    description: string | React.ReactNode,
+    inputValue?: string,
+    setInputValue?: Dispatch<SetStateAction<string>>,
     inputPlaceholder?: string,
     isInputRequired?: boolean,
     onSave?: () => void,
     isDangerous?: boolean,
     buttonText?: string,
+    footerText?: string,
+    children?: React.ReactNode,
 }
 
 export function SettingsCard({
@@ -25,7 +27,9 @@ export function SettingsCard({
     isInputRequired,
     onSave,
     isDangerous = false,
-    buttonText = "Save changes"
+    buttonText = "Save changes",
+    footerText,
+    children,
 }: SettingsCardProps) {
     return (
         <Card className={`shadow-none overflow-hidden ${isDangerous ? 'border-destructive' : ''}`}>
@@ -34,14 +38,17 @@ export function SettingsCard({
                 <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent>
-                <Input
-                    placeholder={inputPlaceholder}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    required={isInputRequired}
-                />
+                {children ? children : (
+                    <Input
+                        placeholder={inputPlaceholder}
+                        value={inputValue}
+                        onChange={(e) => setInputValue?.(e.target.value)}
+                        required={isInputRequired}
+                    />
+                )}
             </CardContent>
-            <CardFooter className="flex justify-end items-center gap-2 bg-muted py-4">
+            <CardFooter className="flex justify-between items-center gap-2 bg-muted py-4">
+                {footerText && <p className="text-muted-foreground text-sm">{footerText}</p>}
                 <Button
                     onClick={onSave}
                     variant={isDangerous ? "destructive" : "default"}

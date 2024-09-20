@@ -4,8 +4,7 @@ import { Id } from './_generated/dataModel';
 import { Customer, PlanName, Price, Product, Subscription } from './types';
 import Stripe from 'stripe';
 import { getURL } from '@/lib/utils';
-import { currencyValidator, intervalValidator, planTypeValidator, pricingTypeValidator, subscriptionSchema, subscriptionStatusValidator } from './schema';
-import { getViewerId } from './auth';
+import { planTypeValidator, subscriptionSchema } from './schema';
 import { api, internal } from './_generated/api';
 import { getPlanLimits, WORKSPACE_PLAN_LIMITS } from '@/lib/config/plan-limits';
 
@@ -52,7 +51,7 @@ export const getPrices = query({
     },
 });
 
-// Get a product from Stripe dashboard
+//  Sync the products with the Stripe dashboard
 export const upsertProductRecord = internalMutation({
     args: { product: v.any() },
     handler: async (ctx, args) => {
@@ -82,7 +81,7 @@ export const upsertProductRecord = internalMutation({
     },
 });
 
-// Get price from dashboard
+// Sync the prices with the Stripe dashboard
 export const upsertPriceRecord = internalMutation({
     args: { price: v.any() },
     handler: async (ctx, args) => {
@@ -134,51 +133,47 @@ export const upsertPriceRecord = internalMutation({
     },
 });
 
+//  Retrieve a Stripe customer or create a new one
 export const createOrRetrieveCustomer = action({
     args: {
         email: v.string(),
         userId: v.id('users'),
     },
     handler: async (ctx, args): Promise<string> => {
-        console.log('INSIDE createOrRetrieveCustomer');
-        try {
-            const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
+        const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
 
-            if (!user) {
-                throw new Error('User not found');
-            }
-
-            if (user.customerId) {
-                const customer = await ctx.runQuery(api.stripe.getCustomerById, { customerId: user.customerId });
-                if (customer && customer.stripeCustomerId) {
-                    return customer.stripeCustomerId;
-                }
-            }
-
-            const stripeCustomerId = await ctx.runAction(api.stripe.createStripeCustomer, {
-                email: args.email,
-                userId: args.userId,
-            });
-
-            if (!stripeCustomerId) {
-                throw new Error('Failed to create Stripe customer');
-            }
-
-            const customerId = await ctx.runMutation(internal.stripe.insertCustomer, { userId: user._id, stripeCustomerId });
-
-            if (customerId) {
-                await ctx.runMutation(api.users.updateUser, {
-                    userId: args.userId,
-                    updates: { customerId },
-                });
-            }
-
-            console.log(`New customer created and inserted for ${args.userId}.`);
-            return stripeCustomerId;
-        } catch (error) {
-            console.error('Error in createOrRetrieveCustomer:', error);
-            throw new Error('Failed to create or retrieve customer');
+        if (!user) {
+            throw new Error('User not found');
         }
+
+        if (user.customerId) {
+            const customer = await ctx.runQuery(api.stripe.getCustomerById, { customerId: user.customerId });
+            if (customer && customer.stripeCustomerId) {
+                return customer.stripeCustomerId;
+            }
+        }
+
+        const stripeCustomerId = await ctx.runAction(api.stripe.createStripeCustomer, {
+            email: args.email,
+            userId: args.userId,
+        });
+
+        if (!stripeCustomerId) {
+            throw new Error('Failed to create Stripe customer');
+        }
+
+        const customerId = await ctx.runMutation(internal.stripe.insertCustomer, { userId: user._id, stripeCustomerId });
+
+        if (customerId) {
+            await ctx.runMutation(api.users.updateUser, {
+                userId: args.userId,
+                updates: { customerId },
+            });
+        }
+
+        console.log(`New customer created and inserted for ${args.userId}.`);
+
+        return stripeCustomerId;
     },
 });
 
@@ -286,75 +281,28 @@ export const manageSubscriptionStatusChange = action({
 
 export const createStripeBillingPortalSession = action({
     args: {
-        stripeCustomerId: v.string(),
+        userId: v.id('users'),
         workspaceId: v.id('workspaces'),
     },
     handler: async (ctx, args) => {
+        const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const stripeCustomerId = await createOrRetrieveCustomer(ctx, { email: user.email, userId: args.userId });
+
+        if (!stripeCustomerId) {
+            throw new Error('Failed to create or retrieve customer');
+        }
+
         const { url } = await stripe.billingPortal.sessions.create({
-            customer: args.stripeCustomerId,
+            customer: stripeCustomerId,
             return_url: `${getURL()}/dashboard/`,
         });
+
         return { url };
-    },
-});
-
-export const prepareBillingPortalSession = action({
-    args: { userId: v.id('users') },
-    handler: async (ctx, args): Promise<{ stripeCustomerId: string }> => {
-        try {
-            const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
-
-            console.log('STEP1: User ', user);
-
-            if (!user) {
-                throw new Error('User not found');
-            }
-
-            let customer: Customer | null;
-
-            if (!user.customerId) {
-                console.log('No customer ID. Creating a new customer...');
-                // Create a new customer if the user doesn't have one
-                const stripeCustomerId = await ctx.runAction(api.stripe.createStripeCustomer, {
-                    email: user.email,
-                    userId: args.userId,
-                });
-
-                console.log('New customer:', stripeCustomerId);
-
-                if (!stripeCustomerId) {
-                    console.log('Failed to create customer');
-                    throw new Error('Failed to create customer');
-                }
-
-                // Insert the new customer into the Convex database
-                customer = await ctx.runMutation(internal.stripe.insertCustomer, {
-                    stripeCustomerId: stripeCustomerId,
-                    userId: args.userId,
-                });
-
-                if (!customer) {
-                    throw new Error('Newly created customer not found');
-                }
-
-                // Update user with new customerId
-                await ctx.runMutation(api.users.updateUser, { userId: args.userId, updates: { customerId: customer } });
-            } else {
-                customer = await ctx.runQuery(api.stripe.getCustomerById, { customerId: user.customerId });
-                if (!customer) {
-                    throw new Error('Customer not found');
-                }
-            }
-
-            if (!customer.stripeCustomerId) {
-                throw new Error('Customer has no Stripe ID');
-            }
-
-            return { stripeCustomerId: customer.stripeCustomerId };
-        } catch (error) {
-            console.error('Error in prepareBillingPortalSession:', error);
-            throw new Error('Failed to prepare billing portal session');
-        }
     },
 });
 
@@ -372,16 +320,16 @@ export const createCheckoutSession = action({
             throw new Error('User not found');
         }
 
-        const customerIdOrUndefined = await createOrRetrieveCustomer(ctx, { email: user.email, userId: args.userId });
+        const stripeCustomerId = await createOrRetrieveCustomer(ctx, { email: user.email, userId: args.userId });
 
-        if (!customerIdOrUndefined) {
+        if (!stripeCustomerId) {
             throw new Error('Failed to create or retrieve customer');
         }
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             billing_address_collection: 'required',
-            customer: customerIdOrUndefined,
+            customer: stripeCustomerId,
             line_items: [
                 {
                     price: args.priceId,
@@ -396,120 +344,6 @@ export const createCheckoutSession = action({
         });
 
         return { sessionId: session.id };
-    },
-});
-
-export const createSubscription = mutation({
-    args: {
-        workspaceId: v.id('workspaces'),
-        priceId: v.id('prices'),
-        status: subscriptionStatusValidator,
-        currentPeriodStart: v.number(),
-        currentPeriodEnd: v.number(),
-        cancelAtPeriodEnd: v.boolean(),
-        planType: planTypeValidator,
-    },
-    handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new Error('Not authenticated');
-        }
-
-        const existingSubscription = await ctx.db
-            .query('subscriptions')
-            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
-            .first();
-
-        if (existingSubscription) {
-            throw new Error('Subscription already exists for this workspace');
-        }
-
-        const subscriptionId = await ctx.db.insert('subscriptions', {
-            workspaceId: args.workspaceId,
-            priceId: args.priceId,
-            status: args.status,
-            currentPeriodStart: args.currentPeriodStart,
-            currentPeriodEnd: args.currentPeriodEnd,
-            cancelAtPeriodEnd: args.cancelAtPeriodEnd,
-            created: new Date().toISOString(),
-            usageLimits: getPlanLimits(args.planType),
-            quantity: 1,
-            stripeId: '',
-        });
-        return { subscriptionId };
-    },
-});
-
-export const cancelSubscription = mutation({
-    args: {
-        subscriptionId: v.id('subscriptions'),
-    },
-    handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new Error('Not authenticated');
-        }
-
-        const subscription = await ctx.db.get(args.subscriptionId);
-        if (!subscription) {
-            throw new Error('Subscription not found');
-        }
-
-        await ctx.db.patch(args.subscriptionId, {
-            status: 'canceled',
-            cancelAtPeriodEnd: true,
-        });
-
-        return { success: true };
-    },
-});
-
-export const getPriceById = query({
-    args: { priceId: v.id('prices') },
-    handler: async (ctx, args) => {
-        const price = await ctx.db.get(args.priceId);
-        if (!price) {
-            throw new Error('Price not found');
-        }
-        return price;
-    },
-});
-
-export const getAllPrices = query({
-    args: {},
-    handler: async (ctx) => {
-        return ctx.db.query('prices').collect();
-    },
-});
-
-export const createPrice = mutation({
-    args: {
-        productId: v.id('products'),
-        type: pricingTypeValidator,
-        unitAmount: v.number(),
-        currency: currencyValidator,
-        recurring: v.object({
-            interval: intervalValidator,
-            intervalCount: v.number(),
-        }),
-    },
-    handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new Error('Not authenticated');
-        }
-
-        const priceId = await ctx.db.insert('prices', {
-            productId: args.productId,
-            type: args.type,
-            unitAmount: args.unitAmount,
-            currency: args.currency,
-            active: true,
-            stripeId: '',
-            interval: args.recurring.interval,
-        });
-
-        return { priceId };
     },
 });
 
