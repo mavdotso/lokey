@@ -47,8 +47,8 @@ export function SettingsCard({
                     />
                 )}
             </CardContent>
-            <CardFooter className="flex justify-between items-center gap-2 bg-muted py-4">
-                {footerText && <p className="text-muted-foreground text-sm">{footerText}</p>}
+            <CardFooter className="flex justify-end items-center gap-2 bg-muted py-4">
+                {footerText && <p className="mr-auto text-muted-foreground text-sm">{footerText}</p>}
                 <Button
                     onClick={onSave}
                     variant={isDangerous ? "destructive" : "default"}

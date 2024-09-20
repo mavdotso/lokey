@@ -4,7 +4,7 @@ import { UserAvatar } from "@/components/global/user-avatar"
 import { Button } from "@/components/ui/button"
 import { api } from "@/convex/_generated/api"
 import { User, Workspace } from "@/convex/types"
-import { capitalizeFirstLetter } from "@/lib/utils"
+import { formatConstantToTitleCase } from "@/lib/utils"
 import { useMutation, useQuery } from "convex/react"
 import { TrashIcon } from "lucide-react"
 import { useState } from "react"
@@ -62,7 +62,7 @@ export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProp
             </div>
             <div className="flex items-center gap-2">
                 <p className="text-left text-muted-foreground text-sm">
-                    {userRole && capitalizeFirstLetter(userRole.toString())}
+                    {userRole && formatConstantToTitleCase(userRole)}
                 </p>
                 {userRole !== "ADMIN" &&
                     <Button
