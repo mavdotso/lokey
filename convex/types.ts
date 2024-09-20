@@ -103,7 +103,8 @@ export type UsageLimit = PlanLimits;
 export type Customer = {
     _id?: Id<'customers'>;
     _creationTime?: number;
-    stripeCustomerId?: string;
+    userId: Id<'users'>;
+    stripeCustomerId: string;
 };
 
 export type Product = {

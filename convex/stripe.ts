@@ -140,8 +140,10 @@ export const createOrRetrieveCustomer = action({
         userId: v.id('users'),
     },
     handler: async (ctx, args): Promise<string> => {
+        console.log('INSIDE createOrRetrieveCustomer');
         try {
             const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
+
             if (!user) {
                 throw new Error('User not found');
             }
@@ -162,7 +164,7 @@ export const createOrRetrieveCustomer = action({
                 throw new Error('Failed to create Stripe customer');
             }
 
-            const customerId = await ctx.runMutation(internal.stripe.insertCustomer, { stripeCustomerId });
+            const customerId = await ctx.runMutation(internal.stripe.insertCustomer, { userId: user._id, stripeCustomerId });
 
             if (customerId) {
                 await ctx.runMutation(api.users.updateUser, {
@@ -302,30 +304,41 @@ export const prepareBillingPortalSession = action({
         try {
             const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
 
+            console.log('STEP1: User ', user);
+
             if (!user) {
                 throw new Error('User not found');
             }
 
             let customer: Customer | null;
+
             if (!user.customerId) {
+                console.log('No customer ID. Creating a new customer...');
                 // Create a new customer if the user doesn't have one
-                const stripeCustomerId = await ctx.runAction(api.stripe.createOrRetrieveCustomer, {
+                const stripeCustomerId = await ctx.runAction(api.stripe.createStripeCustomer, {
                     email: user.email,
                     userId: args.userId,
                 });
 
+                console.log('New customer:', stripeCustomerId);
+
                 if (!stripeCustomerId) {
+                    console.log('Failed to create customer');
                     throw new Error('Failed to create customer');
                 }
 
-                customer = await ctx.runQuery(internal.stripe.getCustomerByStripeId, { stripeCustomerId });
+                // Insert the new customer into the Convex database
+                customer = await ctx.runMutation(internal.stripe.insertCustomer, {
+                    stripeCustomerId: stripeCustomerId,
+                    userId: args.userId,
+                });
 
                 if (!customer) {
                     throw new Error('Newly created customer not found');
                 }
 
                 // Update user with new customerId
-                await ctx.runMutation(api.users.updateUser, { userId: args.userId, updates: { customerId: customer._id } });
+                await ctx.runMutation(api.users.updateUser, { userId: args.userId, updates: { customerId: customer } });
             } else {
                 customer = await ctx.runQuery(api.stripe.getCustomerById, { customerId: user.customerId });
                 if (!customer) {
@@ -595,10 +608,15 @@ export const getUserByCustomerId = internalQuery({
 });
 
 export const insertCustomer = internalMutation({
-    args: { stripeCustomerId: v.string() },
+    args: { userId: v.id('users'), stripeCustomerId: v.string() },
     handler: async (ctx, args) => {
-        await ctx.db.insert('customers', {
+        const customerId = await ctx.db.insert('customers', {
+            userId: args.userId,
             stripeCustomerId: args.stripeCustomerId,
+        });
+
+        await ctx.db.patch(args.userId, {
+            customerId: customerId,
         });
     },
 });

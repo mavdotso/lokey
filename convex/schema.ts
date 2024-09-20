@@ -138,7 +138,8 @@ const usageTrackingSchema = {
 
 /* STRIPE SCHEMA */
 const customerSchema = {
-    stripeCustomerId: v.optional(v.string()),
+    userId: v.id('users'),
+    stripeCustomerId: v.string(),
 };
 
 const productSchema = {
