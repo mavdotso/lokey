@@ -3,6 +3,7 @@ import { httpAction } from './_generated/server';
 import Stripe from 'stripe';
 import { stripe } from './stripe';
 import { api, internal } from './_generated/api';
+import { Id } from './_generated/dataModel';
 
 const http = httpRouter();
 
@@ -87,26 +88,53 @@ http.route({
                     case 'customer.subscription.updated':
                     case 'customer.subscription.deleted':
                         const subscription = event.data.object as Stripe.Subscription;
-                        const workspaceId = await ctx.runQuery(internal.stripe.getWorkspaceIdByCustomerId, { customerId: subscription.customer as string });
-                        await ctx.runAction(api.stripe.manageSubscriptionStatusChange, {
-                            subscriptionId: subscription.id,
-                            customerId: subscription.customer as string,
-                            createAction: event.type === 'customer.subscription.created',
-                            workspaceId,
-                        });
+                        const workspaces = await ctx.runQuery(internal.stripe.getWorkspaceIdByCustomerId, { customerId: subscription.customer as string });
+
+                        if (event.type === 'customer.subscription.deleted') {
+                            // For deletion, we should only update the workspace that had this specific subscription
+                            const workspaceWithSubscription = await ctx.runQuery(internal.stripe.getWorkspaceByStripeSubscriptionId, {
+                                stripeSubscriptionId: subscription.id,
+                            });
+
+                            if (workspaceWithSubscription) {
+                                await ctx.runAction(api.stripe.manageSubscriptionStatusChange, {
+                                    subscriptionId: subscription.id,
+                                    customerId: subscription.customer as string,
+                                    createAction: false,
+                                    workspaceId: workspaceWithSubscription._id,
+                                });
+                            }
+                        } else {
+                            // For creation and updates, we'll process all workspaces
+                            for (const workspace of workspaces) {
+                                await ctx.runAction(api.stripe.manageSubscriptionStatusChange, {
+                                    subscriptionId: subscription.id,
+                                    customerId: subscription.customer as string,
+                                    createAction: event.type === 'customer.subscription.created',
+                                    workspaceId: workspace._id,
+                                });
+                            }
+                        }
                         break;
                     case 'checkout.session.completed':
                         const checkoutSession = event.data.object as Stripe.Checkout.Session;
                         if (checkoutSession.mode === 'subscription') {
                             const subscriptionId = checkoutSession.subscription as string;
                             const customerId = checkoutSession.customer as string;
-                            const workspaceId = await ctx.runQuery(internal.stripe.getWorkspaceIdByCustomerId, { customerId });
-                            await ctx.runAction(api.stripe.manageSubscriptionStatusChange, {
-                                subscriptionId,
-                                customerId,
-                                createAction: true,
-                                workspaceId,
-                            });
+
+                            // Get workspaceId from metadata
+                            const workspaceId = checkoutSession.metadata?.workspaceId;
+
+                            if (workspaceId) {
+                                await ctx.runAction(api.stripe.manageSubscriptionStatusChange, {
+                                    subscriptionId,
+                                    customerId,
+                                    createAction: true,
+                                    workspaceId: workspaceId as Id<'workspaces'>,
+                                });
+                            } else {
+                                console.error('No workspaceId found in checkout session metadata');
+                            }
                         }
                         break;
                     default:

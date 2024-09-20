@@ -9,8 +9,8 @@ import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 
 interface BillingSettingsProps {
-    user: Partial<User>;
-    workspace: Workspace;
+    user: Partial<User>
+    workspace: Workspace
 }
 
 export default function BillingSettings({ user, workspace }: BillingSettingsProps) {
@@ -22,43 +22,56 @@ export default function BillingSettings({ user, workspace }: BillingSettingsProp
     const [selectedPlanId, setSelectedPlanId] = useState<Id<"products"> | null>(null);
     const [selectedInterval, setSelectedInterval] = useState<IntervalType>(INTERVALS.MONTH);
 
-    const createCheckoutSession = useMutation(api.stripe.createCheckoutSession);
-    const prepareBillingPortalSession = useMutation(api.stripe.prepareBillingPortalSession);
+    const createCheckoutSession = useAction(api.stripe.createCheckoutSession);
+    const prepareBillingPortalSession = useAction(api.stripe.prepareBillingPortalSession);
     const createStripeBillingPortalSession = useAction(api.stripe.createStripeBillingPortalSession);
 
     const currency: CurrencyType = CURRENCIES.USD;
 
     async function handleCreateCheckoutSession() {
-        if (!user._id || !selectedPlanId || !prices) return;
+        if (!user._id || !workspace._id || !prices || !products) return;
 
         try {
-            const price = prices.find(p => p.productId === selectedPlanId && p.interval === selectedInterval);
+            if (workspace.planType === PLANS.FREE) {
+                const teamProduct = products.find(p => p.name.toUpperCase() === PLANS.TEAM);
+                if (!teamProduct) {
+                    throw new Error("TEAM plan product not found");
+                }
 
-            if (!price) {
-                throw new Error("Selected price not found");
+                const teamPrice = prices.find(p => p.productId === teamProduct._id && p.interval === selectedInterval);
+
+                if (!teamPrice) {
+                    throw new Error("Price for TEAM plan not found");
+                }
+
+                const { sessionId } = await createCheckoutSession({
+                    userId: user._id,
+                    priceId: teamPrice.stripeId,
+                    quantity: 1,
+                    metadata: {
+                        workspaceId: workspace._id,
+                        planName: PLANS.TEAM,
+                    },
+                });
+
+                router.push(`https://checkout.stripe.com/c/pay/${sessionId}`);
+            } else {
+                console.log("Already on the highest plan (TEAM)");
             }
-
-            const { sessionId } = await createCheckoutSession({
-                userId: user._id,
-                priceId: price.stripeId,
-                quantity: 1,
-                metadata: {
-                    workspaceId: workspace._id,
-                },
-            });
-
-            router.push(`https://checkout.stripe.com/c/pay/${sessionId}`);
         } catch (error) {
             console.error("Error creating checkout session:", error);
         }
     };
 
     async function handleCreateBillingPortalSession() {
-        if (!user._id) return;
+        if (!user._id || !workspace._id) { console.log("No user id or workspace id"); return };
         try {
             const { stripeCustomerId } = await prepareBillingPortalSession({ userId: user._id });
             if (!stripeCustomerId) throw new Error('No stripe customer ID')
-            const { url } = await createStripeBillingPortalSession({ stripeCustomerId });
+            const { url } = await createStripeBillingPortalSession({
+                stripeCustomerId,
+                workspaceId: workspace._id
+            });
             if (url) window.location.href = url;
         } catch (error) {
             console.error("Error creating billing portal session:", error);

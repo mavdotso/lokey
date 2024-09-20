@@ -16,6 +16,7 @@ export const getUser = query({
             email: user.email,
             image: user.image,
             defaultWorkspace: user.defaultWorkspace,
+            customerId: user.customerId,
         };
     },
 });
@@ -58,6 +59,43 @@ export const checkUserPermission = query({
         const hasPermission = roleHierarchy[userWorkspace.role] >= roleHierarchy[args.requiredRole];
 
         return { hasPermission, userRole: userWorkspace.role };
+    },
+});
+
+export const updateUser = mutation({
+    args: {
+        userId: v.id('users'),
+        updates: v.object({
+            name: v.optional(v.string()),
+            email: v.optional(v.string()),
+            defaultWorkspace: v.optional(v.id('workspaces')),
+            customerId: v.optional(v.id('customers')),
+        }),
+    },
+    handler: async (ctx, args) => {
+        const { userId, updates } = args;
+
+        const user = await ctx.db.get(userId);
+        
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        if (updates.defaultWorkspace) {
+            const userWorkspace = await ctx.db
+                .query('userWorkspaces')
+                .filter((q) => q.eq(q.field('userId'), userId))
+                .filter((q) => q.eq(q.field('workspaceId'), updates.defaultWorkspace))
+                .first();
+
+            if (!userWorkspace) {
+                throw new Error('User is not a member of the selected default workspace');
+            }
+        }
+
+        await ctx.db.patch(userId, updates);
+
+        return { success: true, message: 'User profile updated successfully' };
     },
 });
 
