@@ -266,6 +266,7 @@ export const editWorkspace = mutation({
         }
 
         const workspace = await ctx.db.get(args._id);
+        
         if (!workspace) {
             throw new Error('Workspace not found');
         }
