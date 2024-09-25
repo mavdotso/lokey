@@ -1,25 +1,20 @@
-'use client'
-import { LoadingSpinner } from "@/components/global/loading-spinner"
 import { UserAvatar } from "@/components/global/user-avatar"
 import { Button } from "@/components/ui/button"
 import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
 import { User, Workspace } from "@/convex/types"
 import { formatConstantToTitleCase } from "@/lib/utils"
-import { useMutation, useQuery } from "convex/react"
-import { TrashIcon } from "lucide-react"
-import { useState } from "react"
+import { fetchMutation, fetchQuery } from "convex/nextjs"
 import { toast } from "sonner"
 
 interface WorkspaceMemberCardProps {
-    user: Partial<User>
+    user: User
     workspace: Workspace
 }
 
-export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProps) {
-    const [isRemoving, setIsRemoving] = useState(false)
+export async function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProps) {
 
-    const userRole = useQuery(api.users.getUserRole, (user._id && workspace._id) ? { _id: user._id, workspaceId: workspace._id } : 'skip')
-    const kickUser = useMutation(api.workspaces.kickUserFromWorkspace)
+    const userRole = await fetchQuery(api.users.getUserRole, { _id: user._id as Id<"users">, workspaceId: workspace._id as Id<"workspaces"> })
 
     async function handleRemoveUser() {
         if (!workspace._id) {
@@ -32,9 +27,8 @@ export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProp
             return
         }
 
-        setIsRemoving(true)
         try {
-            const response = await kickUser({ _id: workspace._id, userId: user._id })
+            const response = await fetchMutation(api.workspaces.kickUserFromWorkspace, { _id: workspace._id, userId: user._id })
             if (response.success) {
                 toast.success("Success", {
                     description: `User ${user.name ? (user.name) : (user.email)} has been removed from the workspace`
@@ -47,7 +41,6 @@ export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProp
         } catch (error) {
             console.error("Failed to remove user:", error)
         }
-        setIsRemoving(false)
     }
 
 
@@ -69,9 +62,7 @@ export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProp
                         variant="ghost"
                         size="icon"
                         onClick={handleRemoveUser}
-                        disabled={isRemoving}
                     >
-                        {isRemoving ? <LoadingSpinner /> : <TrashIcon className="w-3 h-3 text-muted-foreground" />}
                     </Button>
                 }
             </div>
