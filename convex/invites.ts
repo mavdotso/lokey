@@ -190,6 +190,32 @@ export const joinWorkspaceByInviteCode = action({
     },
 });
 
+export const expireInvite = action({
+    args: {
+        _id: v.id('workspaceInvites'),
+    },
+    handler: async (ctx, args) => {
+        const invite = await ctx.runQuery(api.invites.getInviteById, { _id: args._id });
+        if (!invite) {
+            throw new ConvexError('Invite not found');
+        }
+
+        // Check if the invite is already expired or processed
+        if (invite.status !== 'PENDING') {
+            throw new ConvexError('Invite is already expired or processed');
+        }
+
+        // Attempt to expire the invite
+        const result = await ctx.runMutation(internal.invites.patchInviteStatus, { inviteId: args._id, status: 'EXPIRED' });
+
+        if (!result.success) {
+            throw new ConvexError('Failed to expire the invite');
+        }
+
+        return { success: true };
+    },
+});
+
 export const getWorkspaceInvites = query({
     args: { workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {

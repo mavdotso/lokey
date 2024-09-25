@@ -9,7 +9,6 @@ import { useSession } from 'next-auth/react';
 import { Id } from '@/convex/_generated/dataModel';
 import { setCookie } from "cookies-next";
 
-
 export default function InvitePage() {
     const session = useSession();
     const [inviteStatus, setInviteStatus] = useState<'loading' | 'pending' | 'error'>('loading');
