@@ -12,7 +12,7 @@ import { isCredentialsActive } from '@/lib/utils';
 import { Credentials, CredentialsRequest, CredentialsType } from '@/convex/types';
 import { EmptySearch } from '@/components/credentials/empty-search';
 import { Button } from '@/components/ui/button';
-import { InboxIcon,  Share2Icon } from 'lucide-react';
+import { InboxIcon, Share2Icon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CredentialsList } from '@/components/credentials/credentials-list';
 
@@ -64,12 +64,14 @@ export default function CredentialsPage({ params }: CredentialsProps) {
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
     const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    const resetFilters = () => setFilters({
-        searchTerm: '',
-        sortOption: 'name',
-        selectedTypes: [],
-        hideExpired: false,
-    });
+    function resetFilters() {
+        setFilters({
+            searchTerm: '',
+            sortOption: 'name',
+            selectedTypes: [],
+            hideExpired: false,
+        });
+    }
 
     const renderContent = (type: TabType) => (
         (type === 'shared' ? credentials : credentialsRequests).length === 0 ? (

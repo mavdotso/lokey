@@ -34,7 +34,7 @@ export function CredentialsSortControls({ searchTerm, onSearchChange, sortOption
                     placeholder="Search by name"
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className='flex bg-background'
+                    className='flex'
                 />
                 <MultiSelect
                     options={credentialTypeOptions}
@@ -45,7 +45,7 @@ export function CredentialsSortControls({ searchTerm, onSearchChange, sortOption
                     maxCount={1}
                 />
                 <Select value={sortOption} onValueChange={onSortChange}>
-                    <SelectTrigger className="bg-background">
+                    <SelectTrigger>
                         <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
                     <SelectContent>

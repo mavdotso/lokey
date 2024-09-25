@@ -4,11 +4,12 @@
 -   [ ] Faster redirect after creating the first workspace
 -   [ ] User is not authenticated after avatar upload?
 -   [ ] Can't click anything after editing credentials in popup, maybe something with the clickOutside
-- [ ] submit cred page — all of the fields with the same names fill out at the same time
+-   [ ] submit cred page — all of the fields with the same names fill out at the same time
 
 -   [x] See fulfilled credentials
 -   [ ] Share page UI
     -   [ ] Hidden fields
+-   [ ] Fix the fields display -> login-password shows as the first label "usernama"
 
 ### What's needed for launch:
 
@@ -25,7 +26,7 @@
     -   [x] Form builder
     -   [ ] Share via link / email
     -   [ ] Page to input
-        - [ ] UI
+        -   [ ] UI
 
 -   [ ] Share link via email / text
 
@@ -59,8 +60,9 @@
 ### AFTER THE FIRST 5 CUSTOMERS:
 
 -   [ ] API
--   [ ] Secure file sharing
+-   [ ] Secure file sharing — [Danger!](https://x.com/mfts0/status/1837871900149555606)
 -   [ ] Secure chats (p2p)
+-   [ ] Valut — Store passwords inside the app, encrypted with your passphrase and share them from there
 -   [ ] Custom SMTP
 -   [ ] Custom URL
 -   [ ] IP tracking
@@ -75,6 +77,11 @@
 -   [ ] Add instructions on where to get the passwords from to credentials requests
 -   [ ] Master password encryption for the account to decrypt passwords inside
 -   [ ] Team sharing credentials
+
+### Nice to have
+
+-   [ ] [optimizePachageImports](https://nextjs.org/docs/app/api-reference/next-config-js/optimizePackageImports)
+-   [ ] ["server-only"](https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns#keeping-server-only-code-out-of-the-client-environment)
 
 ### UI
 

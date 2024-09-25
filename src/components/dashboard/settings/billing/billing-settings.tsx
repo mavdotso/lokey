@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { useQuery, useMutation, useAction } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
 import { CurrencyType, IntervalType, User, Workspace } from "@/convex/types";
 import { CURRENCIES, INTERVALS, PLANS } from "@/convex/schema";
@@ -114,18 +113,18 @@ export default function BillingSettings({ user, workspace }: BillingSettingsProp
                                     <div className="flex items-center gap-2">
                                         <span className="font-medium text-base">{product.name}</span>
                                         {price && (
-                                            <span className="bg-gray-100 px-1.5 py-0.5 rounded-md text-sm">
+                                            <span className="bg-muted px-1.5 py-0.5 rounded-md text-sm">
                                                 {currency === CURRENCIES.USD ? "$" : "€"}{" "}
                                                 {price.unitAmount / 100} / {price.interval}
                                             </span>
                                         )}
                                     </div>
-                                    <p className="text-gray-600 text-sm">{product.description}</p>
+                                    <p className="text-secondary-foreground text-sm">{product.description}</p>
                                 </div>
 
                                 {product.name !== "Free" && (
                                     <div className="flex items-center gap-2">
-                                        <label htmlFor="interval-switch" className="text-gray-600 text-sm">
+                                        <label htmlFor="interval-switch" className="text-secondary-foreground text-sm">
                                             {selectedInterval === INTERVALS.MONTH ? "Monthly" : "Yearly"}
                                         </label>
                                         <Switch
@@ -151,7 +150,7 @@ export default function BillingSettings({ user, workspace }: BillingSettingsProp
                 buttonText="Manage"
                 onSave={handleCreateBillingPortalSession}
                 footerText="You will be redirected to the Stripe Customer Portal."
-            />
+            >{" "}</SettingsCard>
         </div>
     );
 }
