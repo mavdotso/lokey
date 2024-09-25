@@ -2,7 +2,7 @@ import { CREDENTIALS_TYPES } from '@/convex/schema';
 
 type FieldType = 'text' | 'password';
 
-interface CredentialsField {
+export interface CredentialsField {
     id: string;
     label: string;
     type: FieldType;
