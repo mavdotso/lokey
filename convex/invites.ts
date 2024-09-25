@@ -1,10 +1,11 @@
-import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { ConvexError, v } from 'convex/values';
+import { action, internalMutation, mutation, query } from './_generated/server';
 import { nanoid } from 'nanoid';
 import { getViewerId } from './auth';
 import { getUser } from './users';
 import { getURL } from '@/lib/utils';
 import { inviteTypeValidator, roleTypeValidator } from './schema';
+import { api, internal } from './_generated/api';
 
 export const createInvite = mutation({
     args: {
@@ -17,12 +18,12 @@ export const createInvite = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('Not authenticated');
+            throw new ConvexError('Not authenticated');
         }
 
         const user = await getUser(ctx, { _id: identity });
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         const inviteCode = nanoid(10);
@@ -50,24 +51,24 @@ export const respondToInvite = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('Not authenticated');
+            throw new ConvexError('Not authenticated');
         }
 
         const user = await getUser(ctx, { _id: identity });
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         const invite = await ctx.db.get(args._id);
         if (!invite) {
-            throw new Error('Invite not found');
+            throw new ConvexError('Invite not found');
         }
 
         if (invite.invitedUserId && invite.invitedUserId !== user._id) {
-            throw new Error('Unauthorized');
+            throw new ConvexError('Unauthorized');
         }
         if (invite.invitedEmail && invite.invitedEmail !== user.email) {
-            throw new Error('Unauthorized');
+            throw new ConvexError('Unauthorized');
         }
 
         await ctx.db.patch(args._id, { status: args.response });
@@ -92,12 +93,12 @@ export const generateInviteLink = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('Not authenticated');
+            throw new ConvexError('Not authenticated');
         }
 
         const user = await getUser(ctx, { _id: identity });
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         const inviteCode = nanoid(10);
@@ -143,6 +144,7 @@ export const getInviteByCode = query({
         }
 
         const workspace = await ctx.db.get(invite.workspaceId);
+
         if (!workspace) {
             return null;
         }
@@ -153,49 +155,35 @@ export const getInviteByCode = query({
             workspaceName: workspace.name,
             inviteCode: invite.inviteCode,
             status: invite.status,
+            role: invite.role,
+            invitedEmail: invite.invitedEmail,
         };
     },
 });
 
-export const joinWorkspaceByInviteCode = mutation({
-    args: { inviteCode: v.string() },
+export const joinWorkspaceByInviteCode = action({
+    args: { _id: v.id('users'), inviteCode: v.string() },
     handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new Error('User is not authenticated');
-        }
-
-        const invite = await ctx.db
-            .query('workspaceInvites')
-            .filter((q) => q.eq(q.field('inviteCode'), args.inviteCode))
-            .first();
+        const invite = await ctx.runQuery(api.invites.getInviteByCode, { inviteCode: args.inviteCode });
 
         if (!invite) {
-            throw new Error('Invalid invite code');
+            throw new ConvexError('Invalid invite code');
         }
 
         if (invite.status !== 'PENDING') {
-            throw new Error('This invite has already been processed');
+            throw new ConvexError('This invite has already been processed');
         }
 
-        const existingMembership = await ctx.db
-            .query('userWorkspaces')
-            .filter((q) => q.eq(q.field('userId'), identity))
-            .filter((q) => q.eq(q.field('workspaceId'), invite.workspaceId))
-            .first();
+        const existingMembership = await ctx.runQuery(api.workspaces.TEMP_getUserWorkspaces, { _id: args._id });
 
         if (existingMembership) {
-            throw new Error('You are already a member of this workspace');
+            throw new ConvexError('You are already a member of this workspace');
         }
 
-        await ctx.db.insert('userWorkspaces', {
-            userId: identity,
-            workspaceId: invite.workspaceId,
-            role: invite.role,
-        });
+        await ctx.runMutation(internal.invites.addUserToWorkspace, { _id: args._id, workspace: invite.workspaceId, role: invite.role });
 
         if (invite.invitedEmail) {
-            await ctx.db.patch(invite._id, { status: 'ACCEPTED' });
+            await ctx.runMutation(internal.invites.patchInviteStatus, { inviteId: invite._id, status: 'ACCEPTED' });
         }
 
         return { success: true };
@@ -213,22 +201,25 @@ export const getWorkspaceInvites = query({
     },
 });
 
-export const setInviteExpired = mutation({
+export const addUserToWorkspace = internalMutation({
+    args: { _id: v.id('users'), workspace: v.id('workspaces'), role: roleTypeValidator },
+    handler: async (ctx, args) => {
+        return await ctx.db.insert('userWorkspaces', {
+            userId: args._id,
+            workspaceId: args.workspace,
+            role: args.role,
+        });
+    },
+});
+
+export const patchInviteStatus = internalMutation({
     args: {
-        _id: v.id('workspaceInvites'),
+        inviteId: v.id('workspaceInvites'),
+        status: inviteTypeValidator,
     },
     handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new Error('Not authenticated');
-        }
-
-        const invite = await ctx.db.get(args._id);
-        if (!invite) {
-            throw new Error('Invite not found');
-        }
-
-        await ctx.db.patch(args._id, { status: 'EXPIRED' });
+        const { inviteId, status } = args;
+        await ctx.db.patch(inviteId, { status });
         return { success: true };
     },
 });

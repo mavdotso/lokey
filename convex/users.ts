@@ -1,5 +1,5 @@
 import { mutation, query } from './_generated/server';
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 import { getViewerId } from './auth';
 import { roleTypeValidator } from './schema';
 
@@ -78,7 +78,7 @@ export const updateUser = mutation({
         const user = await ctx.db.get(userId);
 
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         if (updates.defaultWorkspace) {
@@ -89,7 +89,7 @@ export const updateUser = mutation({
                 .first();
 
             if (!userWorkspace) {
-                throw new Error('User is not a member of the selected default workspace');
+                throw new ConvexError('User is not a member of the selected default workspace');
             }
         }
 
@@ -110,12 +110,12 @@ export const editUser = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('Log in to edit user profile');
+            throw new ConvexError('Log in to edit user profile');
         }
 
         const user = await ctx.db.get(identity);
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         if (args.updates.defaultWorkspace) {
@@ -126,7 +126,7 @@ export const editUser = mutation({
                 .first();
 
             if (!userWorkspace) {
-                throw new Error('User is not a member of the selected default workspace');
+                throw new ConvexError('User is not a member of the selected default workspace');
             }
         }
 
@@ -143,12 +143,12 @@ export const updateUserAvatar = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('User is not authenticated');
+            throw new ConvexError('User is not authenticated');
         }
 
         const imageUrl = await ctx.storage.getUrl(args.storageId);
         if (!imageUrl) {
-            throw new Error('Failed to get image URL');
+            throw new ConvexError('Failed to get image URL');
         }
 
         await ctx.db.patch(identity, { image: imageUrl });
@@ -162,7 +162,7 @@ export const deleteUser = mutation({
     handler: async (ctx) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('User is not authenticated');
+            throw new ConvexError('User is not authenticated');
         }
 
         await ctx.db.delete(identity);

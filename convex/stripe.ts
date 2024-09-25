@@ -1,4 +1,4 @@
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 import { action, internalMutation, internalQuery, mutation, query } from './_generated/server';
 import { Id } from './_generated/dataModel';
 import { Customer, PlanName, Price, Product, Subscription } from './types';
@@ -93,7 +93,7 @@ export const upsertPriceRecord = internalMutation({
             .unique();
 
         if (!product) {
-            throw new Error(`Product not found for price ${price.id}`);
+            throw new ConvexError(`Product not found for price ${price.id}`);
         }
 
         const priceData: Price = {
@@ -143,7 +143,7 @@ export const createOrRetrieveCustomer = action({
         const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
 
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         if (user.customerId) {
@@ -159,7 +159,7 @@ export const createOrRetrieveCustomer = action({
         });
 
         if (!stripeCustomerId) {
-            throw new Error('Failed to create Stripe customer');
+            throw new ConvexError('Failed to create Stripe customer');
         }
 
         const customerId = await ctx.runMutation(internal.stripe.insertCustomer, { userId: user._id, stripeCustomerId });
@@ -204,7 +204,7 @@ export const manageSubscriptionStatusChange = action({
     handler: async (ctx, args) => {
         const customerData = await ctx.runQuery(internal.stripe.getCustomerByStripeId, { stripeCustomerId: args.customerId });
 
-        if (!customerData) throw new Error('Cannot find the customer');
+        if (!customerData) throw new ConvexError('Cannot find the customer');
 
         const subscription = await stripe.subscriptions.retrieve(args.subscriptionId, {
             expand: ['default_payment_method'],
@@ -214,12 +214,12 @@ export const manageSubscriptionStatusChange = action({
             stripeId: subscription.items.data[0].price.id,
         });
 
-        if (!price) throw new Error('Price not found');
+        if (!price) throw new ConvexError('Price not found');
 
         const planName = subscription.metadata.planName;
 
         if (!planName || !(planName in WORKSPACE_PLAN_LIMITS)) {
-            throw new Error(`Invalid or missing plan name: ${planName}`);
+            throw new ConvexError(`Invalid or missing plan name: ${planName}`);
         }
 
         const workspace = await ctx.runQuery(internal.stripe.getWorkspaceByStripeSubscriptionId, {
@@ -227,7 +227,7 @@ export const manageSubscriptionStatusChange = action({
         });
 
         if (!workspace || workspace._id !== args.workspaceId) {
-            throw new Error('Workspace mismatch or not found');
+            throw new ConvexError('Workspace mismatch or not found');
         }
 
         const subscriptionData: Subscription = {
@@ -288,13 +288,13 @@ export const createStripeBillingPortalSession = action({
         const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
 
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         const stripeCustomerId = await createOrRetrieveCustomer(ctx, { email: user.email, userId: args.userId });
 
         if (!stripeCustomerId) {
-            throw new Error('Failed to create or retrieve customer');
+            throw new ConvexError('Failed to create or retrieve customer');
         }
 
         const { url } = await stripe.billingPortal.sessions.create({
@@ -317,13 +317,13 @@ export const createCheckoutSession = action({
         const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
 
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         const stripeCustomerId = await createOrRetrieveCustomer(ctx, { email: user.email, userId: args.userId });
 
         if (!stripeCustomerId) {
-            throw new Error('Failed to create or retrieve customer');
+            throw new ConvexError('Failed to create or retrieve customer');
         }
 
         const session = await stripe.checkout.sessions.create({
@@ -356,7 +356,7 @@ export const getWorkspaceIdByCustomerId = internalQuery({
             .unique();
 
         if (!customer) {
-            throw new Error('Customer not found');
+            throw new ConvexError('Customer not found');
         }
 
         const workspaces = await ctx.db
@@ -365,7 +365,7 @@ export const getWorkspaceIdByCustomerId = internalQuery({
             .collect();
 
         if (!workspaces) {
-            throw new Error('Workspaces not found for customer');
+            throw new ConvexError('Workspaces not found for customer');
         }
 
         return workspaces;

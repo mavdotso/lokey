@@ -3,10 +3,11 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
-import { useMutation, useQuery } from 'convex/react';
+import { useAction, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useSession } from 'next-auth/react';
 import { cookies } from 'next/headers';
+import { Id } from '@/convex/_generated/dataModel';
 
 export default function InvitePage() {
     const session = useSession();
@@ -24,7 +25,7 @@ export default function InvitePage() {
     const getWorkspaceName = useQuery(api.workspaces.getWorkspaceName,
         getInviteDetails?.workspaceId ? { _id: getInviteDetails.workspaceId } : 'skip');
 
-    const joinWorkspace = useMutation(api.invites.joinWorkspaceByInviteCode);
+    const joinWorkspace = useAction(api.invites.joinWorkspaceByInviteCode);
 
     useEffect(() => {
         if (getInviteDetails === undefined) {
@@ -50,7 +51,7 @@ export default function InvitePage() {
         if (session) {
             setIsJoining(true);
             try {
-                await joinWorkspace({ inviteCode });
+                joinWorkspace({ _id: session.data?.user?.id as Id<"users">, inviteCode });
                 router.push('/dashboard');
             } catch (error) {
                 console.error('Error joining workspace:', error);

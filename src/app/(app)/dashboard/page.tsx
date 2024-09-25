@@ -1,7 +1,7 @@
 import { api } from '@/convex/_generated/api';
 import { CreateWorkspaceDialog } from '@/components/workspaces/create-workspace-dialog';
 import { cookies } from 'next/headers';
-import { fetchMutation, fetchQuery } from 'convex/nextjs';
+import { fetchAction, fetchQuery } from 'convex/nextjs';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Id } from '@/convex/_generated/dataModel';
@@ -17,7 +17,7 @@ export default async function Dashboard() {
     const defaultWorkspace = await fetchQuery(api.users.getUserDefaultWorkspace, { _id: session.user.id as Id<"users"> });
 
     if (inviteCode) {
-        await fetchMutation(api.invites.joinWorkspaceByInviteCode, { inviteCode });
+        await fetchAction(api.invites.joinWorkspaceByInviteCode, { _id: session.user.id as Id<"users">, inviteCode });
     }
 
     if (!workspaces || workspaces.length === 0) {

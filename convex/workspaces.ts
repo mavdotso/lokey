@@ -2,7 +2,7 @@ import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 import { getViewerId } from './auth';
 import { canCreateWorkspace } from './limits';
-import { createInvite, setInviteExpired } from './invites';
+import { createInvite } from './invites';
 import { planTypeValidator, roleTypeValidator } from './schema';
 
 export const createWorkspace = mutation({
@@ -266,7 +266,7 @@ export const editWorkspace = mutation({
         }
 
         const workspace = await ctx.db.get(args._id);
-        
+
         if (!workspace) {
             throw new Error('Workspace not found');
         }
@@ -405,10 +405,7 @@ export const updateWorkspaceInviteCode = mutation({
         }
 
         if (workspace.defaultInvite) {
-            const expireResult = await setInviteExpired(ctx, { _id: workspace.defaultInvite });
-            if (!expireResult.success) {
-                throw new Error(`Failed to expire previous invite.`);
-            }
+            await ctx.db.patch(workspace.defaultInvite, { status: 'EXPIRED' });
         }
 
         const newInvite = await createInvite(ctx, {
