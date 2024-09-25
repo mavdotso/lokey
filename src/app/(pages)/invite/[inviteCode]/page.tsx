@@ -6,8 +6,9 @@ import { useRouter, useParams } from 'next/navigation';
 import { useAction, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useSession } from 'next-auth/react';
-import { cookies } from 'next/headers';
 import { Id } from '@/convex/_generated/dataModel';
+import { setCookie } from "cookies-next";
+
 
 export default function InvitePage() {
     const session = useSession();
@@ -60,7 +61,7 @@ export default function InvitePage() {
             }
             setIsJoining(false);
         } else {
-            cookies().set('inviteCode', inviteCode, { maxAge: 60 * 60 * 24 * 7 });
+            setCookie('inviteCode', inviteCode, { maxAge: 60 * 60 * 24 * 7 });
             router.push('/sign-in');
         }
     }
