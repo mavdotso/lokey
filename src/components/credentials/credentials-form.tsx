@@ -287,9 +287,9 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                                         <SelectValue placeholder="Select a type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {Object.values(CREDENTIALS_TYPES).map((credType) => (
-                                            <SelectItem key={credType} value={credType}>
-                                                {credentialsFields[credType][0].label}
+                                        {Object.entries(CREDENTIALS_TYPES).map(([credType, credTypeValue]) => (
+                                            <SelectItem key={credType} value={credTypeValue}>
+                                                {credentialsFields[credTypeValue].map(field => field.label).join(' / ')}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -326,9 +326,9 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                                 <SelectValue placeholder="Select a type" />
                             </SelectTrigger>
                             <SelectContent>
-                                {Object.values(CREDENTIALS_TYPES).map((credType) => (
-                                    <SelectItem key={credType} value={credType}>
-                                        {credentialsFields[credType][0].label}
+                                {Object.entries(CREDENTIALS_TYPES).map(([credType, credTypeValue]) => (
+                                    <SelectItem key={credType} value={credTypeValue}>
+                                        {credentialsFields[credTypeValue].map(field => field.label).join(' / ')}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
