@@ -7,10 +7,11 @@ import { UserSettingsCard } from "@/components/dashboard/settings/user-settings-
 import { BillingSettings } from "@/components/dashboard/settings/billing/billing-settings";
 import { PageHeader } from "@/components/global/page-header";
 import { LoadingScreen } from "@/components/global/loading-screen";
-import { SettingsForm } from "@/components/dashboard/settings/settings-form";
 import { auth } from "@/lib/auth";
 import { Id } from "@/convex/_generated/dataModel";
 import { redirect } from "next/navigation";
+import { UserSettings } from "@/components/dashboard/settings/user-settings";
+import { WorkspaceSettings } from "@/components/dashboard/settings/workspace-settings";
 
 const workspaceSettingsItems = [
     { tabName: 'workspaceGeneral', icon: CogIcon, name: 'General' },
@@ -73,11 +74,7 @@ export default async function SettingsPage({ params }: { params: { slug: string 
                     <div className="flex-grow w-4/5 overflow-hidden">
                         <div className="pr-4 h-full overflow-y-auto">
                             <TabsContent value="workspaceGeneral">
-                                <SettingsForm
-                                    workspace={workspace}
-                                    user={user}
-                                    userWorkspaces={userWorkspaces}
-                                />
+                                <WorkspaceSettings workspace={workspace} />
                             </TabsContent>
                             <TabsContent value="workspaceUsers">
                                 <UserSettingsCard users={workspaceUsers.users} workspace={workspace} invites={workspaceInvites} />
@@ -86,8 +83,7 @@ export default async function SettingsPage({ params }: { params: { slug: string 
                                 {user && <BillingSettings user={user} workspace={workspace} />}
                             </TabsContent>
                             <TabsContent value="userGeneral">
-                                <SettingsForm
-                                    workspace={workspace}
+                                <UserSettings
                                     user={user}
                                     userWorkspaces={userWorkspaces}
                                 />
