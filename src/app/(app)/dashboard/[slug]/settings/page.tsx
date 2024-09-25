@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import { signout } from "@/lib/server-actions";
 import { SelectCard } from "@/components/dashboard/settings/select-card";
 import BillingSettings from "@/components/dashboard/settings/billing/billing-settings";
+import { PageHeader } from "@/components/global/page-header";
 
 const workspaceSettingsItems = [
     { tabName: 'workspaceGeneral', icon: CogIcon, name: 'General' },
@@ -266,10 +267,7 @@ export default function SettingsPage() {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex justify-between items-center px-8 py-6">
-                <h1 className="font-bold text-2xl">Settings</h1>
-            </div>
-            <Separator />
+            <PageHeader title="Settings" />
             <div className="flex flex-grow gap-4 px-8 py-4 overflow-hidden">
                 <Tabs defaultValue={isAdmin() ? "workspaceGeneral" : "userGeneral"} orientation="horizontal" className="flex gap-6 w-full h-full">
                     <TabsList className="flex flex-col flex-shrink-0 justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { InboxIcon, Share2Icon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CredentialsList } from '@/components/credentials/credentials-list';
+import { PageHeader } from '@/components/global/page-header';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
@@ -104,32 +105,28 @@ export default function CredentialsPage({ params }: CredentialsProps) {
 
     return (
         <div className="flex flex-col h-full">
-            <div className='flex justify-between items-center px-8 py-6'>
-                <h1 className='font-bold text-2xl'>Credentials</h1>
-                <div className='flex gap-2'>
-                    <CredentialsDialog
-                        isOpen={isCreateDialogOpen}
-                        setIsOpen={setCreateDialogOpen}
-                        formType="new"
-                    >
-                        <Button className='gap-2' variant={"outline"} size={"lg"}>
-                            <Share2Icon className='w-4 h-4' />
-                            Share credentials
-                        </Button>
-                    </CredentialsDialog>
-                    <CredentialsDialog
-                        isOpen={isRequestDialogOpen}
-                        setIsOpen={setRequestDialogOpen}
-                        formType="request"
-                    >
-                        <Button className='gap-2' size={"lg"}>
-                            <InboxIcon className='w-4 h-4' />
-                            Request credentials
-                        </Button>
-                    </CredentialsDialog>
-                </div>
-            </div>
-            <Separator />
+            <PageHeader title="Credentials">
+                <CredentialsDialog
+                    isOpen={isCreateDialogOpen}
+                    setIsOpen={setCreateDialogOpen}
+                    formType="new"
+                >
+                    <Button className='gap-2' variant={"outline"} >
+                        <Share2Icon className='w-4 h-4' />
+                        Share credentials
+                    </Button>
+                </CredentialsDialog>
+                <CredentialsDialog
+                    isOpen={isRequestDialogOpen}
+                    setIsOpen={setRequestDialogOpen}
+                    formType="request"
+                >
+                    <Button className='gap-2'>
+                        <InboxIcon className='w-4 h-4' />
+                        Request credentials
+                    </Button>
+                </CredentialsDialog>
+            </PageHeader>
             <div className={`${totalPages > 1 && 'pb-10'} overflow-auto flex-grow flex flex-col`}>
                 <Tabs defaultValue="shared" className='px-8 py-4 h-full' onValueChange={(value) => setActiveTab(value as TabType)}>
                     <TabsList>

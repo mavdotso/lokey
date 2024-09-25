@@ -35,12 +35,12 @@ const helpItems: NavItemProps[] = [
 
 export default function Sidebar({ params, session, className, onToggleSidebar }: SidebarProps) {
     return (
-        <aside className={`w-60 h-full flex flex-col p-4 gap-4 ${className}`}>
-            <div className="flex justify-start items-center gap-2 py-3 font-semibold">
+        <aside className={`w-60 h-full flex flex-col p-2 gap-4 ${className}`}>
+            <div className="flex justify-start items-center gap-2 px-2 pt-4 pb-2 font-semibold">
                 <WorkspacesDropdown />
             </div>
             <Separator />
-            <nav className="flex flex-col flex-grow gap-2 py-4">
+            <nav className="flex flex-col flex-grow gap-2 px-2 py-2">
                 {navItems.map((item) =>
                     item.href && (
                         <NavigationItem key={item.name} params={params} item={item} />
