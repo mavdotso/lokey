@@ -11,7 +11,12 @@ import { User, Workspace } from "@/convex/types";
 import { signout } from "@/lib/server-actions";
 import { fetchMutation } from "convex/nextjs";
 
-export function UserSettings({ user, userWorkspaces }: { user: Partial<User>, userWorkspaces: Workspace[] | undefined }) {
+interface UserSettingsProps {
+    user: Partial<User>,
+    userWorkspaces: Workspace[]
+}
+
+export function UserSettings({ user, userWorkspaces }: UserSettingsProps) {
     const [userName, setUserName] = useState(user.name || '');
     const [defaultWorkspace, setDefaultWorkspace] = useState(user.defaultWorkspace || '');
     const [confirmUserDelete, setConfirmUserDelete] = useState('');
