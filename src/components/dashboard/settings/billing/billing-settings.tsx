@@ -15,7 +15,7 @@ interface BillingSettingsProps {
     workspace: Workspace
 }
 
-export default function BillingSettings({ user, workspace }: BillingSettingsProps) {
+export function BillingSettings({ user, workspace }: BillingSettingsProps) {
     const router = useRouter();
 
     const products = useQuery(api.stripe.getProducts);

@@ -17,7 +17,7 @@ import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { useSession } from "next-auth/react";
 import { signout } from "@/lib/server-actions";
 import { SelectCard } from "@/components/dashboard/settings/select-card";
-import BillingSettings from "@/components/dashboard/settings/billing/billing-settings";
+import { BillingSettings } from "@/components/dashboard/settings/billing/billing-settings";
 import { PageHeader } from "@/components/global/page-header";
 
 const workspaceSettingsItems = [

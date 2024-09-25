@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
 import { api } from '@/convex/_generated/api';
-import { Separator } from '@/components/ui/separator';
 import { CredentialsSortControls } from '@/components/credentials/credentials-sort-controls';
 import { CredentialsDialog } from '@/components/credentials/credentials-dialog';
 import { PagePagination } from '@/components/global/page-pagination';
