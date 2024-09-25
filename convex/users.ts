@@ -76,7 +76,7 @@ export const updateUser = mutation({
         const { userId, updates } = args;
 
         const user = await ctx.db.get(userId);
-        
+
         if (!user) {
             throw new Error('User not found');
         }
@@ -181,14 +181,11 @@ export const deleteUser = mutation({
 });
 
 export const getUserDefaultWorkspace = query({
-    args: {},
-    handler: async (ctx) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            return null;
-        }
-
-        const user = await ctx.db.get(identity);
+    args: {
+        _id: v.id('users'),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args._id);
         if (!user || !user.defaultWorkspace) {
             return null;
         }
