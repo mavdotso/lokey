@@ -1,13 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface ConfirmationDialogProps {
     title: string;
@@ -19,15 +11,7 @@ interface ConfirmationDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
-export function ConfirmationDialog({
-    title,
-    description,
-    confirmText,
-    onConfirm,
-    isDangerous = false,
-    isOpen,
-    onOpenChange
-}: ConfirmationDialogProps) {
+export function ConfirmationDialog({ title, description, confirmText, onConfirm, isDangerous = false, isOpen, onOpenChange }: ConfirmationDialogProps) {
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>

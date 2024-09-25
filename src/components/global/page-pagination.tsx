@@ -1,12 +1,4 @@
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 interface PaginationComponentProps {
     currentPage: number;
@@ -14,11 +6,7 @@ interface PaginationComponentProps {
     setCurrentPage: (page: number) => void;
 }
 
-export function PagePagination({
-    currentPage,
-    totalPages,
-    setCurrentPage,
-}: PaginationComponentProps) {
+export function PagePagination({ currentPage, totalPages, setCurrentPage }: PaginationComponentProps) {
     return (
         <Pagination className="pb-4 text-primary/70">
             <PaginationContent>

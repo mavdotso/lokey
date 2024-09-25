@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card"
 import { CreateWorkspaceForm } from '@/components/workspaces/create-workspace-form'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
