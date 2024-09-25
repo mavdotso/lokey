@@ -11,7 +11,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 interface WorkspaceMemberCardProps {
-    user: User
+    user: Partial<User>
     workspace: Workspace
 }
 

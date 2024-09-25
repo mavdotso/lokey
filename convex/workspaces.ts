@@ -15,7 +15,7 @@ export const createWorkspace = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-        
+
         if (!identity) {
             throw new Error('User is not authenticated');
         }
@@ -69,8 +69,11 @@ export const createWorkspace = mutation({
 
 export const getUserWorkspaces = query({
     args: {},
-    handler: async (ctx) => {
+    handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
+
+        console.log(identity);
+
         if (!identity) {
             throw new Error('User is not authenticated');
         }
@@ -83,6 +86,32 @@ export const getUserWorkspaces = query({
         const userWorkspaces = await ctx.db
             .query('userWorkspaces')
             .filter((q) => q.eq(q.field('userId'), identity))
+            .collect();
+
+        const memberWorkspaces = await Promise.all(userWorkspaces.map(async (uw) => await ctx.db.get(uw.workspaceId)));
+
+        const allWorkspaces = [...ownedWorkspaces, ...memberWorkspaces];
+        const uniqueWorkspaces = Array.from(new Set(allWorkspaces.map((w) => w?._id)))
+            .map((id) => allWorkspaces.find((w) => w?._id === id))
+            .filter((w): w is NonNullable<typeof w> => w !== null && w !== undefined);
+
+        return uniqueWorkspaces;
+    },
+});
+
+export const TEMP_getUserWorkspaces = query({
+    args: {
+        _id: v.id('users'),
+    },
+    handler: async (ctx, args) => {
+        const ownedWorkspaces = await ctx.db
+            .query('workspaces')
+            .filter((q) => q.eq(q.field('ownerId'), args._id))
+            .collect();
+
+        const userWorkspaces = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), args._id))
             .collect();
 
         const memberWorkspaces = await Promise.all(userWorkspaces.map(async (uw) => await ctx.db.get(uw.workspaceId)));
