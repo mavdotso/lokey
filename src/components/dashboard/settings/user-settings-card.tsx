@@ -9,7 +9,7 @@ import { InviteCard } from "@/components/dashboard/settings/invite-card";
 
 interface UserSettingsCardProps {
     workspace: Workspace
-    users: Partial<User>[],
+    users: User[],
     invites: WorkspaceInvite[]
 }
 
