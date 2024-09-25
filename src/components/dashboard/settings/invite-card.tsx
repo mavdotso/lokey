@@ -4,7 +4,6 @@ import { api } from "@/convex/_generated/api";
 import { WorkspaceInvite } from "@/convex/types";
 import { capitalizeFirstLetter } from "@/lib/utils";
 import { fetchAction } from "convex/nextjs";
-import { useMutation } from "convex/react";
 import { Mail } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,7 +16,7 @@ export function InviteCard({ invite }: InviteCardProps) {
     async function handleDiscard() {
         if (!invite._id) {
             toast.error("Wrong invite.", {
-                description: "Couldn't find this invite"
+                description: "Couldn't find this in"
             })
             return;
         }
