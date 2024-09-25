@@ -3,7 +3,7 @@
 -   [ ] Faster redirect after creating the first workspace
 -   [ ] User is not authenticated after avatar upload?
 -   [ ] Can't click anything after editing credentials in popup, maybe something with the clickOutside
-
+-   [ ] having issues with being logged out on convex??
 
 ### What's needed for launch:
 
