@@ -1,12 +1,11 @@
 
-import { BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon } from 'lucide-react';
+import { BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon, LucideIcon } from 'lucide-react';
 import { UserCard } from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
 import { Separator } from '@/components/ui/separator';
 import { UpgradeBox } from '@/components/sidebar/upgrade-box';
 import { NavigationItem } from '@/components/sidebar/nav-item';
-import { ElementType } from 'react';
 
 interface SidebarProps {
     params: { slug: string };
@@ -17,7 +16,7 @@ interface SidebarProps {
 
 export interface NavItemProps {
     href?: string;
-    icon: ElementType;
+    icon: LucideIcon;
     name: string;
     onClick?: () => void,
     badge?: string;

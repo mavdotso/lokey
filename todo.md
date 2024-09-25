@@ -9,7 +9,7 @@
 -   [x] See fulfilled credentials
 -   [ ] Share page UI
     -   [ ] Hidden fields
--   [ ] Fix the fields display -> login-password shows as the first label "username"
+-   [x] Fix the fields display -> login-password shows as the first label "username"
 
 ### What's needed for launch:
 
