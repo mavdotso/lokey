@@ -21,7 +21,7 @@ export const createInvite = mutation({
             throw new ConvexError('Not authenticated');
         }
 
-        const user = await getUser(ctx, { _id: identity });
+        const user = await getUser(ctx, { userId: identity });
         if (!user) {
             throw new ConvexError('User not found');
         }
@@ -54,7 +54,7 @@ export const respondToInvite = mutation({
             throw new ConvexError('Not authenticated');
         }
 
-        const user = await getUser(ctx, { _id: identity });
+        const user = await getUser(ctx, { userId: identity });
         if (!user) {
             throw new ConvexError('User not found');
         }
@@ -96,7 +96,7 @@ export const generateInviteLink = mutation({
             throw new ConvexError('Not authenticated');
         }
 
-        const user = await getUser(ctx, { _id: identity });
+        const user = await getUser(ctx, { userId: identity });
         if (!user) {
             throw new ConvexError('User not found');
         }
