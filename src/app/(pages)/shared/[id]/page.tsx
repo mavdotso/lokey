@@ -11,6 +11,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { capitalizeFirstLetter, decryptData } from "@/lib/utils";
+import { fetchAction } from "convex/nextjs";
 
 export default function SharePage() {
     const [credentialsData, setCredentialsData] = useState<any>(null)
@@ -26,7 +27,6 @@ export default function SharePage() {
     const publicKey = searchParams.get('publicKey') || '';
 
     const credentials = useQuery(api.credentials.retrieveCredentials, { _id: id as Id<"credentials">, publicKey: publicKey })
-    const incrementCredentialsViewCount = useMutation(api.credentials.incrementCredentialsViewCount)
 
     useEffect(() => {
         async function fetchAndDecryptCredentials() {
@@ -43,7 +43,7 @@ export default function SharePage() {
 
                     const parsedData = JSON.parse(decryptedData)
 
-                    await incrementCredentialsViewCount({ _id: id as Id<"credentials"> })
+                    await fetchAction(api.credentials.incrementCredentialsViewCount, { credentialsId: id as Id<"credentials"> })
                     setCredentialsData(parsedData);
                 } else {
                     setError('Failed to retrieve encrypted data');
@@ -57,7 +57,7 @@ export default function SharePage() {
         };
 
         fetchAndDecryptCredentials();
-    }, [id, publicKey, credentials, incrementCredentialsViewCount]);
+    }, [id, publicKey, credentials]);
 
 
     function copyToClipboard(key: string, value: string) {
