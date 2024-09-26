@@ -180,7 +180,7 @@ export const joinWorkspaceByInviteCode = action({
             throw new ConvexError('You are already a member of this workspace');
         }
 
-        await ctx.runMutation(internal.invites.addUserToWorkspace, { _id: args._id, workspace: invite.workspaceId, role: invite.role });
+        await ctx.runMutation(internal.invites.addUserToWorkspace, { _id: args._id, workspaceId: invite.workspaceId, role: invite.role });
 
         if (invite.invitedEmail) {
             await ctx.runMutation(internal.invites.patchInviteStatus, { inviteId: invite._id, status: 'ACCEPTED' });
@@ -250,11 +250,11 @@ export const INTERNAL_createInvite = internalMutation({
 });
 
 export const addUserToWorkspace = internalMutation({
-    args: { _id: v.id('users'), workspace: v.id('workspaces'), role: roleTypeValidator },
+    args: { _id: v.id('users'), workspaceId: v.id('workspaces'), role: roleTypeValidator },
     handler: async (ctx, args) => {
         return await ctx.db.insert('userWorkspaces', {
             userId: args._id,
-            workspaceId: args.workspace,
+            workspaceId: args.workspaceId,
             role: args.role,
         });
     },

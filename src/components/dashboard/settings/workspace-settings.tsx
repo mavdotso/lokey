@@ -8,10 +8,12 @@ import { UploadCard } from "@/components/dashboard/settings/upload-card";
 import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
 import { Workspace } from "@/convex/types";
-import { fetchMutation } from "convex/nextjs";
+import { fetchAction, fetchMutation } from "convex/nextjs";
+import { useSession } from "next-auth/react";
 
 export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
     const router = useRouter();
+    const session = useSession();
 
     const [workspaceName, setWorkspaceName] = useState(workspace.name);
     const [workspaceSlug, setWorkspaceSlug] = useState(workspace.slug);
@@ -33,8 +35,10 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
     async function handleEdit() {
         if (!workspace._id) return;
 
-        const response = await fetchMutation(api.workspaces.editWorkspace, {
-            _id: workspace._id, updates: {
+        const response = await fetchAction(api.workspaces.editWorkspace, {
+            workspaceId: workspace._id,
+            adminId: session.data?.user?.id as Id<"users">,
+            updates: {
                 name: workspaceName,
                 slug: workspaceSlug
             }

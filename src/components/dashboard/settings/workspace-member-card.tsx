@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button"
 import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { User, Workspace } from "@/convex/types"
+import { auth } from "@/lib/auth"
 import { formatConstantToTitleCase } from "@/lib/utils"
-import { fetchMutation, fetchQuery } from "convex/nextjs"
+import { fetchAction, fetchMutation, fetchQuery } from "convex/nextjs"
 import { toast } from "sonner"
 
 interface WorkspaceMemberCardProps {
@@ -14,6 +15,7 @@ interface WorkspaceMemberCardProps {
 
 export async function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProps) {
 
+    const session = await auth()
     const userRole = await fetchQuery(api.users.getUserRole, { _id: user._id as Id<"users">, workspaceId: workspace._id as Id<"workspaces"> })
 
     async function handleRemoveUser() {
@@ -28,7 +30,7 @@ export async function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCa
         }
 
         try {
-            const response = await fetchMutation(api.workspaces.kickUserFromWorkspace, { _id: workspace._id, userId: user._id })
+            const response = await fetchAction(api.workspaces.kickUserFromWorkspace, { workspaceId: workspace._id, adminUserId: session?.user?.id as Id<"users">, kickedUserId: user._id })
             if (response.success) {
                 toast.success("Success", {
                     description: `User ${user.name ? (user.name) : (user.email)} has been removed from the workspace`
