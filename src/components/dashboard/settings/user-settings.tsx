@@ -9,7 +9,7 @@ import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
 import { User, Workspace } from "@/convex/types";
 import { signout } from "@/lib/server-actions";
-import { fetchMutation } from "convex/nextjs";
+import { fetchAction, fetchMutation } from "convex/nextjs";
 
 interface UserSettingsProps {
     user: Partial<User>,
@@ -101,7 +101,7 @@ export function UserSettings({ user, userWorkspaces }: UserSettingsProps) {
     }
 
     async function confirmDeleteUser() {
-        const response = await fetchMutation(api.users.deleteUser);
+        const response = await fetchAction(api.users.removeUser, { userId: user._id as Id<"users"> });
         if (response.success) {
             toast.success('User account deleted successfully');
             signout();
