@@ -263,7 +263,7 @@ export const updateWorkspaceInviteCode = action({
 
         await ctx.runMutation(internal.workspaces.patchWorkspace, { workspaceId: workspace._id, updates: { defaultInvite: newInvite } });
 
-        const invite = await ctx.runQuery(api.invites.getInviteById, { _id: newInvite });
+        const invite = await ctx.runQuery(api.workspaceInvites.getInviteById, { _id: newInvite });
 
         if (!invite) {
             throw new ConvexError('Invite not found');

@@ -133,7 +133,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                 const encryptedPrivateKey = crypto.encryptPrivateKey(privateKey, secretPhrase);
                 const encodedPublicKey = crypto.encodePublicKey(publicKey);
 
-                const response = await fetchAction(api.credentials.newCredentialsRequest, {
+                const response = await fetchAction(api.credentialsRequests.newCredentialsRequest, {
                     workspaceId: currentWorkspaceId._id,
                     name,
                     description,

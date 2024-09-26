@@ -26,7 +26,7 @@ export default function FillCredentialsRequestPage() {
     const [formData, setFormData] = useState<Record<string, string>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const credentialsRequest = useQuery(api.credentials.getCredentialsRequestById, {
+    const credentialsRequest = useQuery(api.credentialsRequests.getCredentialsRequestById, {
         credentialsRequestId: id as Id<'credentialsRequests'>
     });
 
@@ -85,7 +85,7 @@ export default function FillCredentialsRequestPage() {
         }
 
         try {
-            const result = await fetchAction(api.credentials.fulfillCredentialsRequest, {
+            const result = await fetchAction(api.credentialsRequests.fulfillCredentialsRequest, {
                 credentialsRequestId: credentialsRequest._id,
                 fulfilledCredentials: credentials,
             });

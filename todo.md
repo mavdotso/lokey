@@ -3,8 +3,8 @@
 -   [ ] Faster redirect after creating the first workspace
 -   [ ] User is not authenticated after avatar upload?
 -   [ ] Can't click anything after editing credentials in popup, maybe something with the clickOutside
--   [ ] having issues with being logged out on convex? —> potentially because I'm calling the functions on the server — refactor the CRUD functions to be internal only 
-- [ ] TODO: test new cookies inviteCode
+-   [ ] having issues with being logged out on convex? —> potentially because I'm calling the functions on the server — refactor the CRUD functions to be internal only
+-   [ ] TODO: test new cookies inviteCode
 
 ### What's needed for launch:
 

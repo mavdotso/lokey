@@ -21,7 +21,7 @@ type InvitableRoleType = Exclude<RoleType, "ADMIN">;
 
 export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
     const [emails, setEmails] = useState([{ id: 1, value: '', role: 'MEMBER' as InvitableRoleType }]);
-    const createInvite = useMutation(api.invites.createInvite);
+    const createInvite = useMutation(api.workspaceInvites.createInvite);
     const [isLoading, setIsLoading] = useState(false);
     const baseUrl = getURL();
 

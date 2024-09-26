@@ -21,7 +21,7 @@ export function InviteCard({ invite }: InviteCardProps) {
             return;
         }
         try {
-            const response = await fetchAction(api.invites.expireInvite, { _id: invite._id });
+            const response = await fetchAction(api.workspaceInvites.expireInvite, { _id: invite._id });
             if (response.success) {
                 toast.success("Success", {
                     description: `Removed the invite for ${invite.invitedEmail}`

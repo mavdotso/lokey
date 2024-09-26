@@ -41,7 +41,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
     const [isCredentialsDialogOpen, setIsCredentialsDialogOpen] = useState(false);
 
     const removeCredentials = useMutation(api.credentials.removeCredentials);
-    const setExpired = useMutation(api.credentials.setExpired);
+    const setExpired = useMutation(api.credentials.setCredentialsExpired);
 
     const isShared = type === 'shared';
     const credentials = isShared ? item as Credentials : null;
@@ -76,7 +76,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
     async function handleReject() {
         if (!credentialsRequest) return;
         try {
-            const result = await fetchAction(api.credentials.rejectCredentialsRequest, { credentialsRequestId: credentialsRequest._id as Id<"credentialsRequests"> });
+            const result = await fetchAction(api.credentialsRequests.rejectCredentialsRequest, { credentialsRequestId: credentialsRequest._id as Id<"credentialsRequests"> });
             if (result.success) {
                 toast.success('Credential request rejected');
             } else {

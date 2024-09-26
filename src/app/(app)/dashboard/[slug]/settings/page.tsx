@@ -33,7 +33,7 @@ export default async function SettingsPage({ params }: { params: { slug: string 
     }
 
     const workspaceUsers = await fetchQuery(api.workspaces.getWorkspaceUsers, { workspaceId: workspace._id });
-    const workspaceInvites = await fetchQuery(api.invites.getWorkspaceInvites, { workspaceId: workspace._id });
+    const workspaceInvites = await fetchQuery(api.workspaceInvites.getWorkspaceInvites, { workspaceId: workspace._id });
     const user = await fetchQuery(api.users.getUser, { userId: session.user.id as Id<"users"> });
     const userWorkspaces = await fetchQuery(api.workspaces.getUserWorkspaces, { userId: session.user.id as Id<"users"> });
 

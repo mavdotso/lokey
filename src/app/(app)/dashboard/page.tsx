@@ -17,7 +17,7 @@ export default async function Dashboard() {
     const defaultWorkspace = await fetchQuery(api.users.getUserDefaultUserWorkspace, { userId: session.user.id as Id<"users"> });
 
     if (inviteCode) {
-        await fetchAction(api.invites.joinWorkspaceByInviteCode, { _id: session.user.id as Id<"users">, inviteCode });
+        await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, { _id: session.user.id as Id<"users">, inviteCode });
     }
 
     if (!workspaces || workspaces.length === 0) {

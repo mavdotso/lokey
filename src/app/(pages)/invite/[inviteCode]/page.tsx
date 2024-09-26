@@ -21,11 +21,11 @@ export default function InvitePage() {
 
     const inviteCode = params.inviteCode as string;
 
-    const getInviteDetails = useQuery(api.invites.getInviteByCode, { inviteCode });
+    const getInviteDetails = useQuery(api.workspaceInvites.getInviteByCode, { inviteCode });
     const getWorkspaceName = useQuery(api.workspaces.getWorkspaceName,
         getInviteDetails?.workspaceId ? { workspaceId: getInviteDetails.workspaceId } : 'skip');
 
-    const joinWorkspace = useAction(api.invites.joinWorkspaceByInviteCode);
+    const joinWorkspace = useAction(api.workspaceInvites.joinWorkspaceByInviteCode);
 
     useEffect(() => {
         if (getInviteDetails === undefined) {

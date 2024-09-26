@@ -39,7 +39,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
-    const credentialsRequests = useQuery(api.credentials.getCredentialsRequests, workspace ? { workspaceId: workspace._id } : 'skip');
+    const credentialsRequests = useQuery(api.credentialsRequests.getWorkspaceCredentialsRequests, workspace ? { workspaceId: workspace._id } : 'skip');
 
     if (credentials === undefined || credentialsRequests === undefined) return <LoadingScreen />;
     if (!session || !session.data || !session.data.user) return <LoadingScreen />;

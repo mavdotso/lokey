@@ -162,7 +162,7 @@ export const getInviteByCode = query({
 export const joinWorkspaceByInviteCode = action({
     args: { _id: v.id('users'), inviteCode: v.string() },
     handler: async (ctx, args) => {
-        const invite = await ctx.runQuery(api.invites.getInviteByCode, { inviteCode: args.inviteCode });
+        const invite = await ctx.runQuery(api.workspaceInvites.getInviteByCode, { inviteCode: args.inviteCode });
 
         if (!invite) {
             throw new ConvexError('Invalid invite code');
@@ -193,7 +193,7 @@ export const expireInvite = action({
         _id: v.id('workspaceInvites'),
     },
     handler: async (ctx, args) => {
-        const invite = await ctx.runQuery(api.invites.getInviteById, { _id: args._id });
+        const invite = await ctx.runQuery(api.workspaceInvites.getInviteById, { _id: args._id });
         if (!invite) {
             throw new ConvexError('Invite not found');
         }

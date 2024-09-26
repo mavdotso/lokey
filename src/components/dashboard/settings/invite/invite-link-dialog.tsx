@@ -21,7 +21,7 @@ export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
     const session = useSession();
     const [inviteLink, setInviteLink] = useState("");
 
-    const getInviteLink = useQuery(api.invites.getInviteById, workspace.defaultInvite ? { _id: workspace.defaultInvite } : 'skip')
+    const getInviteLink = useQuery(api.workspaceInvites.getInviteById, workspace.defaultInvite ? { _id: workspace.defaultInvite } : 'skip')
 
     useEffect(() => {
         if (getInviteLink) {
