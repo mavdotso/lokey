@@ -122,12 +122,10 @@ export const generateInviteLink = mutation({
 export const getInviteById = query({
     args: { _id: v.string() },
     handler: async (ctx, args) => {
-        const invite = await ctx.db
+        return await ctx.db
             .query('workspaceInvites')
             .filter((q) => q.eq(q.field('_id'), args._id))
             .first();
-
-        return invite || null;
     },
 });
 

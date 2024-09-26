@@ -5,6 +5,8 @@ import { createInvite } from './invites';
 import { planTypeValidator, roleTypeValidator } from './schema';
 import { api, internal } from './_generated/api';
 import { Id } from './_generated/dataModel';
+import { WorkspaceInvite } from './types';
+import { boolean } from 'zod';
 
 export const createWorkspace = action({
     args: {
@@ -44,7 +46,7 @@ export const createWorkspace = action({
 
         const newInvite = await ctx.runMutation(internal.invites.INTERNAL_createInvite, { workspaceId: newWorkspace, invitedBy: user._id, role: 'MEMBER' });
 
-        if (!newWorkspace) {
+        if (!newInvite) {
             throw new ConvexError("Couldn't create invite");
         }
 
@@ -322,48 +324,53 @@ export const removeWorkspace = action({
     },
 });
 
-export const updateWorkspaceInviteCode = mutation({
+export const updateWorkspaceInviteCode = action({
     args: {
-        _id: v.id('workspaces'),
+        workspaceId: v.id('workspaces'),
+        adminId: v.id('users'),
     },
     handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new ConvexError('User is not authenticated');
+        const adminWorkspace = await ctx.runQuery(internal.workspaces.getUserWorkspace, { userId: args.adminId, workspaceId: args.workspaceId });
+
+        if (!adminWorkspace || adminWorkspace.role !== 'ADMIN') {
+            throw new ConvexError('Unauthorized: Only admins can invite users to this workspace');
         }
 
-        const workspace = await ctx.db.get(args._id);
+        const workspace = await ctx.runQuery(internal.workspaces.getWorkspaceById, { _id: args.workspaceId });
+
         if (!workspace) {
-            throw new ConvexError('Workspace not found');
+            throw new ConvexError('Cannot find the workspace');
         }
 
-        if (workspace.ownerId !== identity) {
+        if (workspace.ownerId !== args.adminId) {
             throw new ConvexError('Unauthorized: You are not the owner of this workspace');
         }
 
         if (workspace.defaultInvite) {
-            // TODO: internal.invites.patchInviteStatus
-            await ctx.db.patch(workspace.defaultInvite, { status: 'EXPIRED' });
+            await ctx.runMutation(internal.invites.patchInviteStatus, { inviteId: workspace.defaultInvite, status: 'EXPIRED' });
         }
 
-        const newInvite = await createInvite(ctx, {
-            workspaceId: args._id,
-            role: 'MEMBER',
-        });
+        const newInvite: Id<'workspaceInvites'> = await ctx.runMutation(internal.invites.INTERNAL_createInvite, { workspaceId: args.workspaceId, invitedBy: args.adminId, role: 'MEMBER' });
 
-        if (!newInvite.success || !newInvite.data) {
-            throw new ConvexError('Failed to create new invite');
+        if (!newInvite) {
+            throw new ConvexError("Couldn't create invite");
         }
 
-        // TODO: patchWorkspace
-        await ctx.db.patch(args._id, {
-            defaultInvite: newInvite.data.inviteId,
-        });
+        await ctx.runMutation(internal.workspaces.patchWorkspace, { _id: workspace._id, updates: { defaultInvite: newInvite } });
+
+        const invite = await ctx.runQuery(api.invites.getInviteById, { _id: newInvite });
+
+        if (!invite) {
+            throw new ConvexError('Invite not found');
+        }
+
+        // TODO: Why does this work?
+        const workspaceInvite: WorkspaceInvite = invite;
 
         return {
             success: true,
             message: 'Workspace invite code updated successfully',
-            inviteCode: newInvite.data.inviteCode,
+            inviteCode: workspaceInvite.inviteCode,
         };
     },
 });
