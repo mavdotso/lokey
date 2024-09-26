@@ -104,7 +104,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
         try {
             const privateKey = crypto.decryptPrivateKey(credentialsRequest.encryptedPrivateKey, secretPhrase);
 
-            if (credentialsRequest.status === 'fulfilled') {
+            if (credentialsRequest.status === 'FULFILLED') {
                 const decrypted = credentialsRequest.credentials.map(cred => {
                     if (cred.encryptedValue) {
                         const decryptedValue = crypto.decryptWithPrivateKey(cred.encryptedValue, privateKey);
@@ -197,7 +197,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
                             </>
                         ) : (
                             <>
-                                {credentialsRequest?.status === 'pending' && (
+                                {credentialsRequest?.status === 'PENDING' && (
                                     <DropdownMenuItem onClick={() => setDialogOpen(true)}>
                                         Reject Request
                                     </DropdownMenuItem>
