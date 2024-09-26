@@ -178,10 +178,10 @@ export const joinWorkspaceByInviteCode = action({
             throw new ConvexError('You are already a member of this workspace');
         }
 
-        await ctx.runMutation(internal.invites.addUserToWorkspace, { _id: args._id, workspaceId: invite.workspaceId, role: invite.role });
+        await ctx.runMutation(internal.workspaceInvites.addUserToWorkspace, { _id: args._id, workspaceId: invite.workspaceId, role: invite.role });
 
         if (invite.invitedEmail) {
-            await ctx.runMutation(internal.invites.patchInviteStatus, { inviteId: invite._id, status: 'ACCEPTED' });
+            await ctx.runMutation(internal.workspaceInvites.patchInviteStatus, { inviteId: invite._id, status: 'ACCEPTED' });
         }
 
         return { success: true };
@@ -202,7 +202,7 @@ export const expireInvite = action({
             throw new ConvexError('Invite is already expired or processed');
         }
 
-        const result = await ctx.runMutation(internal.invites.patchInviteStatus, { inviteId: args._id, status: 'EXPIRED' });
+        const result = await ctx.runMutation(internal.workspaceInvites.patchInviteStatus, { inviteId: args._id, status: 'EXPIRED' });
 
         if (!result.success) {
             throw new ConvexError('Failed to expire the invite');
