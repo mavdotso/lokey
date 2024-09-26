@@ -1,6 +1,5 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v, Validator } from 'convex/values';
-import { OptionalWorkspaceSchema } from './types';
 
 /* APP */
 export const CREDENTIALS_TYPES = {
