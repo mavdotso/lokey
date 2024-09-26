@@ -125,7 +125,7 @@ export const kickUserFromWorkspace = action({
     },
 });
 
-export const editWorkspace = action({
+export const updateWorkspace = action({
     args: {
         workspaceId: v.id('workspaces'),
         adminId: v.id('users'),

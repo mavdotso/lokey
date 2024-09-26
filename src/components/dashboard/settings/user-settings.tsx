@@ -9,7 +9,7 @@ import { ConfirmationDialog } from "@/components/global/confirmation-dialog";
 import { Id } from "@/convex/_generated/dataModel";
 import { User, Workspace } from "@/convex/types";
 import { signout } from "@/lib/server-actions";
-import { fetchAction, fetchMutation } from "convex/nextjs";
+import { fetchAction } from "convex/nextjs";
 
 interface UserSettingsProps {
     user: Partial<User>,
@@ -57,7 +57,7 @@ export function UserSettings({ user, userWorkspaces }: UserSettingsProps) {
         }
 
         if (Object.keys(updates).length > 0) {
-            const response = await fetchMutation(api.users.editUser, { updates });
+            const response = await fetchAction(api.users.updateUser, { userId: user._id as Id<"users">, updates });
 
             if (response.success) {
                 toast.success('Successfully updated user profile');
@@ -71,7 +71,8 @@ export function UserSettings({ user, userWorkspaces }: UserSettingsProps) {
 
     async function handleUserAvatarUpload(storageId: Id<"_storage">) {
         try {
-            const response = await fetchMutation(api.users.updateUserAvatar, {
+            const response = await fetchAction(api.users.updateUserAvatar, {
+                userId: user._id as Id<"users">,
                 storageId: storageId
             });
 

@@ -64,7 +64,7 @@ export const checkUserPermission = query({
     },
 });
 
-export const updateUser = mutation({
+export const updateUser = action({
     args: {
         userId: v.id('users'),
         updates: v.object({
@@ -75,85 +75,37 @@ export const updateUser = mutation({
         }),
     },
     handler: async (ctx, args) => {
-        const { userId, updates } = args;
-
-        const user = await ctx.db.get(userId);
+        const user = await ctx.runQuery(api.users.getUser, { userId: args.userId });
 
         if (!user) {
             throw new ConvexError('User not found');
         }
 
-        if (updates.defaultWorkspace) {
-            const userWorkspace = await ctx.db
-                .query('userWorkspaces')
-                .filter((q) => q.eq(q.field('userId'), userId))
-                .filter((q) => q.eq(q.field('workspaceId'), updates.defaultWorkspace))
-                .first();
-
-            if (!userWorkspace) {
-                throw new ConvexError('User is not a member of the selected default workspace');
-            }
-        }
-
-        await ctx.db.patch(userId, updates);
+        await ctx.runMutation(internal.users.patchUser, { userId: args.userId, updates: args.updates });
 
         return { success: true, message: 'User profile updated successfully' };
     },
 });
 
-export const editUser = mutation({
+export const updateUserAvatar = action({
     args: {
-        updates: v.object({
-            name: v.optional(v.string()),
-            email: v.optional(v.string()),
-            defaultWorkspace: v.optional(v.id('workspaces')),
-        }),
-    },
-    handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new ConvexError('Log in to edit user profile');
-        }
-
-        const user = await ctx.db.get(identity);
-        if (!user) {
-            throw new ConvexError('User not found');
-        }
-
-        if (args.updates.defaultWorkspace) {
-            const userWorkspace = await ctx.db
-                .query('userWorkspaces')
-                .filter((q) => q.eq(q.field('userId'), identity))
-                .filter((q) => q.eq(q.field('workspaceId'), args.updates.defaultWorkspace))
-                .first();
-
-            if (!userWorkspace) {
-                throw new ConvexError('User is not a member of the selected default workspace');
-            }
-        }
-
-        await ctx.db.patch(identity, args.updates);
-
-        return { success: true, message: 'User profile updated successfully' };
-    },
-});
-
-export const updateUserAvatar = mutation({
-    args: {
+        userId: v.id('users'),
         storageId: v.id('_storage'),
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
+
         if (!identity) {
             throw new ConvexError('User is not authenticated');
         }
 
         const imageUrl = await ctx.storage.getUrl(args.storageId);
+
         if (!imageUrl) {
             throw new ConvexError('Failed to get image URL');
         }
 
-        await ctx.db.patch(identity, { image: imageUrl });
+        await ctx.runMutation(internal.users.patchUser, { userId: args.userId, updates: { image: imageUrl } });
 
         return { success: true, message: 'User avatar updated successfully', imageUrl };
     },
@@ -177,6 +129,21 @@ export const deleteUser = action({
         await ctx.runMutation(internal.users.deleteUserAccount, { userId: args.userId });
 
         return { success: true, message: 'User account deleted successfully' };
+    },
+});
+
+export const patchUser = internalMutation({
+    args: {
+        userId: v.id('users'),
+        updates: v.object({
+            name: v.optional(v.string()),
+            email: v.optional(v.string()),
+            defaultWorkspace: v.optional(v.id('workspaces')),
+            image: v.optional(v.string()),
+        }),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.userId, args.updates);
     },
 });
 

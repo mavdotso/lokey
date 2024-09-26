@@ -35,7 +35,7 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
     async function handleEdit() {
         if (!workspace._id) return;
 
-        const response = await fetchAction(api.workspaces.editWorkspace, {
+        const response = await fetchAction(api.workspaces.updateWorkspace, {
             workspaceId: workspace._id,
             adminId: session.data?.user?.id as Id<"users">,
             updates: {
