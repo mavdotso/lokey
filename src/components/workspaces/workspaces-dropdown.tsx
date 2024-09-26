@@ -19,7 +19,7 @@ export function WorkspacesDropdown() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedSpaceSlug, setSelectedSpaceSlug] = useState<string>('');
 
-    const workspacesQuery = useQuery(api.workspaces.getUserWorkspaces, { _id: session.data?.user?.id as Id<"users"> });
+    const workspacesQuery = useQuery(api.workspaces.getUserWorkspaces, { userId: session.data?.user?.id as Id<"users"> });
 
     const workspaces = useMemo(() => workspacesQuery ?? [], [workspacesQuery]);
 

@@ -86,7 +86,7 @@ export const canCreateWorkspace = action({
         _id: v.id('users'),
     },
     handler: async (ctx, args) => {
-        const userWorkspaces: Workspace[] = await ctx.runQuery(api.workspaces.getUserWorkspaces, { _id: args._id });
+        const userWorkspaces: Workspace[] = await ctx.runQuery(api.workspaces.getUserWorkspaces, { userId: args._id });
 
         if (userWorkspaces.length >= MAX_FREE_WORKSPACES) {
             const freeWorkspaces = await Promise.all(

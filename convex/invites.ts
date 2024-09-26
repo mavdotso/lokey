@@ -172,7 +172,7 @@ export const joinWorkspaceByInviteCode = action({
             throw new ConvexError('This invite has already been processed');
         }
 
-        const existingMembership = await ctx.runQuery(api.workspaces.getUserWorkspaces, { _id: args._id });
+        const existingMembership = await ctx.runQuery(api.workspaces.getUserWorkspaces, { userId: args._id });
 
         if (existingMembership) {
             throw new ConvexError('You are already a member of this workspace');
