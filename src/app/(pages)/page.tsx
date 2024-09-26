@@ -5,11 +5,11 @@ import { Input } from '@/components/ui/input';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { useMutation } from 'convex/react';
 import { encryptData, generateShareLink } from '@/lib/utils';
 import { api } from '@/convex/_generated/api';
 import { CopyCredentialsLink } from '@/components/credentials/copy-credentials-link';
 import { SubmitButton } from '@/components/global/submit-button';
+import { fetchAction } from 'convex/nextjs';
 
 export default function LandingPage() {
     const [password, setPassword] = useState('');
@@ -18,8 +18,6 @@ export default function LandingPage() {
     const [link, setLink] = useState('');
     const [error, setError] = useState('');
 
-    const createCredentials = useMutation(api.credentials.createCredentials);
-
     async function handleSubmit() {
         setError('');
         setLink('');
@@ -27,7 +25,7 @@ export default function LandingPage() {
         try {
             const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify({ password: password }))
 
-            const { credentialsId } = await createCredentials({
+            const credentialsId = await fetchAction(api.credentials.newCredentials, {
                 name: 'Shared Password',
                 description: 'One-time shared password',
                 type: 'PASSWORD',

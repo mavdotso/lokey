@@ -1,31 +1,11 @@
-import { query, mutation } from './_generated/server';
+import { query, mutation, internalQuery, internalMutation, action } from './_generated/server';
 import { ConvexError, v } from 'convex/values';
 import { getViewerId } from './auth';
 import { Id } from './_generated/dataModel';
 import { credentialsTypeValidator } from './schema';
+import { api, internal } from './_generated/api';
 
-export const getCredentialsById = query({
-    args: { credentialsId: v.id('credentials') },
-    handler: async (ctx, args) => {
-        const credentials = await ctx.db.get(args.credentialsId);
-        if (!credentials) {
-            throw new ConvexError('Credentials not found');
-        }
-        return credentials;
-    },
-});
-
-export const getWorkspaceCredentials = query({
-    args: { workspaceId: v.id('workspaces') },
-    handler: async (ctx, args) => {
-        return ctx.db
-            .query('credentials')
-            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
-            .collect();
-    },
-});
-
-export const createCredentials = mutation({
+export const newCredentials = action({
     args: {
         workspaceId: v.optional(v.id('workspaces')),
         name: v.string(),
@@ -38,62 +18,57 @@ export const createCredentials = mutation({
     },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
-        const credentialsId = await ctx.db.insert('credentials', {
-            workspaceId: args.workspaceId,
-            name: args.name,
-            description: args.description,
-            type: args.type,
-            encryptedData: args.encryptedData,
-            privateKey: args.privateKey,
-            updatedAt: new Date().toISOString(),
-            expiresAt: args.expiresAt,
-            maxViews: args.maxViews,
-            viewCount: 0,
-            createdBy: identity || undefined,
-        });
-        return { credentialsId };
+
+        const credentialsId: Id<'credentials'> = await ctx.runMutation(internal.credentials.createCredentials, { ...args, createdBy: identity || undefined });
+
+        return credentialsId;
     },
 });
 
-export const incrementCredentialsViewCount = mutation({
-    args: { _id: v.id('credentials') },
+export const incrementCredentialsViewCount = action({
+    args: { credentialsId: v.id('credentials') },
     handler: async (ctx, args) => {
-        
-        const credential = await ctx.db.get(args._id);
+        const credentials = await ctx.runQuery(api.credentials.getCredentialsById, { credentialsId: args.credentialsId });
 
-        if (!credential) {
-            throw new ConvexError('Credential not found');
+        if (!credentials) {
+            throw new ConvexError('Credentials not found');
         }
 
-        const newViewCount = (credential.viewCount || 0) + 1;
+        const newViewCount = (credentials.viewCount || 0) + 1;
+
         const updates: any = {
             viewCount: newViewCount,
             updatedAt: new Date().toISOString(),
         };
 
-        if (credential.maxViews && newViewCount > credential.maxViews) {
+        if (credentials.maxViews && newViewCount > credentials.maxViews) {
             updates.expiresAt = new Date().toISOString();
         }
 
-        await ctx.db.patch(args._id, updates);
-        return { success: true };
+        const updatedCredentials = await ctx.runMutation(internal.credentials.patchCredentials, { credentialsId: args.credentialsId, updates });
+
+        if (updatedCredentials) {
+            return { success: true };
+        } else {
+            return { success: false };
+        }
     },
 });
-
-export type RetrieveCredentialsResult = { isExpired: true } | { isExpired: false; encryptedData: string; privateKey: string };
 
 export const retrieveCredentials = query({
     args: {
         _id: v.id('credentials'),
         publicKey: v.string(),
     },
-    handler: async (ctx, args): Promise<RetrieveCredentialsResult> => {
+    handler: async (ctx, args) => {
         const credential = await ctx.db.get(args._id);
+
         if (!credential) {
             throw new ConvexError('Credential not found');
         }
 
         const now = new Date();
+
         const isExpired = (credential.expiresAt && new Date(credential.expiresAt) <= now) || (credential.maxViews !== undefined && credential.viewCount >= credential.maxViews);
 
         if (isExpired) {
@@ -318,5 +293,84 @@ export const rejectCredentialsRequest = mutation({
         });
 
         return { success: true };
+    },
+});
+
+export const getCredentialsById = query({
+    args: { credentialsId: v.id('credentials') },
+    handler: async (ctx, args) => {
+        return await ctx.db.get(args.credentialsId);
+    },
+});
+
+export const getWorkspaceCredentials = query({
+    args: { workspaceId: v.id('workspaces') },
+    handler: async (ctx, args) => {
+        return ctx.db
+            .query('credentials')
+            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+            .collect();
+    },
+});
+
+export const createCredentials = internalMutation({
+    args: {
+        workspaceId: v.optional(v.id('workspaces')),
+        name: v.string(),
+        description: v.optional(v.string()),
+        type: credentialsTypeValidator,
+        encryptedData: v.string(),
+        privateKey: v.string(),
+        expiresAt: v.optional(v.string()),
+        maxViews: v.optional(v.number()),
+        createdBy: v.optional(v.id('users')),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db.insert('credentials', {
+            workspaceId: args.workspaceId,
+            name: args.name,
+            description: args.description,
+            type: args.type,
+            encryptedData: args.encryptedData,
+            privateKey: args.privateKey,
+            updatedAt: new Date().toISOString(),
+            expiresAt: args.expiresAt,
+            maxViews: args.maxViews,
+            viewCount: 0,
+            createdBy: args.createdBy,
+        });
+    },
+});
+
+export const patchCredentials = internalMutation({
+    args: {
+        credentialsId: v.id('credentials'),
+        updates: v.object({
+            workspaceId: v.id('workspaces'),
+            name: v.string(),
+            description: v.optional(v.string()),
+            createdBy: v.optional(v.id('users')),
+            type: credentialsTypeValidator,
+            encryptedData: v.string(),
+            privateKey: v.string(),
+            expiresAt: v.optional(v.string()),
+            maxViews: v.optional(v.number()),
+            viewCount: v.number(),
+        }),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db.patch(args.credentialsId, {
+            ...args.updates,
+            updatedAt: new Date().toISOString(),
+        });
+    },
+});
+
+export const deleteCredentials = internalMutation({
+    args: {
+        credentialsId: v.id('credentials'),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db.delete(args.credentialsId);
     },
 });

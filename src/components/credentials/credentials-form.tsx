@@ -19,6 +19,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
 import { credentialsFields } from '@/lib/config/credentials-fields'
 import { CREDENTIALS_TYPES } from '@/convex/schema'
+import { fetchAction } from 'convex/nextjs'
 
 interface CredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -48,7 +49,6 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
 
     const { slug } = useParams();
 
-    const createCredentials = useMutation(api.credentials.createCredentials);
     const editCredentials = useMutation(api.credentials.editCredentials);
     const createCredentialsRequest = useMutation(api.credentials.createCredentialsRequest);
     const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string });
@@ -109,7 +109,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                 } else {
                     const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data));
 
-                    const { credentialsId } = await createCredentials({
+                    const credentialsId = await fetchAction(api.credentials.newCredentials, {
                         workspaceId: currentWorkspaceId._id,
                         name,
                         description,

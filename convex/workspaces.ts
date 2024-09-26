@@ -403,25 +403,6 @@ export const INTERNAL_createWorkspace = internalMutation({
     },
 });
 
-export const patchWorkspace = internalMutation({
-    args: {
-        workspaceId: v.id('workspaces'),
-        updates: v.object({
-            name: v.optional(v.string()),
-            slug: v.optional(v.string()),
-            iconId: v.optional(v.string()),
-            logo: v.optional(v.string()),
-            defaultInvite: v.optional(v.id('workspaceInvites')),
-            planType: v.optional(planTypeValidator),
-            customer: v.optional(v.id('customers')),
-            currentSubscription: v.optional(v.id('subscriptions')),
-        }),
-    },
-    handler: async (ctx, args) => {
-        await ctx.db.patch(args.workspaceId, args.updates);
-    },
-});
-
 export const getWorkspaceById = internalQuery({
     args: {
         workspaceId: v.id('workspaces'),
@@ -449,11 +430,30 @@ export const getUserWorkspace = internalQuery({
     },
 });
 
+export const patchWorkspace = internalMutation({
+    args: {
+        workspaceId: v.id('workspaces'),
+        updates: v.object({
+            name: v.optional(v.string()),
+            slug: v.optional(v.string()),
+            iconId: v.optional(v.string()),
+            logo: v.optional(v.string()),
+            defaultInvite: v.optional(v.id('workspaceInvites')),
+            planType: v.optional(planTypeValidator),
+            customer: v.optional(v.id('customers')),
+            currentSubscription: v.optional(v.id('subscriptions')),
+        }),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db.patch(args.workspaceId, args.updates);
+    },
+});
+
 export const deleteWorkspace = internalMutation({
     args: {
         workspaceId: v.id('workspaces'),
     },
     handler: async (ctx, args) => {
-        await ctx.db.delete(args.workspaceId);
+        return await ctx.db.delete(args.workspaceId);
     },
 });
