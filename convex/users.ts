@@ -7,6 +7,7 @@ export const getUser = query({
     args: { _id: v.id('users') },
     handler: async (ctx, args) => {
         const user = await ctx.db.get(args._id);
+        
         if (!user) {
             return null;
         }

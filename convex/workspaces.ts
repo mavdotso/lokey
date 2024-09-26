@@ -1,12 +1,14 @@
-import { mutation, query } from './_generated/server';
-import { v } from 'convex/values';
+import { action, internalMutation, internalQuery, mutation, query } from './_generated/server';
+import { ConvexError, v } from 'convex/values';
 import { getViewerId } from './auth';
-import { canCreateWorkspace } from './limits';
 import { createInvite } from './invites';
 import { planTypeValidator, roleTypeValidator } from './schema';
+import { api, internal } from './_generated/api';
+import { Id } from './_generated/dataModel';
 
-export const createWorkspace = mutation({
+export const createWorkspace = action({
     args: {
+        userId: v.id('users'),
         name: v.string(),
         slug: v.string(),
         iconId: v.string(),
@@ -14,92 +16,46 @@ export const createWorkspace = mutation({
         planType: planTypeValidator,
     },
     handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
+        const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
 
-        if (!identity) {
-            throw new Error('User is not authenticated');
-        }
-
-        const user = await ctx.db
-            .query('users')
-            .filter((q) => q.eq(q.field('_id'), identity))
-            .unique();
         if (!user) {
-            throw new Error('User not found');
+            throw new ConvexError('User not found');
         }
 
         if (args.planType === 'FREE') {
-            const canCreate = await canCreateWorkspace(ctx.db, user._id);
+            const canCreate = await ctx.runAction(api.limits.canCreateWorkspace, { _id: user._id });
+
             if (!canCreate) {
-                throw new Error('You have reached the maximum number of free workspaces');
+                throw new ConvexError('You have reached the maximum number of free workspaces');
             }
         }
 
-        const isUnique = await isSlugUnique(ctx, { slug: args.slug });
+        const isUnique = await ctx.runQuery(api.workspaces.isSlugUnique, { slug: args.slug });
+
         if (!isUnique) {
-            throw new Error('The slug is not unique');
+            throw new ConvexError('The slug is not unique');
         }
 
-        const workspaceId = await ctx.db.insert('workspaces', {
-            ...args,
-            ownerId: identity,
-            planType: args.planType,
-        });
+        const newWorkspace: Id<'workspaces'> = await ctx.runMutation(internal.workspaces.INTERNAL_createWorkspace, { ...args, ownerId: args.userId });
 
-        const newInvite = await createInvite(ctx, {
-            workspaceId,
-            role: 'MEMBER',
-        });
-
-        if (newInvite.success && newInvite.data) {
-            await ctx.db.patch(workspaceId, {
-                defaultInvite: newInvite.data.inviteId,
-            });
+        if (!newWorkspace) {
+            throw new ConvexError("Couldn't create workspace");
         }
 
-        await ctx.db.insert('userWorkspaces', {
-            userId: user._id,
-            workspaceId: workspaceId,
-            role: 'ADMIN',
-        });
+        const newInvite = await ctx.runMutation(internal.invites.INTERNAL_createInvite, { workspaceId: newWorkspace, invitedBy: user._id, role: 'MEMBER' });
 
-        return { workspaceId };
+        if (!newWorkspace) {
+            throw new ConvexError("Couldn't create invite");
+        }
+
+        await ctx.runMutation(internal.workspaces.patchWorkspace, { _id: newWorkspace, updates: { defaultInvite: newInvite } });
+        await ctx.runMutation(internal.workspaces.createWorkspaceAdmin, { userId: user._id, workspaceId: newWorkspace });
+
+        return newWorkspace;
     },
 });
 
 export const getUserWorkspaces = query({
-    args: {},
-    handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-
-        console.log(identity);
-
-        if (!identity) {
-            throw new Error('User is not authenticated');
-        }
-
-        const ownedWorkspaces = await ctx.db
-            .query('workspaces')
-            .filter((q) => q.eq(q.field('ownerId'), identity))
-            .collect();
-
-        const userWorkspaces = await ctx.db
-            .query('userWorkspaces')
-            .filter((q) => q.eq(q.field('userId'), identity))
-            .collect();
-
-        const memberWorkspaces = await Promise.all(userWorkspaces.map(async (uw) => await ctx.db.get(uw.workspaceId)));
-
-        const allWorkspaces = [...ownedWorkspaces, ...memberWorkspaces];
-        const uniqueWorkspaces = Array.from(new Set(allWorkspaces.map((w) => w?._id)))
-            .map((id) => allWorkspaces.find((w) => w?._id === id))
-            .filter((w): w is NonNullable<typeof w> => w !== null && w !== undefined);
-
-        return uniqueWorkspaces;
-    },
-});
-
-export const TEMP_getUserWorkspaces = query({
     args: {
         _id: v.id('users'),
     },
@@ -138,18 +94,6 @@ export const isSlugUnique = query({
     },
 });
 
-export const getWorkspaceIdBySlug = query({
-    args: {
-        slug: v.string(),
-    },
-    handler: async (ctx, args) => {
-        return ctx.db
-            .query('workspaces')
-            .filter((q) => q.eq(q.field('slug'), args.slug))
-            .first();
-    },
-});
-
 export const getWorkspaceBySlug = query({
     args: {
         slug: v.string(),
@@ -171,7 +115,7 @@ export const inviteUserToWorkspace = mutation({
     handler: async (ctx, args) => {
         const inviterId = await getViewerId(ctx);
         if (!inviterId) {
-            throw new Error('Log in to invite users');
+            throw new ConvexError('Log in to invite users');
         }
 
         const inviterWorkspace = await ctx.db
@@ -181,7 +125,7 @@ export const inviteUserToWorkspace = mutation({
             .first();
 
         if (!inviterWorkspace || inviterWorkspace.role !== 'ADMIN') {
-            throw new Error('Unauthorized: Only admins can invite users to this workspace');
+            throw new ConvexError('Unauthorized: Only admins can invite users to this workspace');
         }
 
         const invitedUser = await ctx.db
@@ -190,7 +134,7 @@ export const inviteUserToWorkspace = mutation({
             .first();
 
         if (!invitedUser) {
-            throw new Error('Invited user not found');
+            throw new ConvexError('Invited user not found');
         }
 
         const existingMembership = await ctx.db
@@ -200,9 +144,10 @@ export const inviteUserToWorkspace = mutation({
             .first();
 
         if (existingMembership) {
-            throw new Error('User is already part of the workspace');
+            throw new ConvexError('User is already part of the workspace');
         }
 
+        // TODO: internal.invites.addUserToWorkspace
         await ctx.db.insert('userWorkspaces', {
             userId: args.userId,
             workspaceId: args._id,
@@ -221,7 +166,7 @@ export const kickUserFromWorkspace = mutation({
     handler: async (ctx, args) => {
         const requesterId = await getViewerId(ctx);
         if (!requesterId) {
-            throw new Error('Log in to manage workspace members');
+            throw new ConvexError('Log in to manage workspace members');
         }
 
         const userWorkspace = await ctx.db
@@ -231,18 +176,19 @@ export const kickUserFromWorkspace = mutation({
             .first();
 
         if (!userWorkspace) {
-            throw new Error('User is not a member of the workspace');
+            throw new ConvexError('User is not a member of the workspace');
         }
 
         const workspace = await ctx.db.get(args._id);
         if (!workspace) {
-            throw new Error('Cannot find the workspace');
+            throw new ConvexError('Cannot find the workspace');
         }
 
         if (workspace.ownerId === args.userId) {
-            throw new Error('Cannot remove the workspace owner');
+            throw new ConvexError('Cannot remove the workspace owner');
         }
 
+        // TODO: removeUserFromWorkspace
         await ctx.db.delete(userWorkspace._id);
 
         return { success: true, message: 'User successfully removed from the workspace' };
@@ -262,19 +208,20 @@ export const editWorkspace = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('Log in to edit workspaces');
+            throw new ConvexError('Log in to edit workspaces');
         }
 
         const workspace = await ctx.db.get(args._id);
 
         if (!workspace) {
-            throw new Error('Workspace not found');
+            throw new ConvexError('Workspace not found');
         }
 
         if (workspace.ownerId !== identity) {
-            throw new Error('Unauthorized: You are not the owner of this workspace');
+            throw new ConvexError('Unauthorized: You are not the owner of this workspace');
         }
 
+        // TODO: patchWorkspace
         await ctx.db.patch(args._id, args.updates);
 
         return { success: true, message: 'Workspace updated successfully' };
@@ -288,7 +235,7 @@ export const getWorkspaceUsers = query({
     handler: async (ctx, args) => {
         const workspace = await ctx.db.get(args._id);
         if (!workspace) {
-            throw new Error('Workspace not found');
+            throw new ConvexError('Workspace not found');
         }
 
         const associatedUsers = await ctx.db
@@ -297,7 +244,7 @@ export const getWorkspaceUsers = query({
             .collect();
 
         if (!associatedUsers || associatedUsers.length === 0) {
-            throw new Error('No users are associated with this workspace');
+            throw new ConvexError('No users are associated with this workspace');
         }
 
         const users = await Promise.all(
@@ -328,23 +275,24 @@ export const updateWorkspaceLogo = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('User is not authenticated');
+            throw new ConvexError('User is not authenticated');
         }
 
         const workspace = await ctx.db.get(args._id);
         if (!workspace) {
-            throw new Error('Workspace not found');
+            throw new ConvexError('Workspace not found');
         }
 
         if (workspace.ownerId !== identity) {
-            throw new Error('Unauthorized: You are not the owner of this workspace');
+            throw new ConvexError('Unauthorized: You are not the owner of this workspace');
         }
 
         const imageUrl = await ctx.storage.getUrl(args.storageId);
         if (!imageUrl) {
-            throw new Error('Failed to get image URL');
+            throw new ConvexError('Failed to get image URL');
         }
 
+        // TODO: patchWorkspace
         await ctx.db.patch(args._id, { logo: imageUrl });
 
         return { success: true, message: 'Workspace logo updated successfully' };
@@ -358,16 +306,16 @@ export const deleteWorkspace = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('User is not authenticated');
+            throw new ConvexError('User is not authenticated');
         }
 
         const workspace = await ctx.db.get(args._id);
         if (!workspace) {
-            throw new Error('Workspace not found');
+            throw new ConvexError('Workspace not found');
         }
 
         if (workspace.ownerId !== identity) {
-            throw new Error('Unauthorized: Only the workspace owner can delete the workspace');
+            throw new ConvexError('Unauthorized: Only the workspace owner can delete the workspace');
         }
 
         await ctx.db.delete(args._id);
@@ -378,6 +326,7 @@ export const deleteWorkspace = mutation({
             .collect();
 
         for (const userWorkspace of userWorkspaces) {
+            // TODO: deleteWorkspace
             await ctx.db.delete(userWorkspace._id);
         }
 
@@ -392,19 +341,20 @@ export const updateWorkspaceInviteCode = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new Error('User is not authenticated');
+            throw new ConvexError('User is not authenticated');
         }
 
         const workspace = await ctx.db.get(args._id);
         if (!workspace) {
-            throw new Error('Workspace not found');
+            throw new ConvexError('Workspace not found');
         }
 
         if (workspace.ownerId !== identity) {
-            throw new Error('Unauthorized: You are not the owner of this workspace');
+            throw new ConvexError('Unauthorized: You are not the owner of this workspace');
         }
 
         if (workspace.defaultInvite) {
+            // TODO: internal.invites.patchInviteStatus
             await ctx.db.patch(workspace.defaultInvite, { status: 'EXPIRED' });
         }
 
@@ -414,9 +364,10 @@ export const updateWorkspaceInviteCode = mutation({
         });
 
         if (!newInvite.success || !newInvite.data) {
-            throw new Error('Failed to create new invite');
+            throw new ConvexError('Failed to create new invite');
         }
 
+        // TODO: patchWorkspace
         await ctx.db.patch(args._id, {
             defaultInvite: newInvite.data.inviteId,
         });
@@ -428,3 +379,85 @@ export const updateWorkspaceInviteCode = mutation({
         };
     },
 });
+
+export const createWorkspaceAdmin = internalMutation({
+    args: {
+        userId: v.id('users'),
+        workspaceId: v.id('workspaces'),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.insert('userWorkspaces', {
+            userId: args.userId,
+            workspaceId: args.workspaceId,
+            role: 'ADMIN',
+        });
+    },
+});
+
+export const removeUserFromWorkspace = internalMutation({
+    args: {
+        userWorkspace: v.id('userWorkspaces'),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args.userWorkspace);
+    },
+});
+
+export const INTERNAL_createWorkspace = internalMutation({
+    args: {
+        ownerId: v.id('users'),
+        name: v.string(),
+        slug: v.string(),
+        iconId: v.string(),
+        logo: v.optional(v.string()),
+        planType: planTypeValidator,
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db.insert('workspaces', {
+            ...args,
+            ownerId: args.ownerId,
+            planType: args.planType,
+        });
+    },
+});
+
+export const patchWorkspace = internalMutation({
+    args: {
+        _id: v.id('workspaces'),
+        updates: v.object({
+            name: v.optional(v.string()),
+            slug: v.optional(v.string()),
+            iconId: v.optional(v.string()),
+            logo: v.optional(v.string()),
+            defaultInvite: v.optional(v.id('workspaceInvites')),
+            planType: v.optional(planTypeValidator),
+            customer: v.optional(v.id('customers')),
+            currentSubscription: v.optional(v.id('subscriptions')),
+        }),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args._id, args.updates);
+    },
+});
+
+export const getWorkspaceById = internalQuery({
+    args: {
+        _id: v.id('workspaces'),
+    },
+    handler: async (ctx, args) => {
+        const workspace = await ctx.db.get(args._id);
+        if (!workspace) {
+            throw new ConvexError('Workspace not found');
+        }
+        return workspace;
+    },
+});
+
+// export const deleteWorkspace = internalMutation({
+//     args: {
+//         _id: v.id('workspaces'),
+//     },
+//     handler: async (ctx, args) => {
+//         await ctx.db.delete(args._id);
+//     },
+// });

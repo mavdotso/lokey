@@ -1,6 +1,6 @@
 import { WORKSPACE_PLAN_LIMITS } from '@/lib/config/plan-limits';
 import { Id } from './_generated/dataModel';
-import { CREDENTIALS_TYPES, CURRENCIES, INTERVALS, INVITES, PLANS, PRICING, ROLES, SUBSCRIPTION_STATUS } from './schema';
+import { CREDENTIALS_TYPES, CURRENCIES, INTERVALS, INVITES, PLANS, PRICING, ROLES, SUBSCRIPTION_STATUS, workspaceSchema } from './schema';
 
 export type CredentialsType = (typeof CREDENTIALS_TYPES)[keyof typeof CREDENTIALS_TYPES];
 export type RoleType = (typeof ROLES)[keyof typeof ROLES];

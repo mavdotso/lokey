@@ -174,7 +174,7 @@ export const joinWorkspaceByInviteCode = action({
             throw new ConvexError('This invite has already been processed');
         }
 
-        const existingMembership = await ctx.runQuery(api.workspaces.TEMP_getUserWorkspaces, { _id: args._id });
+        const existingMembership = await ctx.runQuery(api.workspaces.getUserWorkspaces, { _id: args._id });
 
         if (existingMembership) {
             throw new ConvexError('You are already a member of this workspace');
@@ -200,12 +200,10 @@ export const expireInvite = action({
             throw new ConvexError('Invite not found');
         }
 
-        // Check if the invite is already expired or processed
         if (invite.status !== 'PENDING') {
             throw new ConvexError('Invite is already expired or processed');
         }
 
-        // Attempt to expire the invite
         const result = await ctx.runMutation(internal.invites.patchInviteStatus, { inviteId: args._id, status: 'EXPIRED' });
 
         if (!result.success) {
@@ -224,6 +222,30 @@ export const getWorkspaceInvites = query({
             .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
             .filter((q) => q.eq(q.field('status'), 'pending'))
             .collect();
+    },
+});
+
+export const INTERNAL_createInvite = internalMutation({
+    args: {
+        workspaceId: v.id('workspaces'),
+        invitedBy: v.id('users'),
+        invitedUserId: v.optional(v.id('users')),
+        invitedEmail: v.optional(v.string()),
+        role: roleTypeValidator,
+        expiresAt: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        const inviteCode = nanoid(10);
+        return await ctx.db.insert('workspaceInvites', {
+            workspaceId: args.workspaceId,
+            invitedBy: args.invitedBy,
+            invitedUserId: args.invitedUserId,
+            invitedEmail: args.invitedEmail,
+            role: args.role,
+            status: 'PENDING',
+            expiresAt: args.expiresAt,
+            inviteCode,
+        });
     },
 });
 

@@ -37,7 +37,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const [isRequestDialogOpen, setRequestDialogOpen] = useState(false);
 
-    const workspace = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: params.slug });
+    const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
     const credentialsRequests = useQuery(api.credentials.getCredentialsRequests, workspace ? { workspaceId: workspace._id } : 'skip');
 

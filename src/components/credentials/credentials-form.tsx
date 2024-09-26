@@ -51,7 +51,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
     const createCredentials = useMutation(api.credentials.createCredentials);
     const editCredentials = useMutation(api.credentials.editCredentials);
     const createCredentialsRequest = useMutation(api.credentials.createCredentialsRequest);
-    const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: slug as string });
+    const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string });
 
     useEffect(() => {
         if (existingData) {

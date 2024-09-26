@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useMutation, useQuery } from 'convex/react'
+import { useQuery } from 'convex/react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
@@ -13,6 +13,8 @@ import { api } from '@/convex/_generated/api'
 import { SubmitButton } from '@/components/global/submit-button'
 import { DialogClose, DialogFooter } from '../ui/dialog'
 import { Button } from '../ui/button'
+import { fetchAction } from 'convex/nextjs'
+import { useSession } from 'next-auth/react'
 
 interface CreateWorkspaceFormProps {
     isCloseable?: boolean
@@ -20,6 +22,7 @@ interface CreateWorkspaceFormProps {
 
 export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
     const router = useRouter()
+    const session = useSession();
 
     const [formState, setFormState] = useState({
         name: '',
@@ -33,7 +36,6 @@ export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     const isUnique = useQuery(api.workspaces.isSlugUnique, { slug: formState.slug })
-    const createWorkspace = useMutation(api.workspaces.createWorkspace)
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -63,7 +65,7 @@ export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
         setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
 
         try {
-            const { workspaceId } = await createWorkspace({ name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
+            const workspaceId = await fetchAction(api.workspaces.createWorkspace, { userId: session.data?.user?.id as Id<"users">, name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
 
             toast.success('Workspace created successfully!')
             setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))

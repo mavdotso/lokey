@@ -13,7 +13,7 @@ export default async function Dashboard() {
     if (!session || !session.user) redirect('/')
 
     const inviteCode = cookieStore.get('inviteCode')?.value;
-    const workspaces = await fetchQuery(api.workspaces.TEMP_getUserWorkspaces, { _id: session.user.id as Id<"users"> });
+    const workspaces = await fetchQuery(api.workspaces.getUserWorkspaces, { _id: session.user.id as Id<"users"> });
     const defaultWorkspace = await fetchQuery(api.users.getUserDefaultWorkspace, { _id: session.user.id as Id<"users"> });
 
     if (inviteCode) {

@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v, Validator } from 'convex/values';
+import { OptionalWorkspaceSchema } from './types';
 
 /* APP */
 export const CREDENTIALS_TYPES = {
@@ -45,6 +46,7 @@ export const SUBSCRIPTION_STATUS = {
 } as const;
 
 /* VALIDATORS */
+
 export const roleTypeValidator = v.union(...Object.values(ROLES).map(v.literal));
 export const credentialsTypeValidator = v.union(...Object.values(CREDENTIALS_TYPES).map(v.literal));
 export const inviteTypeValidator = v.union(...Object.values(INVITES).map(v.literal));
@@ -55,7 +57,7 @@ export const pricingTypeValidator = v.union(...Object.values(PRICING).map(v.lite
 export const subscriptionStatusValidator = v.union(...Object.values(SUBSCRIPTION_STATUS).map(v.literal));
 
 /* SCHEMA */
-const workspaceSchema = {
+export const workspaceSchema = {
     ownerId: v.id('users'),
     name: v.string(),
     slug: v.string(),
