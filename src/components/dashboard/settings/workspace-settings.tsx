@@ -57,8 +57,9 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
     async function handleLogoUpload(storageId: Id<"_storage">) {
         if (!workspace._id) return;
         try {
-            const response = await fetchMutation(api.workspaces.updateWorkspaceLogo, {
-                _id: workspace._id,
+            const response = await fetchAction(api.workspaces.updateWorkspaceLogo, {
+                workspaceId: workspace._id,
+                adminId: session.data?.user?.id as Id<"users">,
                 storageId: storageId
             });
 
