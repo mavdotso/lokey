@@ -91,7 +91,7 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
     async function confirmDeleteWorkspace() {
         if (!workspace._id) return;
 
-        const response = await fetchMutation(api.workspaces.deleteWorkspace, { _id: workspace._id });
+        const response = await fetchAction(api.workspaces.removeWorkspace, { workspaceId: workspace._id, adminId: session.data?.user?.id as Id<"users">, });
         if (response.success) {
             toast.success('Workspace deleted successfully');
             router.push('/dashboard');

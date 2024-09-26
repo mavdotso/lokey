@@ -172,7 +172,7 @@ export const kickUserFromWorkspace = action({
         }
 
         // TODO: check if this is right
-        await ctx.runMutation(internal.workspaces.removeUserFromWorkspace, { userWorkspace: existingMembership._id });
+        await ctx.runMutation(internal.workspaces.removeUserFromWorkspace, { removedUser: args.kickedUserId });
 
         return { success: true, message: 'User successfully removed from the workspace' };
     },
@@ -287,35 +287,35 @@ export const updateWorkspaceLogo = action({
     },
 });
 
-export const deleteWorkspace = mutation({
+export const removeWorkspace = action({
     args: {
-        _id: v.id('workspaces'),
+        workspaceId: v.id('workspaces'),
+        adminId: v.id('users'),
     },
     handler: async (ctx, args) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new ConvexError('User is not authenticated');
+        const adminWorkspace = await ctx.runQuery(internal.workspaces.getUserWorkspace, { userId: args.adminId, workspaceId: args.workspaceId });
+
+        if (!adminWorkspace || adminWorkspace.role !== 'ADMIN') {
+            throw new ConvexError('Unauthorized: Only admins can invite users to this workspace');
         }
 
-        const workspace = await ctx.db.get(args._id);
+        const workspace = await ctx.runQuery(internal.workspaces.getWorkspaceById, { _id: args.workspaceId });
+
         if (!workspace) {
-            throw new ConvexError('Workspace not found');
+            throw new ConvexError('Cannot find the workspace');
         }
 
-        if (workspace.ownerId !== identity) {
-            throw new ConvexError('Unauthorized: Only the workspace owner can delete the workspace');
+        if (workspace.ownerId !== args.adminId) {
+            throw new ConvexError('Unauthorized: You are not the owner of this workspace');
         }
 
-        await ctx.db.delete(args._id);
+        await ctx.runMutation(internal.workspaces.deleteWorkspace, { _id: args.workspaceId });
 
-        const userWorkspaces = await ctx.db
-            .query('userWorkspaces')
-            .filter((q) => q.eq(q.field('workspaceId'), args._id))
-            .collect();
+        const workspaceUsers = await ctx.runQuery(api.workspaces.getWorkspaceUsers, { _id: args.workspaceId });
 
-        for (const userWorkspace of userWorkspaces) {
-            // TODO: deleteWorkspace
-            await ctx.db.delete(userWorkspace._id);
+        // TODO: check if this is right
+        for (const userWorkspace of workspaceUsers.users) {
+            await ctx.runMutation(internal.workspaces.removeUserFromWorkspace, { removedUser: userWorkspace._id });
         }
 
         return { success: true, message: 'Workspace deleted successfully' };
@@ -384,10 +384,10 @@ export const createWorkspaceAdmin = internalMutation({
 
 export const removeUserFromWorkspace = internalMutation({
     args: {
-        userWorkspace: v.id('userWorkspaces'),
+        removedUser: v.id('users'),
     },
     handler: async (ctx, args) => {
-        await ctx.db.delete(args.userWorkspace);
+        await ctx.db.delete(args.removedUser);
     },
 });
 
@@ -455,11 +455,11 @@ export const getUserWorkspace = internalQuery({
     },
 });
 
-// export const deleteWorkspace = internalMutation({
-//     args: {
-//         _id: v.id('workspaces'),
-//     },
-//     handler: async (ctx, args) => {
-//         await ctx.db.delete(args._id);
-//     },
-// });
+export const deleteWorkspace = internalMutation({
+    args: {
+        _id: v.id('workspaces'),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args._id);
+    },
+});
