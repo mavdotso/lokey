@@ -1,6 +1,6 @@
 import { WORKSPACE_PLAN_LIMITS } from '@/lib/config/plan-limits';
 import { Id } from './_generated/dataModel';
-import { CREDENTIALS_TYPES, CURRENCIES, INTERVALS, INVITES, PLANS, PRICING, ROLES, SUBSCRIPTION_STATUS, workspaceSchema } from './schema';
+import { CREDENTIALS_REQUEST_STATUS, CREDENTIALS_TYPES, CURRENCIES, INTERVALS, INVITES, PLANS, PRICING, ROLES, SUBSCRIPTION_STATUS } from './schema';
 
 export type CredentialsType = (typeof CREDENTIALS_TYPES)[keyof typeof CREDENTIALS_TYPES];
 export type RoleType = (typeof ROLES)[keyof typeof ROLES];
@@ -10,6 +10,7 @@ export type CurrencyType = (typeof CURRENCIES)[keyof typeof CURRENCIES];
 export type IntervalType = (typeof INTERVALS)[keyof typeof INTERVALS];
 export type PricingType = (typeof PRICING)[keyof typeof PRICING];
 export type SubscriptionStatusType = (typeof SUBSCRIPTION_STATUS)[keyof typeof SUBSCRIPTION_STATUS];
+export type CredentialsRequestStatusType = (typeof CREDENTIALS_REQUEST_STATUS)[keyof typeof CREDENTIALS_REQUEST_STATUS];
 
 export type PlanName = keyof typeof WORKSPACE_PLAN_LIMITS;
 export type PlanLimits = (typeof WORKSPACE_PLAN_LIMITS)[PlanName];

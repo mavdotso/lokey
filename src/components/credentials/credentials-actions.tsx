@@ -14,6 +14,7 @@ import { PasswordPromptDialog } from "@/components/credentials/password-prompt-d
 import { crypto } from "@/lib/utils";
 import { CredentialsDisplayDialog, DecryptedCredential } from "./credentials-display-dialog";
 import { CredentialsDialog } from "./credentials-dialog";
+import { fetchAction } from "convex/nextjs";
 
 const labels = [
     "feature",
@@ -41,7 +42,6 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
 
     const removeCredentials = useMutation(api.credentials.removeCredentials);
     const setExpired = useMutation(api.credentials.setExpired);
-    const rejectCredentialsRequest = useMutation(api.credentials.rejectCredentialsRequest);
 
     const isShared = type === 'shared';
     const credentials = isShared ? item as Credentials : null;
@@ -76,7 +76,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
     async function handleReject() {
         if (!credentialsRequest) return;
         try {
-            const result = await rejectCredentialsRequest({ requestId: credentialsRequest._id as Id<"credentialsRequests"> });
+            const result = await fetchAction(api.credentials.rejectCredentialsRequest, { credentialsRequestId: credentialsRequest._id as Id<"credentialsRequests"> });
             if (result.success) {
                 toast.success('Credential request rejected');
             } else {

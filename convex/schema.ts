@@ -28,6 +28,7 @@ export const CREDENTIALS_TYPES = {
 export const ROLES = { ADMIN: 'ADMIN', MANAGER: 'MANAGER', MEMBER: 'MEMBER' } as const;
 export const PLANS = { FREE: 'FREE', TEAM: 'TEAM' } as const;
 export const INVITES = { ACCEPTED: 'ACCEPTED', REJECTED: 'REJECTED', EXPIRED: 'EXPIRED', PENDING: 'PENDING' } as const;
+export const CREDENTIALS_REQUEST_STATUS = { PENDING: 'PENDING', REJECTED: 'REJECTED', FULFILLED: 'FULFILLED' } as const;
 
 /* STRIPE */
 export const CURRENCIES = { USD: 'usd', EUR: 'eur' } as const;
@@ -54,6 +55,7 @@ export const intervalValidator = v.union(...Object.values(INTERVALS).map(v.liter
 export const planTypeValidator = v.union(...Object.values(PLANS).map(v.literal));
 export const pricingTypeValidator = v.union(...Object.values(PRICING).map(v.literal));
 export const subscriptionStatusValidator = v.union(...Object.values(SUBSCRIPTION_STATUS).map(v.literal));
+export const credentialsRequestStatusValidator = v.union(...Object.values(CREDENTIALS_REQUEST_STATUS).map(v.literal));
 
 /* SCHEMA */
 export const workspaceSchema = {
@@ -102,7 +104,7 @@ const credentialsRequestSchema = {
             encryptedValue: v.optional(v.string()),
         })
     ),
-    status: v.union(v.literal('pending'), v.literal('fulfilled'), v.literal('rejected')),
+    status: credentialsRequestStatusValidator,
     fulfilledBy: v.optional(v.id('users')),
     fulfilledAt: v.optional(v.string()),
     encryptedPrivateKey: v.string(),

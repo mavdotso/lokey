@@ -50,7 +50,6 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
     const { slug } = useParams();
 
     const editCredentials = useMutation(api.credentials.editCredentials);
-    const createCredentialsRequest = useMutation(api.credentials.createCredentialsRequest);
     const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string });
 
     useEffect(() => {
@@ -134,7 +133,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                 const encryptedPrivateKey = crypto.encryptPrivateKey(privateKey, secretPhrase);
                 const encodedPublicKey = crypto.encodePublicKey(publicKey);
 
-                const response = await createCredentialsRequest({
+                const response = await fetchAction(api.credentials.newCredentialsRequest, {
                     workspaceId: currentWorkspaceId._id,
                     name,
                     description,
