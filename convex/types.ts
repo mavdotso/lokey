@@ -67,7 +67,7 @@ export type CredentialsRequest = {
         type: CredentialsType;
         encryptedValue?: string;
     }>;
-    status: 'pending' | 'fulfilled' | 'rejected';
+    status: CredentialsRequestStatusType;
     updatedAt: string;
     fulfilledBy?: Id<'users'>;
     fulfilledAt?: string;
