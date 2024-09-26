@@ -2,12 +2,12 @@
 import { useState, useRef, ChangeEvent } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { ImageUpload } from "@/components/global/image-upload";
 import { toast } from 'sonner';
 import { MAX_WORKSPACE_LOGO_SIZE } from '@/lib/config/plan-limits';
+import { fetchAction } from 'convex/nextjs';
 
 interface UploadCardProps {
     title: string;
@@ -17,7 +17,6 @@ interface UploadCardProps {
 }
 
 export function UploadCard({ title, description, acceptedFileTypes = 'image/*', onUploadComplete }: UploadCardProps) {
-    const generateUploadUrl = useMutation(api.files.generateUploadUrl);
     const fileInput = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -37,9 +36,9 @@ export function UploadCard({ title, description, acceptedFileTypes = 'image/*', 
         setIsUploading(true);
         setError(null);
         try {
-            const postUrl = await generateUploadUrl();
+            const fileUrl = await fetchAction(api.files.getUploadUrl);
 
-            const result = await fetch(postUrl, {
+            const result = await fetch(fileUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': selectedFile.type },
                 body: selectedFile,
