@@ -65,7 +65,7 @@ export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
         setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
 
         try {
-            const workspaceId = await fetchAction(api.workspaces.createWorkspace, { userId: session.data?.user?.id as Id<"users">, name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
+            const workspaceId = await fetchAction(api.workspaces.newWorkspace, { userId: session.data?.user?.id as Id<"users">, name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
 
             toast.success('Workspace created successfully!')
             setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))

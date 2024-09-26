@@ -5,7 +5,7 @@ import { api, internal } from './_generated/api';
 import { Id } from './_generated/dataModel';
 import { WorkspaceInvite } from './types';
 
-export const createWorkspace = action({
+export const newWorkspace = action({
     args: {
         userId: v.id('users'),
         name: v.string(),
@@ -35,13 +35,13 @@ export const createWorkspace = action({
             throw new ConvexError('The slug is not unique');
         }
 
-        const newWorkspace: Id<'workspaces'> = await ctx.runMutation(internal.workspaces.INTERNAL_createWorkspace, { ...args, ownerId: args.userId });
+        const newWorkspace: Id<'workspaces'> = await ctx.runMutation(internal.workspaces.createWorkspace, { ...args, ownerId: args.userId });
 
         if (!newWorkspace) {
             throw new ConvexError("Couldn't create workspace");
         }
 
-        const newInvite = await ctx.runMutation(internal.invites.INTERNAL_createInvite, { workspaceId: newWorkspace, invitedBy: user._id, role: 'MEMBER' });
+        const newInvite = await ctx.runMutation(internal.workspaceInvites.INTERNAL_createInvite, { workspaceId: newWorkspace, invitedBy: user._id, role: 'MEMBER' });
 
         if (!newInvite) {
             throw new ConvexError("Couldn't create invite");
@@ -80,7 +80,7 @@ export const inviteUserToWorkspace = action({
             throw new ConvexError('User is already part of the workspace');
         }
 
-        await ctx.runMutation(internal.invites.addUserToWorkspace, {
+        await ctx.runMutation(internal.workspaceInvites.addUserToWorkspace, {
             _id: args.userId,
             workspaceId: args.workspaceId,
             role: args.role,
@@ -252,10 +252,10 @@ export const updateWorkspaceInviteCode = action({
         }
 
         if (workspace.defaultInvite) {
-            await ctx.runMutation(internal.invites.patchInviteStatus, { inviteId: workspace.defaultInvite, status: 'EXPIRED' });
+            await ctx.runMutation(internal.workspaceInvites.patchInviteStatus, { inviteId: workspace.defaultInvite, status: 'EXPIRED' });
         }
 
-        const newInvite: Id<'workspaceInvites'> = await ctx.runMutation(internal.invites.INTERNAL_createInvite, { workspaceId: args.workspaceId, invitedBy: args.adminId, role: 'MEMBER' });
+        const newInvite: Id<'workspaceInvites'> = await ctx.runMutation(internal.workspaceInvites.INTERNAL_createInvite, { workspaceId: args.workspaceId, invitedBy: args.adminId, role: 'MEMBER' });
 
         if (!newInvite) {
             throw new ConvexError("Couldn't create invite");
@@ -385,7 +385,7 @@ export const createWorkspaceAdmin = internalMutation({
     },
 });
 
-export const INTERNAL_createWorkspace = internalMutation({
+export const createWorkspace = internalMutation({
     args: {
         ownerId: v.id('users'),
         name: v.string(),
