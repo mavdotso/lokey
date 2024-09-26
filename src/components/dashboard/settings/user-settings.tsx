@@ -101,7 +101,7 @@ export function UserSettings({ user, userWorkspaces }: UserSettingsProps) {
     }
 
     async function confirmDeleteUser() {
-        const response = await fetchAction(api.users.removeUser, { userId: user._id as Id<"users"> });
+        const response = await fetchAction(api.users.deleteUser, { userId: user._id as Id<"users"> });
         if (response.success) {
             toast.success('User account deleted successfully');
             signout();

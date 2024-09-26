@@ -159,7 +159,7 @@ export const updateUserAvatar = mutation({
     },
 });
 
-export const removeUser = action({
+export const deleteUser = action({
     args: { userId: v.id('users') },
     handler: async (ctx, args) => {
         const user = await ctx.runQuery(api.users.getUser, { userId: args.userId });
@@ -174,13 +174,13 @@ export const removeUser = action({
             await ctx.runMutation(internal.users.removeUserFromWorkspace, { removeUser: args.userId, workspaceId: userWorkspace._id });
         }
 
-        await ctx.runMutation(internal.users.deleteUser, { userId: args.userId });
+        await ctx.runMutation(internal.users.deleteUserAccount, { userId: args.userId });
 
         return { success: true, message: 'User account deleted successfully' };
     },
 });
 
-export const deleteUser = internalMutation({
+export const deleteUserAccount = internalMutation({
     args: { userId: v.id('users') },
     handler: async (ctx, args) => {
         await ctx.db.delete(args.userId);
