@@ -4,20 +4,23 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { CopyIcon, LinkIcon, RefreshCwIcon } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { getURL } from "@/lib/utils";
 import { Workspace } from "@/convex/types";
+import { fetchAction } from "convex/nextjs";
+import { useSession } from "next-auth/react";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface InviteLinkDialogProps {
     workspace: Workspace;
 }
 
 export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
+    const session = useSession();
     const [inviteLink, setInviteLink] = useState("");
 
-    const updateWorkspaceInviteCode = useMutation(api.workspaces.updateWorkspaceInviteCode);
     const getInviteLink = useQuery(api.invites.getInviteById, workspace.defaultInvite ? { _id: workspace.defaultInvite } : 'skip')
 
     useEffect(() => {
@@ -29,7 +32,7 @@ export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
     async function handleUpdateInviteCode() {
         if (!workspace._id) return;
 
-        const result = await updateWorkspaceInviteCode({ _id: workspace._id });
+        const result = await fetchAction(api.workspaces.updateWorkspaceInviteCode, { workspaceId: workspace._id, adminId: session.data?.user?.id as Id<"users"> });
         if (result.success) {
             setInviteLink(`${getURL()}/invite/${result.inviteCode}`);
             toast.success("Invite code updated", {
