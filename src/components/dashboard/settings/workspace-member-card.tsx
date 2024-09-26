@@ -16,7 +16,8 @@ interface WorkspaceMemberCardProps {
 export async function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProps) {
 
     const session = await auth()
-    const userRole = await fetchQuery(api.users.getUserRole, { _id: user._id as Id<"users">, workspaceId: workspace._id as Id<"workspaces"> })
+    
+    const userRole = await fetchQuery(api.users.getUserRole, { userId: user._id as Id<"users">, workspaceId: workspace._id as Id<"workspaces"> })
 
     async function handleRemoveUser() {
         if (!workspace._id) {

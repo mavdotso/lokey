@@ -15,7 +15,7 @@ interface CredentialsCardProps {
 
 export function CredentialsCard({ item, type }: CredentialsCardProps) {
     const isCredentials = type === 'shared';
-    const creator = useQuery(api.users.getUser, item.createdBy ? { _id: item.createdBy } : "skip");
+    const creator = useQuery(api.users.getUser, item.createdBy ? { userId: item.createdBy } : "skip");
 
     function getCredentialsTags(item: Credentials | CredentialsRequest) {
         if (isCredentials) {

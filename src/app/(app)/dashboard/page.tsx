@@ -14,7 +14,7 @@ export default async function Dashboard() {
 
     const inviteCode = cookieStore.get('inviteCode')?.value;
     const workspaces = await fetchQuery(api.workspaces.getUserWorkspaces, { userId: session.user.id as Id<"users"> });
-    const defaultWorkspace = await fetchQuery(api.users.getUserDefaultWorkspace, { _id: session.user.id as Id<"users"> });
+    const defaultWorkspace = await fetchQuery(api.users.getUserDefaultUserWorkspace, { userId: session.user.id as Id<"users"> });
 
     if (inviteCode) {
         await fetchAction(api.invites.joinWorkspaceByInviteCode, { _id: session.user.id as Id<"users">, inviteCode });

@@ -140,7 +140,7 @@ export const createOrRetrieveCustomer = action({
         userId: v.id('users'),
     },
     handler: async (ctx, args): Promise<string> => {
-        const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
+        const user = await ctx.runQuery(api.users.getUser, { userId: args.userId });
 
         if (!user) {
             throw new ConvexError('User not found');
@@ -285,7 +285,7 @@ export const createStripeBillingPortalSession = action({
         workspaceId: v.id('workspaces'),
     },
     handler: async (ctx, args) => {
-        const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
+        const user = await ctx.runQuery(api.users.getUser, { userId: args.userId });
 
         if (!user) {
             throw new ConvexError('User not found');
@@ -314,7 +314,7 @@ export const createCheckoutSession = action({
         metadata: v.optional(v.any()),
     },
     handler: async (ctx, args): Promise<{ sessionId: string }> => {
-        const user = await ctx.runQuery(api.users.getUser, { _id: args.userId });
+        const user = await ctx.runQuery(api.users.getUser, { userId: args.userId });
 
         if (!user) {
             throw new ConvexError('User not found');

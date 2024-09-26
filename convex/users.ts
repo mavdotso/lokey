@@ -1,13 +1,14 @@
-import { mutation, query } from './_generated/server';
+import { action, internalMutation, mutation, query } from './_generated/server';
 import { ConvexError, v } from 'convex/values';
 import { getViewerId } from './auth';
 import { roleTypeValidator } from './schema';
+import { api, internal } from './_generated/api';
 
 export const getUser = query({
-    args: { _id: v.id('users') },
+    args: { userId: v.id('users') },
     handler: async (ctx, args) => {
-        const user = await ctx.db.get(args._id);
-        
+        const user = await ctx.db.get(args.userId);
+
         if (!user) {
             return null;
         }
@@ -23,11 +24,11 @@ export const getUser = query({
 });
 
 export const getUserRole = query({
-    args: { _id: v.id('users'), workspaceId: v.id('workspaces') },
+    args: { userId: v.id('users'), workspaceId: v.id('workspaces') },
     handler: async (ctx, args) => {
         const userWorkspace = await ctx.db
             .query('userWorkspaces')
-            .filter((q) => q.eq(q.field('userId'), args._id))
+            .filter((q) => q.eq(q.field('userId'), args.userId))
             .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
             .first();
 
@@ -158,35 +159,58 @@ export const updateUserAvatar = mutation({
     },
 });
 
-export const deleteUser = mutation({
-    args: {},
-    handler: async (ctx) => {
-        const identity = await getViewerId(ctx);
-        if (!identity) {
-            throw new ConvexError('User is not authenticated');
+export const removeUser = action({
+    args: { userId: v.id('users') },
+    handler: async (ctx, args) => {
+        const user = await ctx.runQuery(api.users.getUser, { userId: args.userId });
+
+        if (!user) {
+            throw new ConvexError('User not found');
         }
 
-        await ctx.db.delete(identity);
-
-        const userWorkspaces = await ctx.db
-            .query('userWorkspaces')
-            .filter((q) => q.eq(q.field('userId'), identity))
-            .collect();
+        const userWorkspaces = await ctx.runQuery(api.workspaces.getUserWorkspaces, { userId: args.userId });
 
         for (const userWorkspace of userWorkspaces) {
-            await ctx.db.delete(userWorkspace._id);
+            await ctx.runMutation(internal.users.removeUserFromWorkspace, { removeUser: args.userId, workspaceId: userWorkspace._id });
         }
+
+        await ctx.runMutation(internal.users.deleteUser, { userId: args.userId });
 
         return { success: true, message: 'User account deleted successfully' };
     },
 });
 
-export const getUserDefaultWorkspace = query({
+export const deleteUser = internalMutation({
+    args: { userId: v.id('users') },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args.userId);
+    },
+});
+
+export const removeUserFromWorkspace = internalMutation({
     args: {
-        _id: v.id('users'),
+        removeUser: v.id('users'),
+        workspaceId: v.id('workspaces'),
     },
     handler: async (ctx, args) => {
-        const user = await ctx.db.get(args._id);
+        const userWorkspace = await ctx.db
+            .query('userWorkspaces')
+            .filter((q) => q.eq(q.field('userId'), args.removeUser))
+            .filter((q) => q.eq(q.field('workspaceId'), args.workspaceId))
+            .first();
+
+        if (userWorkspace) {
+            await ctx.db.delete(userWorkspace._id);
+        }
+    },
+});
+
+export const getUserDefaultUserWorkspace = query({
+    args: {
+        userId: v.id('users'),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db.get(args.userId);
         if (!user || !user.defaultWorkspace) {
             return null;
         }
