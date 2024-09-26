@@ -92,7 +92,7 @@ export const canCreateWorkspace = action({
             const freeWorkspaces = await Promise.all(
                 userWorkspaces.map(async (uw): Promise<boolean> => {
                     if (!uw._id) return false;
-                    const workspace = await ctx.runQuery(internal.workspaces.getWorkspaceById, { _id: uw._id });
+                    const workspace = await ctx.runQuery(internal.workspaces.getWorkspaceById, { workspaceId: uw._id });
                     return workspace?.planType === 'FREE';
                 })
             );
