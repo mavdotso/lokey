@@ -165,7 +165,7 @@ export const createOrRetrieveCustomer = action({
         const customerId = await ctx.runMutation(internal.stripe.insertCustomer, { userId: user._id, stripeCustomerId });
 
         if (customerId) {
-            await ctx.runMutation(api.users.updateUser, {
+            await ctx.runAction(api.users.updateUser, {
                 userId: args.userId,
                 updates: { customerId },
             });
