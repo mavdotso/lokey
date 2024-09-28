@@ -50,7 +50,8 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
 
     const { slug } = useParams();
 
-    const createNewCredentials = useAction(api.credentials.newCredentials)
+    const createNewCredentials = useAction(api.credentials.newCredentials);
+    const createNewCredentialsRequest = useAction(api.credentialsRequests.newCredentialsRequest);
     const editCredentials = useMutation(api.credentials.editCredentials);
     const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string });
 
@@ -135,7 +136,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                 const encryptedPrivateKey = crypto.encryptPrivateKey(privateKey, secretPhrase);
                 const encodedPublicKey = crypto.encodePublicKey(publicKey);
 
-                const response = await fetchAction(api.credentialsRequests.newCredentialsRequest, {
+                const response = await createNewCredentialsRequest({
                     workspaceId: currentWorkspaceId._id,
                     name,
                     description,
@@ -356,7 +357,6 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={formType === 'new' ? 'Only for internal reference' : 'Provide instructions or context for the credentials request'}
-                    required
                 />
             </div>
             {formType === 'new' ? renderNewCredentialsForm() : renderCredentialRequestForm()}
