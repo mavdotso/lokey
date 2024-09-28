@@ -43,7 +43,14 @@ export default function SharePage() {
 
                     const parsedData = JSON.parse(decryptedData)
 
-                    await fetchAction(api.credentials.incrementCredentialsViewCount, { credentialsId: id as Id<"credentials"> })
+                    try {
+                        await fetchAction(api.credentials.incrementCredentialsViewCount, { credentialsId: id as Id<"credentials"> })
+                    } catch (incrementError) {
+                        console.error('Error incrementing view count:', incrementError);
+                        // Optionally show a toast message
+                        toast.error("Failed to update view count, but credentials are still available.");
+                    }
+
                     setCredentialsData(parsedData);
                 } else {
                     setError('Failed to retrieve encrypted data');

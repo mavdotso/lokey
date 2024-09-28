@@ -26,6 +26,7 @@ interface CredentialsProps {
 
 export default function CredentialsPage({ params }: CredentialsProps) {
     const session = useSession();
+    
     const [activeTab, setActiveTab] = useState<TabType>('shared');
     const [filters, setFilters] = useState({
         searchTerm: '',

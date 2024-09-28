@@ -269,7 +269,7 @@ export const updateWorkspaceInviteCode = action({
             throw new ConvexError('Invite not found');
         }
 
-        // TODO: Why does this work?
+        // Why tf does this work?
         const workspaceInvite: WorkspaceInvite = invite;
 
         return {

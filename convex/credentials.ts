@@ -34,9 +34,15 @@ export const incrementCredentialsViewCount = action({
             throw new ConvexError('Credentials not found');
         }
 
+        console.log('Existing credentials:', credentials);
+
         const newViewCount = (credentials.viewCount || 0) + 1;
 
-        const updates: any = {
+        const updates: {
+            viewCount: number;
+            updatedAt: string;
+            expiresAt?: string;
+        } = {
             viewCount: newViewCount,
             updatedAt: new Date().toISOString(),
         };
@@ -45,7 +51,12 @@ export const incrementCredentialsViewCount = action({
             updates.expiresAt = new Date().toISOString();
         }
 
-        const updatedCredentials = await ctx.runMutation(internal.credentials.patchCredentials, { credentialsId: args.credentialsId, updates });
+        console.log('Updates to be applied:', updates);
+
+        const updatedCredentials = await ctx.runMutation(internal.credentials.patchCredentials, {
+            credentialsId: args.credentialsId,
+            updates,
+        });
 
         if (updatedCredentials) {
             return { success: true };
@@ -217,21 +228,21 @@ export const patchCredentials = internalMutation({
     args: {
         credentialsId: v.id('credentials'),
         updates: v.object({
-            workspaceId: v.id('workspaces'),
-            name: v.string(),
+            workspaceId: v.optional(v.id('workspaces')),
+            name: v.optional(v.string()),
             description: v.optional(v.string()),
             createdBy: v.optional(v.id('users')),
-            type: credentialsTypeValidator,
+            type: v.optional(credentialsTypeValidator),
+            encryptedData: v.optional(v.string()),
+            privateKey: v.optional(v.string()),
+            updatedAt: v.string(),
             expiresAt: v.optional(v.string()),
             maxViews: v.optional(v.number()),
-            viewCount: v.number(),
+            viewCount: v.optional(v.number()),
         }),
     },
     handler: async (ctx, args) => {
-        return await ctx.db.patch(args.credentialsId, {
-            ...args.updates,
-            updatedAt: new Date().toISOString(),
-        });
+        return await ctx.db.patch(args.credentialsId, args.updates);
     },
 });
 

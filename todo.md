@@ -5,6 +5,7 @@
 -   [ ] Can't click anything after editing credentials in popup, maybe something with the clickOutside
 -   [ ] having issues with being logged out on convex? —> potentially because I'm calling the functions on the server — refactor the CRUD functions to be internal only
 -   [ ] TODO: test new cookies inviteCode
+-   [ ] TODO: Test everything after the refactoring
 
 ### What's needed for launch:
 
