@@ -19,10 +19,6 @@ export const newCredentials = action({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
 
-        if (!identity) {
-            throw new ConvexError('User is not found');
-        }
-
         const credentialsId: Id<'credentials'> = await ctx.runMutation(internal.credentials.createCredentials, { ...args, createdBy: identity || undefined });
 
         return credentialsId;
