@@ -19,6 +19,10 @@ export const newCredentials = action({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
 
+        if (!identity) {
+            throw new ConvexError('User is not found');
+        }
+
         const credentialsId: Id<'credentials'> = await ctx.runMutation(internal.credentials.createCredentials, { ...args, createdBy: identity || undefined });
 
         return credentialsId;
@@ -34,8 +38,6 @@ export const incrementCredentialsViewCount = action({
             throw new ConvexError('Credentials not found');
         }
 
-        console.log('Existing credentials:', credentials);
-
         const newViewCount = (credentials.viewCount || 0) + 1;
 
         const updates: {
@@ -50,8 +52,6 @@ export const incrementCredentialsViewCount = action({
         if (credentials.maxViews && newViewCount > credentials.maxViews) {
             updates.expiresAt = new Date().toISOString();
         }
-
-        console.log('Updates to be applied:', updates);
 
         const updatedCredentials = await ctx.runMutation(internal.credentials.patchCredentials, {
             credentialsId: args.credentialsId,

@@ -1,5 +1,5 @@
 import { FormEvent, useState, useEffect } from 'react'
-import { useMutation, useQuery } from 'convex/react'
+import { useAction, useMutation, useQuery } from 'convex/react'
 import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,6 +20,7 @@ import { Card } from '@/components/ui/card'
 import { credentialsFields } from '@/lib/config/credentials-fields'
 import { CREDENTIALS_TYPES } from '@/convex/schema'
 import { fetchAction } from 'convex/nextjs'
+import { useSession } from 'next-auth/react'
 
 interface CredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -49,6 +50,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
 
     const { slug } = useParams();
 
+    const createNewCredentials = useAction(api.credentials.newCredentials)
     const editCredentials = useMutation(api.credentials.editCredentials);
     const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string });
 
@@ -108,7 +110,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                 } else {
                     const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data));
 
-                    const credentialsId = await fetchAction(api.credentials.newCredentials, {
+                    const credentialsId = await createNewCredentials({
                         workspaceId: currentWorkspaceId._id,
                         name,
                         description,
