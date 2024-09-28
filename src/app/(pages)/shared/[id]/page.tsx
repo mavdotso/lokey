@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useEffect, useRef } from 'react';
 import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { capitalizeFirstLetter, decryptData } from "@/lib/utils";
@@ -43,13 +43,7 @@ export default function SharePage() {
 
                     const parsedData = JSON.parse(decryptedData)
 
-                    try {
-                        await fetchAction(api.credentials.incrementCredentialsViewCount, { credentialsId: id as Id<"credentials"> })
-                    } catch (incrementError) {
-                        console.error('Error incrementing view count:', incrementError);
-                        // Optionally show a toast message
-                        toast.error("Failed to update view count, but credentials are still available.");
-                    }
+                    await fetchAction(api.credentials.incrementCredentialsViewCount, { credentialsId: id as Id<"credentials"> })
 
                     setCredentialsData(parsedData);
                 } else {
