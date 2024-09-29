@@ -1,7 +1,7 @@
 import { api } from '@/convex/_generated/api';
 import { CreateWorkspaceDialog } from '@/components/workspaces/create-workspace-dialog';
 import { cookies } from 'next/headers';
-import { fetchAction, fetchQuery } from 'convex/nextjs';
+import { fetchAction } from 'convex/nextjs';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Id } from '@/convex/_generated/dataModel';

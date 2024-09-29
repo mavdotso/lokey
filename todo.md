@@ -1,48 +1,33 @@
 ### Bugs
 
--   [ ] Faster redirect after creating the first workspace
 -   [ ] User is not authenticated after avatar upload?
 -   [ ] Can't click anything after editing credentials in popup, maybe something with the clickOutside
--   [ ] having issues with being logged out on convex? —> potentially because I'm calling the functions on the server — refactor the CRUD functions to be internal only
--   [ ] TODO: test new cookies inviteCode
--   [ ] TODO: Test everything after the refactoring
 -   [ ] BUG: When I input the login link from another email, I get into the workplace I'm not supposed to be in
-
+-   [ ] TODO: Test everything after the refactoring
 -   [ ] Kicking user doesn't update the state
+- [ ] Refactor ConvexErrors to status returns
 
 ### What's needed for launch:
 
 -   [ ] Change workspace owner
 -   [ ] Change credentials owner
 -   [ ] User roles
-
     -   [ ] Admin — access to everything
     -   [ ] Manager — access to everything (CRUD all credentials) except workspace settings
     -   [ ] Member — access ONLY to CRUD personal credentials
 
--   [x] Request credentials from clients
-
-    -   [x] Form builder
-    -   [ ] Share via link / email
-    -   [ ] Page to input
-        -   [ ] UI
+    -   [ ] Share credentials via link / email
 
 -   [ ] Share link via email / text
 
 -   [ ] Sidebar
+    -   [ ] Billing settings
+    -   [ ] People / team
+        -   [ ] Promote / demote
 
-    -   [x] Workspace settings
-        -   General:
-            -   [x] ws name
-            -   [x] ws slug
-            -   [x] ws logo
-            -   [x] delete
-        -   [ ] Billing
-        -   [ ] People / team
-            -   [ ] Promote / demote
+- [ ] Subscription popup
 
 -   [ ] User settings
-
     -   General:
     -   [ ] email
         -   [ ] Send an email change request
@@ -84,4 +69,3 @@
 
 ### UI
 
--   [ ] Fix the Separator alignment with the content on the Sidebar
