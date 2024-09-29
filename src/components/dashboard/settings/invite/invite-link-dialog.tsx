@@ -30,18 +30,44 @@ export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
     }, [getInviteLink]);
 
     async function handleUpdateInviteCode() {
-        if (!workspace._id) return;
-
-        const result = await fetchAction(api.workspaces.updateWorkspaceInviteCode, { workspaceId: workspace._id, adminId: session.data?.user?.id as Id<"users"> });
-        if (result.success) {
-            setInviteLink(`${getURL()}/invite/${result.inviteCode}`);
-            toast.success("Invite code updated", {
-                description: "The workspace invite code has been updated successfully.",
-            });
-        } else {
-            toast.error('Error: something went wrong', { description: result.message });
+        if (!workspace._id) {
+            toast.error("Error", { description: "Workspace ID is undefined" });
+            return;
         }
-    };
+
+        if (!session.data?.user?.id) {
+            toast.error("Error", { description: "User is not authenticated" });
+            return;
+        }
+
+        toast.loading("Updating invite code...", { id: "updateInviteCode" });
+
+        try {
+            const result = await fetchAction(api.workspaces.updateWorkspaceInviteCode, {
+                workspaceId: workspace._id,
+                adminId: session.data.user.id as Id<"users">
+            });
+
+            if (result.success) {
+                setInviteLink(`${getURL()}/invite/${result.inviteCode}`);
+                toast.success("Invite code updated", {
+                    description: "The workspace invite code has been updated successfully.",
+                    id: "updateInviteCode"
+                });
+            } else {
+                toast.error("Failed to update invite code", {
+                    description: result.error || "An unexpected error occurred while updating the invite code.",
+                    id: "updateInviteCode"
+                });
+            }
+        } catch (error) {
+            console.error("Failed to update invite code:", error);
+            toast.error("Error updating invite code", {
+                description: error instanceof Error ? error.message : "An unexpected error occurred while updating the invite code.",
+                id: "updateInviteCode"
+            });
+        }
+    }
 
     function handleCopy() {
         navigator.clipboard.writeText(inviteLink);

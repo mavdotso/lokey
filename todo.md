@@ -6,6 +6,7 @@
 -   [ ] having issues with being logged out on convex? —> potentially because I'm calling the functions on the server — refactor the CRUD functions to be internal only
 -   [ ] TODO: test new cookies inviteCode
 -   [ ] TODO: Test everything after the refactoring
+-   [ ] BUG: When I input the login link from another email, I get into the workplace I'm not supposed to be in
 
 ### What's needed for launch:
 

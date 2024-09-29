@@ -160,20 +160,25 @@ export const rejectCredentialsRequest = action({
         const identity = await getViewerId(ctx);
 
         if (!identity) {
-            throw new ConvexError('Log in to edit credentials');
+            return { success: false, error: 'Log in to edit credentials' };
         }
 
         const request = await ctx.runQuery(api.credentialsRequests.getCredentialsRequestById, { credentialsRequestId: args.credentialsRequestId });
 
         if (!request || request.status !== 'PENDING') {
-            throw new ConvexError('Invalid or already processed request');
+            return { success: false, error: 'Invalid or already processed request' };
         }
 
-        await ctx.runMutation(internal.credentialsRequests.patchCredentialsRequest, {
-            credentialsRequestId: args.credentialsRequestId,
-            updates: { status: 'REJECTED', fulfilledBy: identity, fulfilledAt: new Date().toISOString() },
-        });
+        try {
+            await ctx.runMutation(internal.credentialsRequests.patchCredentialsRequest, {
+                credentialsRequestId: args.credentialsRequestId,
+                updates: { status: 'REJECTED', fulfilledBy: identity, fulfilledAt: new Date().toISOString() },
+            });
 
-        return { success: true };
+            return { success: true };
+        } catch (error) {
+            console.error('Error rejecting credentials request:', error);
+            return { success: false, error: 'Failed to reject credentials request' };
+        }
     },
 });

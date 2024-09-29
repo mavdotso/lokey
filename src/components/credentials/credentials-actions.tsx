@@ -53,22 +53,32 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
 
     async function handleRemove() {
         if (credentials?._id) {
-            const response = await removeCredentials({ _id: credentials._id });
-            if (response.success) {
-                toast.success('Credentials have been removed successfully');
-            } else {
-                toast.error('Something went wrong ', { description: "Please, try again" });
+            try {
+                const response = await removeCredentials({ _id: credentials._id });
+                if (response.success) {
+                    toast.success('Credentials have been removed successfully');
+                } else {
+                    toast.error('Error removing credentials', { description: response.error });
+                }
+            } catch (error) {
+                console.error('Error removing credentials:', error);
+                toast.error('Something went wrong', { description: "Please try again" });
             }
         }
     }
 
     async function handleSetExpired() {
         if (credentials?._id) {
-            const response = await setExpired({ _id: credentials._id });
-            if (response.success) {
-                toast.success('Credentials were successfully set as expired.');
-            } else {
-                toast.error('Something went wrong ', { description: "Please, try again" });
+            try {
+                const response = await setExpired({ _id: credentials._id });
+                if (response.success) {
+                    toast.success('Credentials were successfully set as expired.');
+                } else {
+                    toast.error('Error setting credentials as expired', { description: response.error });
+                }
+            } catch (error) {
+                console.error('Error setting credentials as expired:', error);
+                toast.error('Something went wrong', { description: "Please try again" });
             }
         }
     }
@@ -80,11 +90,11 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
             if (result.success) {
                 toast.success('Credential request rejected');
             } else {
-                toast.error('Failed to reject credential request');
+                toast.error('Failed to reject credential request', { description: result.error });
             }
         } catch (error) {
-            toast.error('Failed to reject credential request');
-            console.error('Error:', error);
+            console.error('Error rejecting credential request:', error);
+            toast.error('Failed to reject credential request', { description: "Please try again" });
         }
     }
 

@@ -160,28 +160,30 @@ export const getInviteByCode = query({
 });
 
 export const joinWorkspaceByInviteCode = action({
-    args: { _id: v.id('users'), inviteCode: v.string() },
+    args: { userId: v.optional(v.id('users')), inviteCode: v.string() },
     handler: async (ctx, args) => {
         const invite = await ctx.runQuery(api.workspaceInvites.getInviteByCode, { inviteCode: args.inviteCode });
 
         if (!invite) {
-            throw new ConvexError('Invalid invite code');
+            return { success: false, error: 'Invalid invite code' };
         }
 
         if (invite.status !== 'PENDING') {
-            throw new ConvexError('This invite has already been processed');
+            return { success: false, error: 'This invite has already been used' };
         }
 
-        const existingMembership = await ctx.runQuery(api.workspaces.getUserWorkspaces, { userId: args._id });
+        if (args.userId) {
+            const existingMembership = await ctx.runQuery(api.workspaces.getUserWorkspaces, { userId: args.userId });
 
-        if (existingMembership) {
-            throw new ConvexError('You are already a member of this workspace');
-        }
+            if (existingMembership && existingMembership.length > 0) {
+                return { success: false, error: 'You are already a member of this workspace' };
+            }
 
-        await ctx.runMutation(internal.workspaceInvites.addUserToWorkspace, { _id: args._id, workspaceId: invite.workspaceId, role: invite.role });
+            await ctx.runMutation(internal.workspaceInvites.addUserToWorkspace, { _id: args.userId, workspaceId: invite.workspaceId, role: invite.role });
 
-        if (invite.invitedEmail) {
-            await ctx.runMutation(internal.workspaceInvites.patchInviteStatus, { inviteId: invite._id, status: 'ACCEPTED' });
+            if (invite.invitedEmail) {
+                await ctx.runMutation(internal.workspaceInvites.patchInviteStatus, { inviteId: invite._id, status: 'ACCEPTED' });
+            }
         }
 
         return { success: true };

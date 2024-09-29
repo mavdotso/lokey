@@ -5,6 +5,7 @@ import { fetchAction, fetchQuery } from 'convex/nextjs';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Id } from '@/convex/_generated/dataModel';
+import { deleteCookie } from "cookies-next";
 
 export default async function Dashboard() {
     const session = await auth();
@@ -17,7 +18,8 @@ export default async function Dashboard() {
     const defaultWorkspace = await fetchQuery(api.users.getUserDefaultUserWorkspace, { userId: session.user.id as Id<"users"> });
 
     if (inviteCode) {
-        await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, { _id: session.user.id as Id<"users">, inviteCode });
+        await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, { userId: session.user.id as Id<"users">, inviteCode });
+        deleteCookie('inviteCode');
     }
 
     if (!workspaces || workspaces.length === 0) {

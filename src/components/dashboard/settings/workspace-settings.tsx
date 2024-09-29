@@ -33,44 +33,89 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
     ];
 
     async function handleEdit() {
-        if (!workspace._id) return;
+        if (!workspace._id) {
+            toast.error("Error", { description: "Workspace ID is undefined" });
+            return;
+        }
 
-        const response = await fetchAction(api.workspaces.updateWorkspace, {
-            workspaceId: workspace._id,
-            adminId: session.data?.user?.id as Id<"users">,
-            updates: {
-                name: workspaceName,
-                slug: workspaceSlug
-            }
-        });
+        if (!session.data?.user?.id) {
+            toast.error("Error", { description: "User is not authenticated" });
+            return;
+        }
 
-        if (response.success) {
-            toast.success('Successfully updated the workspace')
-            if (workspaceSlug !== workspace.slug) {
-                router.push('/dashboard/' + workspaceSlug + '/settings')
+        toast.loading("Updating workspace...", { id: "updateWorkspace" });
+
+        try {
+            const response = await fetchAction(api.workspaces.updateWorkspace, {
+                workspaceId: workspace._id,
+                adminId: session.data.user.id as Id<"users">,
+                updates: {
+                    name: workspaceName,
+                    slug: workspaceSlug
+                }
+            });
+
+            if (response.success) {
+                toast.success('Workspace updated', {
+                    description: 'The workspace has been successfully updated.',
+                    id: "updateWorkspace"
+                });
+                if (workspaceSlug !== workspace.slug) {
+                    toast.loading('Redirecting to new workspace URL...', { id: "redirect" });
+                    router.push('/dashboard/' + workspaceSlug + '/settings')
+                }
+            } else {
+                toast.error('Update failed', {
+                    description: response.error || 'An unexpected error occurred while updating the workspace.',
+                    id: "updateWorkspace"
+                });
             }
-        } else {
-            toast.error('Something went wrong', { description: response.message })
+        } catch (error) {
+            console.error("Failed to update workspace:", error);
+            toast.error('Update failed', {
+                description: error instanceof Error ? error.message : 'An unexpected error occurred while updating the workspace.',
+                id: "updateWorkspace"
+            });
         }
     }
 
     async function handleLogoUpload(storageId: Id<"_storage">) {
-        if (!workspace._id) return;
+        if (!workspace._id) {
+            toast.error("Error", { description: "Workspace ID is undefined" });
+            return;
+        }
+
+        if (!session.data?.user?.id) {
+            toast.error("Error", { description: "User is not authenticated" });
+            return;
+        }
+
+        toast.loading("Updating workspace logo...", { id: "updateLogo" });
+
         try {
             const response = await fetchAction(api.workspaces.updateWorkspaceLogo, {
                 workspaceId: workspace._id,
-                adminId: session.data?.user?.id as Id<"users">,
+                adminId: session.data.user.id as Id<"users">,
                 storageId: storageId
             });
 
             if (response.success) {
-                toast.success('Successfully updated the workspace logo');
+                toast.success('Logo updated', {
+                    description: 'The workspace logo has been successfully updated.',
+                    id: "updateLogo"
+                });
             } else {
-                toast.error('Failed to update workspace logo');
+                toast.error('Logo update failed', {
+                    description: response.error || 'An unexpected error occurred while updating the workspace logo.',
+                    id: "updateLogo"
+                });
             }
         } catch (error) {
             console.error('Error updating workspace logo:', error);
-            toast.error('An error occurred while updating the workspace logo');
+            toast.error('Logo update failed', {
+                description: error instanceof Error ? error.message : 'An unexpected error occurred while updating the workspace logo.',
+                id: "updateLogo"
+            });
         }
     }
 
@@ -89,14 +134,43 @@ export function WorkspaceSettings({ workspace }: { workspace: Workspace }) {
     }
 
     async function confirmDeleteWorkspace() {
-        if (!workspace._id) return;
+        if (!workspace._id) {
+            toast.error("Error", { description: "Workspace ID is undefined" });
+            return;
+        }
 
-        const response = await fetchAction(api.workspaces.removeWorkspace, { workspaceId: workspace._id, adminId: session.data?.user?.id as Id<"users">, });
-        if (response.success) {
-            toast.success('Workspace deleted successfully');
-            router.push('/dashboard');
-        } else {
-            toast.error('Failed to delete workspace', { description: response.message });
+        if (!session.data?.user?.id) {
+            toast.error("Error", { description: "User is not authenticated" });
+            return;
+        }
+
+        toast.loading("Deleting workspace...", { id: "deleteWorkspace" });
+
+        try {
+            const response = await fetchAction(api.workspaces.removeWorkspace, {
+                workspaceId: workspace._id,
+                adminId: session.data.user.id as Id<"users">
+            });
+
+            if (response.success) {
+                toast.success('Workspace deleted', {
+                    description: 'The workspace has been successfully deleted.',
+                    id: "deleteWorkspace"
+                });
+                toast.loading('Redirecting to dashboard...', { id: "redirect" });
+                router.push('/dashboard')
+            } else {
+                toast.error('Deletion failed', {
+                    description: response.error || 'An unexpected error occurred while deleting the workspace.',
+                    id: "deleteWorkspace"
+                });
+            }
+        } catch (error) {
+            console.error('Error deleting workspace:', error);
+            toast.error('Deletion failed', {
+                description: error instanceof Error ? error.message : 'An unexpected error occurred while deleting the workspace.',
+                id: "deleteWorkspace"
+            });
         }
     }
 

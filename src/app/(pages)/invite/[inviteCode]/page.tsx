@@ -48,10 +48,10 @@ export default function InvitePage() {
     }, [getWorkspaceName]);
 
     async function handleAcceptInvite() {
-        if (session) {
+        if (session.data?.user?.id) {
             setIsJoining(true);
             try {
-                joinWorkspace({ _id: session.data?.user?.id as Id<"users">, inviteCode });
+                joinWorkspace({ userId: session.data?.user?.id as Id<"users">, inviteCode });
                 router.push('/dashboard');
             } catch (error) {
                 console.error('Error joining workspace:', error);

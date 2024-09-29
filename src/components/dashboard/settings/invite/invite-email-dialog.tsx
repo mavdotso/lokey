@@ -138,8 +138,8 @@ export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
                                     <SelectValue placeholder="Role" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="manager">Manager</SelectItem>
-                                    <SelectItem value="member">Member</SelectItem>
+                                    <SelectItem value="MANAGER">Manager</SelectItem>
+                                    <SelectItem value="MEMBER">Member</SelectItem>
                                 </SelectContent>
                             </Select>
                             <Button

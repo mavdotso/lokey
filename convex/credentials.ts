@@ -94,17 +94,19 @@ export const removeCredentials = mutation({
     args: { _id: v.id('credentials') },
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
+
         if (!identity) {
             throw new ConvexError('Log in to remove credentials');
         }
 
         const credential = await ctx.db.get(args._id);
+
         if (!credential) {
-            throw new ConvexError('Credential not found');
+            return { success: false, error: 'Credential not found' };
         }
 
         if (credential.createdBy !== identity) {
-            throw new ConvexError('Unauthorized: You are not the owner of this credential');
+            return { success: false, error: 'Unauthorized: You are not the owner of this credential' };
         }
 
         await ctx.db.delete(args._id);
@@ -153,16 +155,16 @@ export const setCredentialsExpired = mutation({
     handler: async (ctx, args) => {
         const identity = await getViewerId(ctx);
         if (!identity) {
-            throw new ConvexError('Log in to edit credentials');
+            return { success: false, error: 'Log in to edit credentials' };
         }
 
         const credential = await ctx.db.get(args._id);
         if (!credential) {
-            throw new ConvexError('Credential not found');
+            return { success: false, error: 'Credential not found' };
         }
 
         if (credential.createdBy !== identity) {
-            throw new ConvexError('Unauthorized: You are not the owner of this credential');
+            return { success: false, error: 'Unauthorized: You are not the owner of this credential' };
         }
 
         await ctx.db.patch(args._id, {

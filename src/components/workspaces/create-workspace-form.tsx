@@ -13,7 +13,6 @@ import { api } from '@/convex/_generated/api'
 import { SubmitButton } from '@/components/global/submit-button'
 import { DialogClose, DialogFooter } from '../ui/dialog'
 import { Button } from '../ui/button'
-import { fetchAction } from 'convex/nextjs'
 
 interface CreateWorkspaceFormProps {
     isCloseable?: boolean
@@ -64,16 +63,24 @@ export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
         setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
 
         try {
-            const workspaceId = await createNewSpace({ name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
+            const result = await createNewSpace({ name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
 
-            toast.success('Workspace created successfully!')
-            setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))
-            setIsRedirecting(true);
+            if (result.success) {
+                toast.success('Workspace created successfully!')
+                setFormState(prev => ({ ...prev, newWorkspaceId: result.workspaceId as Id<"workspaces"> }))
+                setIsRedirecting(true);
+            } else {
+                toast.error('Failed to create workspace', {
+                    description: 'error' in result ? result.error : 'An unexpected error occurred',
+                })
+                setFormState(prev => ({ ...prev, newWorkspaceId: null }))
+            }
         } catch (error: any) {
             toast.error('Failed to create workspace', {
-                description: `${error.message}`,
+                description: error.message || 'An unexpected error occurred',
             })
             console.error('Error creating workspace:', error)
+            setFormState(prev => ({ ...prev, newWorkspaceId: null }))
         } finally {
             setFormState(prev => ({ ...prev, isSubmitting: false }))
         }
