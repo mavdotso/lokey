@@ -12,6 +12,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { redirect } from "next/navigation";
 import { UserSettings } from "@/components/dashboard/settings/user-settings";
 import { WorkspaceSettings } from "@/components/dashboard/settings/workspace-settings";
+import { User } from "@/convex/types";
 
 const workspaceSettingsItems = [
     { tabName: 'workspaceGeneral', icon: CogIcon, name: 'General' },
@@ -77,7 +78,11 @@ export default async function SettingsPage({ params }: { params: { slug: string 
                                 <WorkspaceSettings workspace={workspace} />
                             </TabsContent>
                             <TabsContent value="workspaceUsers">
-                                <UserSettingsCard users={workspaceUsers.users} workspace={workspace} invites={workspaceInvites} />
+                                <UserSettingsCard
+                                    users={(workspaceUsers?.users as User[]) || []}
+                                    workspace={workspace}
+                                    invites={workspaceInvites}
+                                />
                             </TabsContent>
                             <TabsContent value="workspaceBilling">
                                 {user && <BillingSettings user={user} workspace={workspace} />}
