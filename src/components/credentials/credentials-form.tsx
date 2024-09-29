@@ -1,5 +1,5 @@
 import { FormEvent, useState, useEffect } from 'react'
-import { useMutation, useQuery } from 'convex/react'
+import { useAction, useMutation, useQuery } from 'convex/react'
 import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,6 +19,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
 import { credentialsFields } from '@/lib/config/credentials-fields'
 import { CREDENTIALS_TYPES } from '@/convex/schema'
+import { fetchAction } from 'convex/nextjs'
+import { useSession } from 'next-auth/react'
 
 interface CredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -48,10 +50,10 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
 
     const { slug } = useParams();
 
-    const createCredentials = useMutation(api.credentials.createCredentials);
+    const createNewCredentials = useAction(api.credentials.newCredentials);
+    const createNewCredentialsRequest = useAction(api.credentialsRequests.newCredentialsRequest);
     const editCredentials = useMutation(api.credentials.editCredentials);
-    const createCredentialsRequest = useMutation(api.credentials.createCredentialsRequest);
-    const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceIdBySlug, { slug: slug as string });
+    const currentWorkspaceId = useQuery(api.workspaces.getWorkspaceBySlug, { slug: slug as string });
 
     useEffect(() => {
         if (existingData) {
@@ -109,7 +111,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                 } else {
                     const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify(data));
 
-                    const { credentialsId } = await createCredentials({
+                    const credentialsId = await createNewCredentials({
                         workspaceId: currentWorkspaceId._id,
                         name,
                         description,
@@ -134,7 +136,7 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                 const encryptedPrivateKey = crypto.encryptPrivateKey(privateKey, secretPhrase);
                 const encodedPublicKey = crypto.encodePublicKey(publicKey);
 
-                const response = await createCredentialsRequest({
+                const response = await createNewCredentialsRequest({
                     workspaceId: currentWorkspaceId._id,
                     name,
                     description,
@@ -355,7 +357,6 @@ export function CredentialsForm({ setIsOpen, editId, existingData, onCredentials
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={formType === 'new' ? 'Only for internal reference' : 'Provide instructions or context for the credentials request'}
-                    required
                 />
             </div>
             {formType === 'new' ? renderNewCredentialsForm() : renderCredentialRequestForm()}

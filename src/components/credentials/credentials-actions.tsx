@@ -14,6 +14,7 @@ import { PasswordPromptDialog } from "@/components/credentials/password-prompt-d
 import { crypto } from "@/lib/utils";
 import { CredentialsDisplayDialog, DecryptedCredential } from "./credentials-display-dialog";
 import { CredentialsDialog } from "./credentials-dialog";
+import { fetchAction } from "convex/nextjs";
 
 const labels = [
     "feature",
@@ -40,8 +41,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
     const [isCredentialsDialogOpen, setIsCredentialsDialogOpen] = useState(false);
 
     const removeCredentials = useMutation(api.credentials.removeCredentials);
-    const setExpired = useMutation(api.credentials.setExpired);
-    const rejectCredentialsRequest = useMutation(api.credentials.rejectCredentialsRequest);
+    const setExpired = useMutation(api.credentials.setCredentialsExpired);
 
     const isShared = type === 'shared';
     const credentials = isShared ? item as Credentials : null;
@@ -53,22 +53,32 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
 
     async function handleRemove() {
         if (credentials?._id) {
-            const response = await removeCredentials({ _id: credentials._id });
-            if (response.success) {
-                toast.success('Credentials have been removed successfully');
-            } else {
-                toast.error('Something went wrong ', { description: "Please, try again" });
+            try {
+                const response = await removeCredentials({ _id: credentials._id });
+                if (response.success) {
+                    toast.success('Credentials have been removed successfully');
+                } else {
+                    toast.error('Error removing credentials', { description: response.error });
+                }
+            } catch (error) {
+                console.error('Error removing credentials:', error);
+                toast.error('Something went wrong', { description: "Please try again" });
             }
         }
     }
 
     async function handleSetExpired() {
         if (credentials?._id) {
-            const response = await setExpired({ _id: credentials._id });
-            if (response.success) {
-                toast.success('Credentials were successfully set as expired.');
-            } else {
-                toast.error('Something went wrong ', { description: "Please, try again" });
+            try {
+                const response = await setExpired({ _id: credentials._id });
+                if (response.success) {
+                    toast.success('Credentials were successfully set as expired.');
+                } else {
+                    toast.error('Error setting credentials as expired', { description: response.error });
+                }
+            } catch (error) {
+                console.error('Error setting credentials as expired:', error);
+                toast.error('Something went wrong', { description: "Please try again" });
             }
         }
     }
@@ -76,15 +86,15 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
     async function handleReject() {
         if (!credentialsRequest) return;
         try {
-            const result = await rejectCredentialsRequest({ requestId: credentialsRequest._id as Id<"credentialsRequests"> });
+            const result = await fetchAction(api.credentialsRequests.rejectCredentialsRequest, { credentialsRequestId: credentialsRequest._id as Id<"credentialsRequests"> });
             if (result.success) {
                 toast.success('Credential request rejected');
             } else {
-                toast.error('Failed to reject credential request');
+                toast.error('Failed to reject credential request', { description: result.error });
             }
         } catch (error) {
-            toast.error('Failed to reject credential request');
-            console.error('Error:', error);
+            console.error('Error rejecting credential request:', error);
+            toast.error('Failed to reject credential request', { description: "Please try again" });
         }
     }
 
@@ -104,7 +114,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
         try {
             const privateKey = crypto.decryptPrivateKey(credentialsRequest.encryptedPrivateKey, secretPhrase);
 
-            if (credentialsRequest.status === 'fulfilled') {
+            if (credentialsRequest.status === 'FULFILLED') {
                 const decrypted = credentialsRequest.credentials.map(cred => {
                     if (cred.encryptedValue) {
                         const decryptedValue = crypto.decryptWithPrivateKey(cred.encryptedValue, privateKey);
@@ -197,7 +207,7 @@ export function CredentialsActions({ item, type }: CredentialsActionsProps) {
                             </>
                         ) : (
                             <>
-                                {credentialsRequest?.status === 'pending' && (
+                                {credentialsRequest?.status === 'PENDING' && (
                                     <DropdownMenuItem onClick={() => setDialogOpen(true)}>
                                         Reject Request
                                     </DropdownMenuItem>

@@ -1,13 +1,10 @@
-"use client"
 
-import { LoadingSpinner } from "@/components/global/loading-spinner";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import { WorkspaceInvite } from "@/convex/types";
 import { capitalizeFirstLetter } from "@/lib/utils";
-import { useMutation } from "convex/react";
-import { Mail, TrashIcon } from "lucide-react";
-import { useState } from "react";
+import { fetchAction } from "convex/nextjs";
+import { Mail } from "lucide-react";
 import { toast } from "sonner";
 
 interface InviteCardProps {
@@ -15,15 +12,16 @@ interface InviteCardProps {
 }
 
 export function InviteCard({ invite }: InviteCardProps) {
-    const [isRemoving, setIsRemoving] = useState(false)
-
-    const setInviteExpired = useMutation(api.invites.setInviteExpired);
 
     async function handleDiscard() {
-        setIsRemoving(true)
-        if (!invite._id) return
+        if (!invite._id) {
+            toast.error("Wrong invite.", {
+                description: "Couldn't find this in"
+            })
+            return;
+        }
         try {
-            const response = await setInviteExpired({ _id: invite._id });
+            const response = await fetchAction(api.workspaceInvites.expireInvite, { _id: invite._id });
             if (response.success) {
                 toast.success("Success", {
                     description: `Removed the invite for ${invite.invitedEmail}`
@@ -36,7 +34,6 @@ export function InviteCard({ invite }: InviteCardProps) {
         } catch (error) {
             console.error("Failed to discard invite:", error);
         }
-        setIsRemoving(false)
     };
 
     return (
@@ -58,9 +55,7 @@ export function InviteCard({ invite }: InviteCardProps) {
                     variant="ghost"
                     size="icon"
                     onClick={handleDiscard}
-                    disabled={isRemoving}
                 >
-                    {isRemoving ? <LoadingSpinner /> : <TrashIcon className="w-3 h-3 text-muted-foreground" />}
                 </Button>
             </div>
         </div>

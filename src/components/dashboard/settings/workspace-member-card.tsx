@@ -1,55 +1,21 @@
-'use client'
-import { LoadingSpinner } from "@/components/global/loading-spinner"
 import { UserAvatar } from "@/components/global/user-avatar"
-import { Button } from "@/components/ui/button"
 import { api } from "@/convex/_generated/api"
+import { Id } from "@/convex/_generated/dataModel"
 import { User, Workspace } from "@/convex/types"
 import { formatConstantToTitleCase } from "@/lib/utils"
-import { useMutation, useQuery } from "convex/react"
-import { TrashIcon } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+import { fetchQuery } from "convex/nextjs"
+import { RemoveUserButton } from "./remove-user-button"
 
 interface WorkspaceMemberCardProps {
     user: User
     workspace: Workspace
 }
 
-export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProps) {
-    const [isRemoving, setIsRemoving] = useState(false)
-
-    const userRole = useQuery(api.users.getUserRole, (user._id && workspace._id) ? { _id: user._id, workspaceId: workspace._id } : 'skip')
-    const kickUser = useMutation(api.workspaces.kickUserFromWorkspace)
-
-    async function handleRemoveUser() {
-        if (!workspace._id) {
-            console.error("Workspace ID is undefined")
-            return
-        }
-
-        if (!user._id) {
-            console.error("User ID is undefined")
-            return
-        }
-
-        setIsRemoving(true)
-        try {
-            const response = await kickUser({ _id: workspace._id, userId: user._id })
-            if (response.success) {
-                toast.success("Success", {
-                    description: `User ${user.name ? (user.name) : (user.email)} has been removed from the workspace`
-                })
-            } else {
-                toast.error("Error", {
-                    description: response.message
-                })
-            }
-        } catch (error) {
-            console.error("Failed to remove user:", error)
-        }
-        setIsRemoving(false)
-    }
-
+export async function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProps) {
+    const userRole = await fetchQuery(api.users.getUserRole, {
+        userId: user._id as Id<"users">,
+        workspaceId: workspace._id as Id<"workspaces">
+    })
 
     return (
         <div className="flex justify-between items-center gap-2 p-2 w-full">
@@ -64,16 +30,9 @@ export function WorkspaceMemberCard({ user, workspace }: WorkspaceMemberCardProp
                 <p className="text-left text-muted-foreground text-sm">
                     {userRole && formatConstantToTitleCase(userRole)}
                 </p>
-                {userRole !== "ADMIN" &&
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleRemoveUser}
-                        disabled={isRemoving}
-                    >
-                        {isRemoving ? <LoadingSpinner /> : <TrashIcon className="w-3 h-3 text-muted-foreground" />}
-                    </Button>
-                }
+                {userRole !== "ADMIN" && (
+                    <RemoveUserButton user={user} workspace={workspace} />
+                )}
             </div>
         </div>
     )

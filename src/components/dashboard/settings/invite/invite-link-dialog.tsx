@@ -1,23 +1,27 @@
+"use client"
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
 import { CopyIcon, LinkIcon, RefreshCwIcon } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { getURL } from "@/lib/utils";
 import { Workspace } from "@/convex/types";
+import { fetchAction } from "convex/nextjs";
+import { useSession } from "next-auth/react";
+import { Id } from "@/convex/_generated/dataModel";
 
 interface InviteLinkDialogProps {
     workspace: Workspace;
 }
 
 export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
+    const session = useSession();
     const [inviteLink, setInviteLink] = useState("");
 
-    const updateWorkspaceInviteCode = useMutation(api.workspaces.updateWorkspaceInviteCode);
-    const getInviteLink = useQuery(api.invites.getInviteById, workspace.defaultInvite ? { _id: workspace.defaultInvite } : 'skip')
+    const getInviteLink = useQuery(api.workspaceInvites.getInviteById, workspace.defaultInvite ? { _id: workspace.defaultInvite } : 'skip')
 
     useEffect(() => {
         if (getInviteLink) {
@@ -26,18 +30,44 @@ export function InviteLinkDialog({ workspace }: InviteLinkDialogProps) {
     }, [getInviteLink]);
 
     async function handleUpdateInviteCode() {
-        if (!workspace._id) return;
-
-        const result = await updateWorkspaceInviteCode({ _id: workspace._id });
-        if (result.success) {
-            setInviteLink(`${getURL()}/invite/${result.inviteCode}`);
-            toast.success("Invite code updated", {
-                description: "The workspace invite code has been updated successfully.",
-            });
-        } else {
-            toast.error('Error: something went wrong', { description: result.message });
+        if (!workspace._id) {
+            toast.error("Error", { description: "Workspace ID is undefined" });
+            return;
         }
-    };
+
+        if (!session.data?.user?.id) {
+            toast.error("Error", { description: "User is not authenticated" });
+            return;
+        }
+
+        toast.loading("Updating invite code...", { id: "updateInviteCode" });
+
+        try {
+            const result = await fetchAction(api.workspaces.updateWorkspaceInviteCode, {
+                workspaceId: workspace._id,
+                adminId: session.data.user.id as Id<"users">
+            });
+
+            if (result.success) {
+                setInviteLink(`${getURL()}/invite/${result.inviteCode}`);
+                toast.success("Invite code updated", {
+                    description: "The workspace invite code has been updated successfully.",
+                    id: "updateInviteCode"
+                });
+            } else {
+                toast.error("Failed to update invite code", {
+                    description: result.error || "An unexpected error occurred while updating the invite code.",
+                    id: "updateInviteCode"
+                });
+            }
+        } catch (error) {
+            console.error("Failed to update invite code:", error);
+            toast.error("Error updating invite code", {
+                description: error instanceof Error ? error.message : "An unexpected error occurred while updating the invite code.",
+                id: "updateInviteCode"
+            });
+        }
+    }
 
     function handleCopy() {
         navigator.clipboard.writeText(inviteLink);

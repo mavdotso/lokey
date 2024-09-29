@@ -15,7 +15,7 @@ interface CredentialsCardProps {
 
 export function CredentialsCard({ item, type }: CredentialsCardProps) {
     const isCredentials = type === 'shared';
-    const creator = useQuery(api.users.getUser, item.createdBy ? { _id: item.createdBy } : "skip");
+    const creator = useQuery(api.users.getUser, item.createdBy ? { userId: item.createdBy } : "skip");
 
     function getCredentialsTags(item: Credentials | CredentialsRequest) {
         if (isCredentials) {
@@ -122,7 +122,7 @@ export function RequestStatusInfo({ request }: RequestStatusInfoProps) {
 }
 
 function getStatusStyles(status: string) {
-    switch (status) {
+    switch (status.toLowerCase()) {
         case 'pending':
             return 'bg-yellow-500 shadow-[0px_0px_5px_3px_rgba(234,179,_8,_0.15)]';
         case 'fulfilled':

@@ -25,7 +25,6 @@ interface CredentialsDisplayDialogProps {
 export function CredentialsDisplayDialog({ isOpen, setIsOpen, decryptedCredentials }: CredentialsDisplayDialogProps) {
     const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>({});
 
-    console.log(decryptedCredentials)
 
     function togglePasswordVisibility(name: string) {
         setShowPasswords(prev => ({ ...prev, [name]: !prev[name] }));

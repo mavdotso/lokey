@@ -9,14 +9,17 @@ import { Dialog } from '@/components/ui/dialog';
 import { api } from '@/convex/_generated/api';
 import { LoadingScreen } from '@/components/global/loading-screen';
 import { CreateWorkspaceDialog } from './create-workspace-dialog';
+import { useSession } from 'next-auth/react';
+import { Id } from '@/convex/_generated/dataModel';
 
 export function WorkspacesDropdown() {
     const router = useRouter();
     const { slug } = useParams();
+    const session = useSession();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedSpaceSlug, setSelectedSpaceSlug] = useState<string>('');
 
-    const workspacesQuery = useQuery(api.workspaces.getUserWorkspaces);
+    const workspacesQuery = useQuery(api.workspaces.getUserWorkspaces, { userId: session.data?.user?.id as Id<"users"> });
 
     const workspaces = useMemo(() => workspacesQuery ?? [], [workspacesQuery]);
 

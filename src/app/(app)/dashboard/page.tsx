@@ -1,64 +1,26 @@
-"use client"
-import { useMutation, useQuery } from 'convex/react';
-import { LoadingScreen } from '@/components/global/loading-screen';
 import { api } from '@/convex/_generated/api';
-import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { CreateWorkspaceDialog } from '@/components/workspaces/create-workspace-dialog';
+import { cookies } from 'next/headers';
+import { fetchAction, fetchQuery } from 'convex/nextjs';
+import { redirect } from 'next/navigation';
+import { auth } from '@/lib/auth';
+import { Id } from '@/convex/_generated/dataModel';
+import { deleteCookie } from "cookies-next";
 
-export default function Dashboard() {
-    const router = useRouter();
-    const [inviteCode, setInviteCode] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true)
+export default async function Dashboard() {
+    const session = await auth();
+    const cookieStore = cookies();
 
-    const workspaces = useQuery(api.workspaces.getUserWorkspaces);
-    const defaultWorkspace = useQuery(api.users.getUserDefaultWorkspace);
-    const getInviteByCode = useQuery(api.invites.getInviteByCode, inviteCode ? { inviteCode } : "skip");
+    if (!session || !session.user) redirect('/')
 
-    const joinWorkspace = useMutation(api.invites.joinWorkspaceByInviteCode);
+    const inviteCode = cookieStore.get('inviteCode')?.value;
+    const workspaces = await fetchQuery(api.workspaces.getUserWorkspaces, { userId: session.user.id as Id<"users"> });
+    const defaultWorkspace = await fetchQuery(api.users.getUserDefaultUserWorkspace, { userId: session.user.id as Id<"users"> });
 
-    useEffect(() => {
-        const storedInviteCode = localStorage.getItem('inviteCode');
-        if (storedInviteCode) {
-            setInviteCode(storedInviteCode);
-            localStorage.removeItem('inviteCode');
-        }
-    }, []);
-
-    const handleInvite = useCallback(async () => {
-        if (inviteCode) {
-            try {
-                await joinWorkspace({ inviteCode });
-                router.refresh();
-            } catch (error) {
-                console.error("Error joining workspace:", error);
-            }
-        }
-    }, [inviteCode, joinWorkspace, router]);
-
-    useEffect(() => {
-        if (workspaces !== undefined && defaultWorkspace !== undefined) {
-            if (inviteCode && getInviteByCode !== undefined) {
-                handleInvite();
-            } else {
-                setIsLoading(false);
-            }
-        }
-    }, [workspaces, defaultWorkspace, inviteCode, getInviteByCode, handleInvite]);
-
-    useEffect(() => {
-        if (!isLoading && workspaces && workspaces.length > 0) {
-            let redirectWorkspace;
-            if (defaultWorkspace) {
-                redirectWorkspace = defaultWorkspace;
-            } else {
-                redirectWorkspace = workspaces[0];
-            }
-            router.replace(`/dashboard/${redirectWorkspace.slug}/credentials`, { scroll: false });
-        }
-    }, [isLoading, workspaces, defaultWorkspace, router]);
-
-    if (isLoading) return <LoadingScreen />
+    if (inviteCode) {
+        await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, { userId: session.user.id as Id<"users">, inviteCode });
+        deleteCookie('inviteCode');
+    }
 
     if (!workspaces || workspaces.length === 0) {
         return (
@@ -66,7 +28,8 @@ export default function Dashboard() {
                 <CreateWorkspaceDialog isOpen={true} />
             </div>
         );
+    } else {
+        const redirectWorkspace = defaultWorkspace || workspaces[0];
+        redirect(`/dashboard/${redirectWorkspace.slug}/credentials`);
     }
-
-    return <LoadingScreen />;
 }

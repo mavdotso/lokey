@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { credentialsFields } from '@/lib/config/credentials-fields';
 import { CREDENTIALS_TYPES } from '@/convex/schema';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { fetchAction } from 'convex/nextjs';
 
 export default function FillCredentialsRequestPage() {
     const { id } = useParams();
@@ -25,11 +26,10 @@ export default function FillCredentialsRequestPage() {
     const [formData, setFormData] = useState<Record<string, string>>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const credentialsRequest = useQuery(api.credentials.getCredentialsRequestById, {
-        _id: id as Id<'credentialsRequests'>
+    const credentialsRequest = useQuery(api.credentialsRequests.getCredentialsRequestById, {
+        credentialsRequestId: id as Id<'credentialsRequests'>
     });
 
-    const fulfillCredentialsRequest = useMutation(api.credentials.fulfillCredentialsRequest);
 
     useEffect(() => {
         if (credentialsRequest && credentialsRequest.credentials.length > 0) {
@@ -85,8 +85,8 @@ export default function FillCredentialsRequestPage() {
         }
 
         try {
-            const result = await fulfillCredentialsRequest({
-                requestId: credentialsRequest._id,
+            const result = await fetchAction(api.credentialsRequests.fulfillCredentialsRequest, {
+                credentialsRequestId: credentialsRequest._id,
                 fulfilledCredentials: credentials,
             });
 

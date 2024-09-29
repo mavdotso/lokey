@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ type InvitableRoleType = Exclude<RoleType, "ADMIN">;
 
 export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
     const [emails, setEmails] = useState([{ id: 1, value: '', role: 'MEMBER' as InvitableRoleType }]);
-    const createInvite = useMutation(api.invites.createInvite);
+    const createInvite = useMutation(api.workspaceInvites.createInvite);
     const [isLoading, setIsLoading] = useState(false);
     const baseUrl = getURL();
 
@@ -137,8 +138,8 @@ export function InviteEmailDialog({ workspace }: InviteEmailDialogProps) {
                                     <SelectValue placeholder="Role" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="manager">Manager</SelectItem>
-                                    <SelectItem value="member">Member</SelectItem>
+                                    <SelectItem value="MANAGER">Manager</SelectItem>
+                                    <SelectItem value="MEMBER">Member</SelectItem>
                                 </SelectContent>
                             </Select>
                             <Button

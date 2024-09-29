@@ -16,14 +16,15 @@ import type {
 import type * as auth from "../auth.js";
 import type * as authAdapter from "../authAdapter.js";
 import type * as credentials from "../credentials.js";
+import type * as credentialsRequests from "../credentialsRequests.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
-import type * as invites from "../invites.js";
 import type * as limits from "../limits.js";
 import type * as stripe from "../stripe.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as types from "../types.js";
 import type * as users from "../users.js";
+import type * as workspaceInvites from "../workspaceInvites.js";
 import type * as workspaces from "../workspaces.js";
 
 /**
@@ -38,14 +39,15 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   authAdapter: typeof authAdapter;
   credentials: typeof credentials;
+  credentialsRequests: typeof credentialsRequests;
   files: typeof files;
   http: typeof http;
-  invites: typeof invites;
   limits: typeof limits;
   stripe: typeof stripe;
   subscriptions: typeof subscriptions;
   types: typeof types;
   users: typeof users;
+  workspaceInvites: typeof workspaceInvites;
   workspaces: typeof workspaces;
 }>;
 export declare const api: FilterApi<
