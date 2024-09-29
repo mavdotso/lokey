@@ -8,7 +8,7 @@
 -   [ ] TODO: Test everything after the refactoring
 -   [ ] BUG: When I input the login link from another email, I get into the workplace I'm not supposed to be in
 
-- [ ] Kicking user doesn't update the state
+-   [ ] Kicking user doesn't update the state
 
 ### What's needed for launch:
 

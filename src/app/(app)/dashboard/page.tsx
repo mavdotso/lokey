@@ -14,22 +14,20 @@ export default async function Dashboard() {
     if (!session || !session.user) redirect('/')
 
     const inviteCode = cookieStore.get('inviteCode')?.value;
-    const workspaces = await fetchQuery(api.workspaces.getUserWorkspaces, { userId: session.user.id as Id<"users"> });
-    const defaultWorkspace = await fetchQuery(api.users.getUserDefaultUserWorkspace, { userId: session.user.id as Id<"users"> });
+    const redirectResult = await fetchAction(api.workspaces.getUserRedirectWorkspace, { userId: session.user.id as Id<"users"> });
 
     if (inviteCode) {
         await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, { userId: session.user.id as Id<"users">, inviteCode });
         deleteCookie('inviteCode');
     }
 
-    if (!workspaces || workspaces.length === 0) {
+    if (!redirectResult.success || !redirectResult.workspace) {
         return (
             <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-sm w-screen h-screen">
                 <CreateWorkspaceDialog isOpen={true} />
             </div>
         );
     } else {
-        const redirectWorkspace = defaultWorkspace || workspaces[0];
-        redirect(`/dashboard/${redirectWorkspace.slug}/credentials`);
+        redirect(`/dashboard/${redirectResult.workspace.slug}/credentials`);
     }
 }

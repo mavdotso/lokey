@@ -3,7 +3,7 @@ import { ConvexError, v } from 'convex/values';
 import { planTypeValidator, roleTypeValidator } from './schema';
 import { api, internal } from './_generated/api';
 import { Id } from './_generated/dataModel';
-import { WorkspaceInvite } from './types';
+import { UserWorkspace, Workspace, WorkspaceInvite } from './types';
 import { getViewerId } from './auth';
 
 export const newWorkspace = action({
@@ -316,6 +316,33 @@ export const updateWorkspaceInviteCode = action({
             console.error('Error updating workspace invite code:', error);
             return { success: false, error: 'Failed to update workspace invite code' };
         }
+    },
+});
+
+export const getUserRedirectWorkspace = action({
+    args: {
+        userId: v.id('users'),
+    },
+    handler: async (ctx, args): Promise<{ success: boolean; workspace?: Workspace; error?: string }> => {
+        const user = await ctx.runQuery(api.users.getUser, { userId: args.userId });
+
+        if (!user) {
+            return { success: false, error: 'User not found' };
+        }
+
+        const defaultWorkspace: Workspace | null = await ctx.runQuery(api.users.getUserDefaultUserWorkspace, { userId: args.userId });
+
+        if (defaultWorkspace) {
+            return { success: true, workspace: defaultWorkspace };
+        }
+
+        const userWorkspaces: Workspace[] | null = await ctx.runQuery(api.workspaces.getUserWorkspaces, { userId: args.userId });
+
+        if (!userWorkspaces || userWorkspaces.length === 0) {
+            return { success: false, error: 'No workspaces found' };
+        }
+
+        return { success: true, workspace: userWorkspaces[0] };
     },
 });
 
