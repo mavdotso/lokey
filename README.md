@@ -4,7 +4,7 @@ Lokey provides a simple, encrypted way to transmit sensitive information. Share 
 
 ## Features
 
--   Secure credential sharing
+-   Secure credentials sharing & credentials requests
 -   One-time links for sensitive information
 -   Workspace management for teams
 -   User invitations and role management
@@ -13,14 +13,14 @@ Lokey provides a simple, encrypted way to transmit sensitive information. Share 
 
 ## Technologies Used
 
--   Next.js
--   React
--   Convex
--   TypeScript
--   Tailwind CSS
--   Radix UI
--   Stripe (for payments)
--   NextAuth (for authentication)
+-   [Next.js](https://nextjs.org/)
+-   [Convex](https://www.convex.dev/)
+-   [Resend](https://resend.com/)
+-   [TypeScript](https://www.typescriptlang.org/)
+-   [Tailwind CSS](https://tailwindcss.com/)
+-   [Shadcn UI](https://ui.shadcn.com/)
+-   [Stripe](https://stripe.com/)
+-   [Auth.js](https://authjs.dev/)
 
 ## Project Structure
 
@@ -46,4 +46,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-mavdotso - [@mavdotso](https://s.com/mavdotso) - hi (at) mav.so
+mavdotso - [@mavdotso](https://x.com/mavdotso) - hi (at) mav.so
