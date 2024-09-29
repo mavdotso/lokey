@@ -11,7 +11,7 @@ Lokey provides a simple, encrypted way to transmit sensitive information. Share 
 -   Customizable workspace settings
 -   Billing and subscription management
 
-## Technologies Used
+## Tech stack
 
 -   [Next.js](https://nextjs.org/)
 -   [Convex](https://www.convex.dev/)
@@ -22,7 +22,7 @@ Lokey provides a simple, encrypted way to transmit sensitive information. Share 
 -   [Stripe](https://stripe.com/)
 -   [Auth.js](https://authjs.dev/)
 
-## Project Structure
+## Project structure
 
 -   `src/app`: Next.js app router and page components
 -   `src/components`: Reusable React components
