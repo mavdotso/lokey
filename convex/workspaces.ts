@@ -4,10 +4,10 @@ import { planTypeValidator, roleTypeValidator } from './schema';
 import { api, internal } from './_generated/api';
 import { Id } from './_generated/dataModel';
 import { WorkspaceInvite } from './types';
+import { getViewerId } from './auth';
 
 export const newWorkspace = action({
     args: {
-        userId: v.id('users'),
         name: v.string(),
         slug: v.string(),
         iconId: v.string(),
@@ -15,14 +15,14 @@ export const newWorkspace = action({
         planType: planTypeValidator,
     },
     handler: async (ctx, args) => {
-        const user = await ctx.runQuery(api.users.getUser, { userId: args.userId });
+        const userId = await getViewerId(ctx);
 
-        if (!user) {
+        if (!userId) {
             throw new ConvexError('User not found');
         }
 
         if (args.planType === 'FREE') {
-            const canCreate = await ctx.runAction(api.limits.canCreateWorkspace, { _id: user._id });
+            const canCreate = await ctx.runAction(api.limits.canCreateWorkspace, { _id: userId });
 
             if (!canCreate) {
                 throw new ConvexError('You have reached the maximum number of free workspaces');
@@ -35,20 +35,20 @@ export const newWorkspace = action({
             throw new ConvexError('The slug is not unique');
         }
 
-        const newWorkspace: Id<'workspaces'> = await ctx.runMutation(internal.workspaces.createWorkspace, { ...args, ownerId: args.userId });
+        const newWorkspace: Id<'workspaces'> = await ctx.runMutation(internal.workspaces.createWorkspace, { ...args, ownerId: userId });
 
         if (!newWorkspace) {
             throw new ConvexError("Couldn't create workspace");
         }
 
-        const newInvite = await ctx.runMutation(internal.workspaceInvites.INTERNAL_createInvite, { workspaceId: newWorkspace, invitedBy: user._id, role: 'MEMBER' });
+        const newInvite = await ctx.runMutation(internal.workspaceInvites.INTERNAL_createInvite, { workspaceId: newWorkspace, invitedBy: userId, role: 'MEMBER' });
 
         if (!newInvite) {
             throw new ConvexError("Couldn't create invite");
         }
 
         await ctx.runMutation(internal.workspaces.patchWorkspace, { workspaceId: newWorkspace, updates: { defaultInvite: newInvite } });
-        await ctx.runMutation(internal.workspaces.createWorkspaceAdmin, { userId: user._id, workspaceId: newWorkspace });
+        await ctx.runMutation(internal.workspaces.createWorkspaceAdmin, { userId: userId, workspaceId: newWorkspace });
 
         return newWorkspace;
     },

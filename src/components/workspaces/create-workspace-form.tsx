@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useQuery } from 'convex/react'
+import { useAction, useQuery } from 'convex/react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
@@ -14,7 +14,6 @@ import { SubmitButton } from '@/components/global/submit-button'
 import { DialogClose, DialogFooter } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { fetchAction } from 'convex/nextjs'
-import { useSession } from 'next-auth/react'
 
 interface CreateWorkspaceFormProps {
     isCloseable?: boolean
@@ -22,7 +21,6 @@ interface CreateWorkspaceFormProps {
 
 export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
     const router = useRouter()
-    const session = useSession();
 
     const [formState, setFormState] = useState({
         name: '',
@@ -36,6 +34,7 @@ export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     const isUnique = useQuery(api.workspaces.isSlugUnique, { slug: formState.slug })
+    const createNewSpace = useAction(api.workspaces.newWorkspace);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -65,7 +64,7 @@ export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
         setFormState(prev => ({ ...prev, isSubmitting: true, showSlugError: false }))
 
         try {
-            const workspaceId = await fetchAction(api.workspaces.newWorkspace, { userId: session.data?.user?.id as Id<"users">, name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
+            const workspaceId = await createNewSpace({ name: formState.name, slug: formState.slug, iconId: 'default', planType: 'FREE' })
 
             toast.success('Workspace created successfully!')
             setFormState(prev => ({ ...prev, newWorkspaceId: workspaceId }))
