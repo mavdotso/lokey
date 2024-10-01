@@ -1,5 +1,5 @@
 
-import { BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon, LucideIcon } from 'lucide-react';
+import { BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon, LucideIcon, VaultIcon } from 'lucide-react';
 import { UserCard } from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
@@ -24,6 +24,7 @@ export interface NavItemProps {
 
 const navItems: NavItemProps[] = [
     { href: 'credentials', icon: KeyIcon, name: 'Credentials' },
+    { href: 'credentials', icon: VaultIcon, name: 'Vault', badge: 'soon' },
     { href: 'credentials', icon: FileLockIcon, name: 'Files', badge: 'soon' },
     { href: 'credentials', icon: MessageSquareDashedIcon, name: 'Chats', badge: 'soon' },
 ];

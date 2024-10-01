@@ -5,13 +5,14 @@
 -   [ ] BUG: When I input the login link from another email, I get into the workplace I'm not supposed to be in
 -   [ ] TODO: Test everything after the refactoring
 -   [ ] Kicking user doesn't update the state
-- [ ] Refactor ConvexErrors to status returns
+-   [ ] Refactor ConvexErrors to status returns
 
 ### What's needed for launch:
 
 -   [ ] Change workspace owner
 -   [ ] Change credentials owner
 -   [ ] User roles
+
     -   [ ] Admin — access to everything
     -   [ ] Manager — access to everything (CRUD all credentials) except workspace settings
     -   [ ] Member — access ONLY to CRUD personal credentials
@@ -21,13 +22,15 @@
 -   [ ] Share link via email / text
 
 -   [ ] Sidebar
+
     -   [ ] Billing settings
     -   [ ] People / team
         -   [ ] Promote / demote
 
-- [ ] Subscription popup
+-   [ ] Subscription popup
 
 -   [ ] User settings
+
     -   General:
     -   [ ] email
         -   [ ] Send an email change request
@@ -68,4 +71,3 @@
 -   [ ] ["server-only"](https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns#keeping-server-only-code-out-of-the-client-environment)
 
 ### UI
-
