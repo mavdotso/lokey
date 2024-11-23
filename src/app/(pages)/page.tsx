@@ -24,6 +24,8 @@ export default function LandingPage() {
 
         try {
             const { publicKey, privateKey, encryptedData } = encryptData(JSON.stringify({ password: password }))
+            const now = new Date().getTime();
+            const expirationDate = new Date(now + (parseInt(expiration) * 24 * 60 * 60 * 1000));
 
             const credentialsId = await fetchAction(api.credentials.newCredentials, {
                 name: 'Shared Password',
@@ -31,7 +33,7 @@ export default function LandingPage() {
                 type: 'PASSWORD',
                 encryptedData: encryptedData,
                 privateKey: privateKey,
-                expiresAt: new Date(Date.now() + parseInt(expiration) * 24 * 60 * 60 * 1000).toISOString(),
+                expiresAt: expirationDate.toISOString(),
                 maxViews: 1
             });
 

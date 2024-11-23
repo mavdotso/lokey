@@ -43,6 +43,9 @@
 -   [ ] Error pages
 -   [ ] Support (email)
 -   [ ] Request feature
+-   [ ] Landing page
+-   [ ] import "server-only"
+-   [ ] paste .env files into a form
 
 ### AFTER THE FIRST 5 CUSTOMERS:
 

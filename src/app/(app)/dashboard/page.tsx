@@ -9,7 +9,7 @@ import { deleteCookie } from "cookies-next";
 
 export default async function Dashboard() {
     const session = await auth();
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     if (!session || !session.user) redirect('/')
 

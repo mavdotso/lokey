@@ -5,10 +5,16 @@ import { redirect } from 'next/navigation';
 
 interface DashboardLayoutProps {
     children: ReactNode;
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 }
 
-export default async function DashboardLayout({ children, params }: DashboardLayoutProps) {
+export default async function DashboardLayout(props: DashboardLayoutProps) {
+    const params = await props.params;
+
+    const {
+        children
+    } = props;
+
     const session = await auth()
 
     if (!session) redirect('/sign-in')
