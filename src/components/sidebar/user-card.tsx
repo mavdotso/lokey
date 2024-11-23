@@ -1,25 +1,34 @@
+"use client"
+
 import { LogOut } from 'lucide-react';
 import { Session } from 'next-auth';
 import SignoutButton from '@/components/auth/signout-button';
 import ThemeToggle from '@/components/global/theme-toggle';
 import { UserAvatar } from '@/components/global/user-avatar';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
 
 export function UserCard({ session }: { session: Session }) {
-    return (
-        <div className="flex justify-between items-center gap-2 w-full">
-            <aside className="flex flex-grow justify-center items-center gap-2 min-w-0">
-                {session.user && <UserAvatar user={session.user} />}
-                <div className="flex flex-col min-w-0">
-                    <p className="text-muted-foreground truncate">{session.user?.name}</p>
-                    <small className="text-muted-foreground truncate">{session.user?.email}</small>
-                </div>
-            </aside>
-            <div className="flex flex-shrink-0 justify-center items-center gap-2">
-                <SignoutButton>
-                    <LogOut className="w-4 h-4" />
-                </SignoutButton>
-                <ThemeToggle />
-            </div>
-        </div>
-    );
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton size="lg">
+          {session.user && <UserAvatar user={session.user} />}
+          <div className="flex-1 grid text-left text-sm leading-tight">
+            <span className="font-semibold truncate">{session.user?.name}</span>
+            <span className="text-xs truncate">{session.user?.email}</span>
+          </div>
+          <div className="flex gap-2">
+            <SignoutButton>
+              <LogOut className="w-4 h-4" />
+            </SignoutButton>
+            <ThemeToggle />
+          </div>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  )
 }

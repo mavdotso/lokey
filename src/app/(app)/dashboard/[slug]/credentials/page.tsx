@@ -1,5 +1,6 @@
 'use client'
-import { use, useState } from 'react';
+
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
@@ -21,13 +22,12 @@ type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'update
 type TabType = 'shared' | 'requested';
 
 interface CredentialsProps {
-    params: Promise<{ slug: string }>;
+    params: { slug: string };
 }
 
 export default function CredentialsPage({ params }: CredentialsProps) {
-    const resolvedParams = use(params);
     const session = useSession();
-    
+
     const [activeTab, setActiveTab] = useState<TabType>('shared');
     const [filters, setFilters] = useState({
         searchTerm: '',
@@ -39,7 +39,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const [isRequestDialogOpen, setRequestDialogOpen] = useState(false);
 
-    const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: resolvedParams.slug });
+    const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
     const credentialsRequests = useQuery(api.credentialsRequests.getWorkspaceCredentialsRequests, workspace ? { workspaceId: workspace._id } : 'skip');
 
@@ -129,7 +129,12 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                 </CredentialsDialog>
             </PageHeader>
             <div className={`${totalPages > 1 && 'pb-10'} overflow-auto flex-grow flex flex-col`}>
-                <Tabs defaultValue="shared" className='px-8 py-4 h-full' onValueChange={(value) => setActiveTab(value as TabType)}>
+            <Tabs 
+                    value={activeTab}
+                    defaultValue="shared" 
+                    className='px-8 py-4 h-full' 
+                    onValueChange={(value) => setActiveTab(value as TabType)}
+                >
                     <TabsList>
                         <TabsTrigger value="shared">Shared</TabsTrigger>
                         <TabsTrigger value="requested">Requested</TabsTrigger>
