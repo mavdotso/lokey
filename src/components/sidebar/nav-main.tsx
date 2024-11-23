@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 interface NavMainProps {
   items: {
@@ -21,13 +22,16 @@ interface NavMainProps {
 export function NavMain({ items }: NavMainProps) {
   return (
     <SidebarGroup>
-      <SidebarMenu>
+      <SidebarMenu className="space-y-4">
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton
               asChild
               disabled={!!item.badge}
-              className={item.badge ? "opacity-50" : ""}
+              className={cn(
+                "py-3",
+                item.badge ? "opacity-50" : ""
+              )}
             >
               <a href={`/dashboard/${item.url}`}>
                 <item.icon className="w-4 h-4" />

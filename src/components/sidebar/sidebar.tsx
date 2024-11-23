@@ -6,13 +6,13 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarProvider,
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { UserCard } from './user-card';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
 import { UpgradeBox } from './upgrade-box';
 import { NavMain } from './nav-main';
+import { cn } from '@/lib/utils';
 
 interface SidebarProps {
   params: { slug: string };
@@ -61,16 +61,16 @@ const helpItems = [
 
 export default function AppSidebar({ params, session, className }: SidebarProps) {
   return (
-      <Sidebar collapsible="icon" className={className}>
+      <Sidebar collapsible="icon" className={cn(className, `px-2`)}>
         <SidebarHeader>
           <WorkspacesDropdown />
         </SidebarHeader>
         <SidebarContent>
           <NavMain items={navItems} />
-          <UpgradeBox />
-          <NavMain items={helpItems} />
         </SidebarContent>
         <SidebarFooter>
+          <UpgradeBox />
+          <NavMain items={helpItems} />
           <UserCard session={session} />
         </SidebarFooter>
         <SidebarRail />
