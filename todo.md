@@ -2,6 +2,7 @@
 
 -   [ ] User is not authenticated after avatar upload?
 -   [ ] Can't click anything after editing credentials in popup, maybe something with the clickOutside
+-   [ ] Can't click anything after closing the 'create a team' ... 
 -   [ ] BUG: When I input the login link from another email, I get into the workplace I'm not supposed to be in
 -   [ ] TODO: Test everything after the refactoring
 -   [ ] Kicking user doesn't update the state

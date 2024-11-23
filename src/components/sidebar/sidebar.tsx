@@ -1,4 +1,5 @@
 "use client"
+
 import { BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon, LucideIcon, VaultIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import {
@@ -6,7 +7,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
 } from "@/components/ui/sidebar"
 import { UserCard } from './user-card';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
@@ -59,21 +59,20 @@ const helpItems = [
   }
 ];
 
-export default function AppSidebar({ params, session, className }: SidebarProps) {
+export default function AppSidebar({ session, className }: SidebarProps) {
   return (
-      <Sidebar collapsible="icon" className={cn(className, `px-2`)}>
-        <SidebarHeader>
-          <WorkspacesDropdown />
-        </SidebarHeader>
-        <SidebarContent>
-          <NavMain items={navItems} />
-        </SidebarContent>
-        <SidebarFooter>
-          <UpgradeBox />
-          <NavMain items={helpItems} />
-          <UserCard session={session} />
-        </SidebarFooter>
-        <SidebarRail />
-      </Sidebar>
+    <Sidebar collapsible="icon" className={cn(className, `px-2`)}>
+      <SidebarHeader>
+        <WorkspacesDropdown />
+      </SidebarHeader>
+      <SidebarContent>
+        <NavMain items={navItems} />
+      </SidebarContent>
+      <SidebarFooter>
+        <UpgradeBox />
+        <NavMain items={helpItems} />
+        <UserCard session={session} />
+      </SidebarFooter>
+    </Sidebar>
   )
 }

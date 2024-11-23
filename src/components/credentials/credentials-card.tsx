@@ -25,8 +25,8 @@ export function CredentialsCard({ item, type }: CredentialsCardProps) {
             }
             return tags;
         } else {
-            // Use a set to ensure unique tags
-            const uniqueTags = new Set((item as CredentialsRequest).credentials.map(cred => cred.type));
+            const credentials = (item as CredentialsRequest).credentials || [];
+            const uniqueTags = new Set(credentials.map(cred => cred.type));
             return Array.from(uniqueTags);
         }
     }
@@ -105,6 +105,8 @@ interface RequestStatusInfoProps {
 }
 
 export function RequestStatusInfo({ request }: RequestStatusInfoProps) {
+    const credentialsCount = request.credentials?.length || 0;
+
     return (
         <>
             <div className="flex items-center gap-2 pl-1 text-md">
@@ -114,15 +116,17 @@ export function RequestStatusInfo({ request }: RequestStatusInfoProps) {
             <div className="flex justify-start items-start gap-4 text-muted-foreground">
                 <div className='flex items-center gap-1'>
                     <KeyIcon className='w-4 h-4' />
-                    <span>{request.credentials.length} credentials</span>
+                    <span>{credentialsCount} credentials</span>
                 </div>
             </div>
         </>
     );
 }
 
-function getStatusStyles(status: string) {
-    switch (status.toLowerCase()) {
+function getStatusStyles(status: string | undefined) {
+    const normalizedStatus = (status || '').toLowerCase();
+
+    switch (normalizedStatus) {
         case 'pending':
             return 'bg-yellow-500 shadow-[0px_0px_5px_3px_rgba(234,179,_8,_0.15)]';
         case 'fulfilled':
