@@ -1,16 +1,30 @@
 "use client"
-import { useEffect, useState, useMemo } from 'react';
+
 import { useParams, useRouter } from 'next/navigation';
-import { Plus, RocketIcon } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+import { ChevronsUpDown, Plus, RocketIcon } from "lucide-react"
 import { useQuery } from 'convex/react';
-import { Dialog } from '@/components/ui/dialog';
 import { api } from '@/convex/_generated/api';
 import { LoadingScreen } from '@/components/global/loading-screen';
 import { CreateWorkspaceDialog } from './create-workspace-dialog';
 import { useSession } from 'next-auth/react';
 import { Id } from '@/convex/_generated/dataModel';
+import { Dialog } from '@/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    useSidebar,
+} from "@/components/ui/sidebar"
+import { useEffect, useMemo, useState } from 'react';
 
 export function WorkspacesDropdown() {
     const router = useRouter();
@@ -18,10 +32,12 @@ export function WorkspacesDropdown() {
     const session = useSession();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedSpaceSlug, setSelectedSpaceSlug] = useState<string>('');
+    const { isMobile } = useSidebar()
 
     const workspacesQuery = useQuery(api.workspaces.getUserWorkspaces, { userId: session.data?.user?.id as Id<"users"> });
 
     const workspaces = useMemo(() => workspacesQuery ?? [], [workspacesQuery]);
+    const activeWorkspace = workspaces.find(w => w.slug === selectedSpaceSlug) || workspaces[0]
 
     useEffect(() => {
         setSelectedSpaceSlug(slug as string);
@@ -39,36 +55,61 @@ export function WorkspacesDropdown() {
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <Select
-                value={selectedSpaceSlug}
-                onValueChange={handleSelect}
-            >
-                <SelectTrigger className="shadow-none focus:outline-none p-0 border-none ring-0 focus:ring-0 w-full text-left text-primary/50 hover:text-primary transition-colors">
-                    <SelectValue placeholder="Select workspace" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border border-border rounded-md text-left text-primary">
-                    {workspaces.map((workspace) => (
-                        <SelectItem key={workspace.slug} value={workspace.slug} className='hover:bg-accent text-primary cursor-pointer'>
-                            <div className='flex flex-row items-center gap-3'>
-                                <div className='bg-primary-foreground p-2.5 rounded-sm'>
-                                    <RocketIcon className='w-6 h-6 stroke-primary' />
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <SidebarMenuButton
+                                size="lg"
+                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                            >
+                                <div className="flex justify-center items-center bg-sidebar-primary rounded-lg text-sidebar-primary-foreground aspect-square size-8">
+                                    <RocketIcon className="size-4" />
                                 </div>
-                                <div className='flex flex-col'>
-                                    <p className='text-md text-primary'>{workspace.name}</p>
-                                    <p className='font-light text-primary/50 text-xs'>/{workspace.slug}</p>
+                                <div className="flex-1 grid text-left text-sm leading-tight">
+                                    <span className="font-semibold truncate">
+                                        {activeWorkspace?.name}
+                                    </span>
+                                    <span className="text-xs truncate">/{activeWorkspace?.slug}</span>
                                 </div>
-                            </div>
-                        </SelectItem>
-                    ))}
-                    <Separator className='my-1' />
-                    <CreateWorkspaceDialog trigger={
-                        <div className="flex flex-row items-center gap-2 hover:bg-muted p-2 rounded-md w-full text-sm transition-all cursor-pointer">
-                            <Plus className="w-4 h-4" />
-                            Create new workspace
-                        </div>
-                    } />
-                </SelectContent>
-            </Select>
+                                <ChevronsUpDown className="ml-auto" />
+                            </SidebarMenuButton>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            className="rounded-lg w-[--radix-dropdown-menu-trigger-width] min-w-56"
+                            align="start"
+                            side={isMobile ? "bottom" : "right"}
+                            sideOffset={4}
+                        >
+                            <DropdownMenuLabel className="text-muted-foreground text-xs">
+                                Workspaces
+                            </DropdownMenuLabel>
+                            {workspaces.map((workspace, index) => (
+                                <DropdownMenuItem
+                                    key={workspace.slug}
+                                    onClick={() => handleSelect(workspace.slug)}
+                                    className="gap-2 p-2"
+                                >
+                                    <div className="flex justify-center items-center border rounded-sm size-6">
+                                        <RocketIcon className="shrink-0 size-4" />
+                                    </div>
+                                    {workspace.name}
+                                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                                </DropdownMenuItem>
+                            ))}
+                            <DropdownMenuSeparator />
+                            <CreateWorkspaceDialog trigger={
+                                <DropdownMenuItem className="gap-2 p-2">
+                                    <div className="flex justify-center items-center bg-background border rounded-md size-6">
+                                        <Plus className="size-4" />
+                                    </div>
+                                    <div className="font-medium text-muted-foreground">Create workspace</div>
+                                </DropdownMenuItem>
+                            } />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </SidebarMenuItem>
+            </SidebarMenu>
         </Dialog>
     );
 }

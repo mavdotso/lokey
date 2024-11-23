@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth';
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import Sidebar from '@/components/sidebar/sidebar';
 import { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
@@ -13,16 +14,18 @@ export default async function DashboardLayout({ children, params }: DashboardLay
 
     if (!session) redirect('/sign-in')
 
-    return (
-        <main className="relative bg-muted h-screen">
-            <div className='flex rounded-md h-full'>
-                <Sidebar session={session} params={params} />
-                <div className="flex-1 p-2">
-                    <div className='relative bg-background border border-border rounded-lg w-full h-full overflow-hidden'>
-                        {children}
-                    </div>
+        return (
+            <main className="relative bg-muted h-screen">
+                <div className='flex rounded-md h-full'>
+                    <SidebarProvider>
+                        <Sidebar session={session} params={params} />
+                        <SidebarInset className="flex-1 p-2">
+                            <div className='relative bg-background border border-border rounded-lg w-full h-full overflow-hidden'>
+                                {children}
+                            </div>
+                        </SidebarInset>
+                    </SidebarProvider>
                 </div>
-            </div>
-        </main>
-    );
+            </main>
+        );
 }

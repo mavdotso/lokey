@@ -1,5 +1,6 @@
 'use client'
-import { use, useState } from 'react';
+
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
@@ -26,7 +27,7 @@ interface CredentialsProps {
 
 export default function CredentialsPage({ params }: CredentialsProps) {
     const session = useSession();
-    
+
     const [activeTab, setActiveTab] = useState<TabType>('shared');
     const [filters, setFilters] = useState({
         searchTerm: '',
@@ -128,7 +129,12 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                 </CredentialsDialog>
             </PageHeader>
             <div className={`${totalPages > 1 && 'pb-10'} overflow-auto flex-grow flex flex-col`}>
-                <Tabs defaultValue="shared" className='px-8 py-4 h-full' onValueChange={(value) => setActiveTab(value as TabType)}>
+            <Tabs 
+                    value={activeTab}
+                    defaultValue="shared" 
+                    className='px-8 py-4 h-full' 
+                    onValueChange={(value) => setActiveTab(value as TabType)}
+                >
                     <TabsList>
                         <TabsTrigger value="shared">Shared</TabsTrigger>
                         <TabsTrigger value="requested">Requested</TabsTrigger>

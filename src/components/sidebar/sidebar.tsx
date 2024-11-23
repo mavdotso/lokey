@@ -1,61 +1,79 @@
-
+"use client"
 import { BoltIcon, FileLockIcon, KeyIcon, MessageSquareDashedIcon, MessageCircleQuestionIcon, LucideIcon, VaultIcon } from 'lucide-react';
-import { UserCard } from '@/components/sidebar/user-card';
 import { Session } from 'next-auth';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+} from "@/components/ui/sidebar"
+import { UserCard } from './user-card';
 import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown';
-import { Separator } from '@/components/ui/separator';
-import { UpgradeBox } from '@/components/sidebar/upgrade-box';
-import { NavigationItem } from '@/components/sidebar/nav-item';
+import { UpgradeBox } from './upgrade-box';
+import { NavMain } from './nav-main';
+import { cn } from '@/lib/utils';
 
 interface SidebarProps {
-    params: { slug: string };
-    session: Session;
-    className?: string;
-    onToggleSidebar?: () => void;
+  params: { slug: string };
+  session: Session;
+  className?: string;
 }
 
-export interface NavItemProps {
-    href?: string;
-    icon: LucideIcon;
-    name: string;
-    onClick?: () => void,
-    badge?: string;
-}
-
-const navItems: NavItemProps[] = [
-    { href: 'credentials', icon: KeyIcon, name: 'Credentials' },
-    { href: 'credentials', icon: VaultIcon, name: 'Vault', badge: 'soon' },
-    { href: 'credentials', icon: FileLockIcon, name: 'Files', badge: 'soon' },
-    { href: 'credentials', icon: MessageSquareDashedIcon, name: 'Chats', badge: 'soon' },
+const navItems = [
+  {
+    title: 'Credentials',
+    url: 'credentials',
+    icon: KeyIcon,
+  },
+  {
+    title: 'Vault',
+    url: 'vault',
+    icon: VaultIcon,
+    badge: 'soon'
+  },
+  {
+    title: 'Files',
+    url: 'files',
+    icon: FileLockIcon,
+    badge: 'soon'
+  },
+  {
+    title: 'Chats',
+    url: 'chats',
+    icon: MessageSquareDashedIcon,
+    badge: 'soon'
+  }
 ];
 
-const helpItems: NavItemProps[] = [
-    { href: 'settings', icon: BoltIcon, name: 'Settings' },
-    { href: 'help', icon: MessageCircleQuestionIcon, name: 'Help & Support' },
-]
+const helpItems = [
+  {
+    title: 'Settings',
+    url: 'settings',
+    icon: BoltIcon,
+  },
+  {
+    title: 'Help & Support',
+    url: 'help',
+    icon: MessageCircleQuestionIcon,
+  }
+];
 
-export default function Sidebar({ params, session, className, onToggleSidebar }: SidebarProps) {
-    return (
-        <aside className={`w-60 h-full flex flex-col p-2 gap-4 ${className}`}>
-            <div className="flex justify-start items-center gap-2 px-2 pt-4 pb-2 font-semibold">
-                <WorkspacesDropdown />
-            </div>
-            <Separator />
-            <nav className="flex flex-col flex-grow gap-2 px-2 py-2">
-                {navItems.map((item) =>
-                    item.href && (
-                        <NavigationItem key={item.name} params={params} item={item} />
-                    )
-                )}
-            </nav>
-            <UpgradeBox />
-            <div className='flex flex-col gap-1'>
-                {helpItems.map((item) =>
-                    <NavigationItem key={item.name} params={params} item={item} />
-                )}
-            </div>
-            <Separator />
-            <UserCard session={session} />
-        </aside>
-    );
+export default function AppSidebar({ params, session, className }: SidebarProps) {
+  return (
+      <Sidebar collapsible="icon" className={cn(className, `px-2`)}>
+        <SidebarHeader>
+          <WorkspacesDropdown />
+        </SidebarHeader>
+        <SidebarContent>
+          <NavMain items={navItems} />
+        </SidebarContent>
+        <SidebarFooter>
+          <UpgradeBox />
+          <NavMain items={helpItems} />
+          <UserCard session={session} />
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+  )
 }
