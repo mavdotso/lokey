@@ -23,12 +23,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn('min-h-screen text-balance', GeistSans.className)}>
+      <body className={cn('min-h-screen text-balance antialiased', GeistSans.className)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange>
+          disableTransitionOnChange
+          storageKey="lokey-theme">
           <ConvexClientProvider session={session}>
             <TooltipProvider>
               <main>{children}</main>
