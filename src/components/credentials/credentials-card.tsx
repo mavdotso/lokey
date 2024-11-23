@@ -105,14 +105,14 @@ interface RequestStatusInfoProps {
 }
 
 export function RequestStatusInfo({ request }: RequestStatusInfoProps) {
-    // Add null check for credentials array
     const credentialsCount = request.credentials?.length || 0;
+    const status = request.status?.toLowerCase() || '';
 
     return (
         <>
             <div className="flex items-center gap-2 pl-1 text-md">
                 <div className={`w-2 h-2 rounded-full ${getStatusStyles(request.status)}`}></div>
-                <span className='text-md capitalize'>{request.status}</span>
+                <span className='text-md capitalize'>{status.toLowerCase()}</span>
             </div>
             <div className="flex justify-start items-start gap-4 text-muted-foreground">
                 <div className='flex items-center gap-1'>

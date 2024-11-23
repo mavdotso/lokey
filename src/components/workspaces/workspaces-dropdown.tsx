@@ -4,7 +4,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { ChevronsUpDown, Plus, RocketIcon } from "lucide-react"
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { LoadingScreen } from '@/components/global/loading-screen';
 import { CreateWorkspaceDialog } from './create-workspace-dialog';
 import { useSession } from 'next-auth/react';
 import { Id } from '@/convex/_generated/dataModel';
@@ -25,17 +24,21 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar"
 import { useEffect, useMemo, useState } from 'react';
+import { WorkspaceDropdownSkeleton } from '@/components/skeletons/workplace-dropdown-skeleton';
 
 export function WorkspacesDropdown() {
     const router = useRouter();
     const { slug } = useParams();
     const session = useSession();
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedSpaceSlug, setSelectedSpaceSlug] = useState<string>('');
+    
     const { isMobile } = useSidebar()
 
     const workspacesQuery = useQuery(api.workspaces.getUserWorkspaces, { userId: session.data?.user?.id as Id<"users"> });
 
+    
     const workspaces = useMemo(() => workspacesQuery ?? [], [workspacesQuery]);
     const activeWorkspace = workspaces.find(w => w.slug === selectedSpaceSlug) || workspaces[0]
 
@@ -43,7 +46,7 @@ export function WorkspacesDropdown() {
         setSelectedSpaceSlug(slug as string);
     }, [slug]);
 
-    if (workspaces === undefined) return <LoadingScreen />
+    if (!workspacesQuery || workspaces === undefined) return <WorkspaceDropdownSkeleton />
 
     function handleSelect(slug: string) {
         const selectedWorkspace = workspaces.find(workspace => workspace.slug === slug);
@@ -63,7 +66,7 @@ export function WorkspacesDropdown() {
                                 size="lg"
                                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                             >
-                                <div className="flex justify-center items-center bg-sidebar-primary rounded-lg text-sidebar-primary-foreground aspect-square size-8">
+                                <div className="flex justify-center items-center bg-white rounded-sm text-sidebar-primary-foreground aspect-square size-8">
                                     <RocketIcon className="size-4" />
                                 </div>
                                 <div className="flex-1 grid text-left text-sm leading-tight">
@@ -88,9 +91,9 @@ export function WorkspacesDropdown() {
                                 <DropdownMenuItem
                                     key={workspace.slug}
                                     onClick={() => handleSelect(workspace.slug)}
-                                    className="gap-2 p-2"
+                                    className="gap-2 p-2 cursor-pointer"
                                 >
-                                    <div className="flex justify-center items-center border rounded-sm size-6">
+                                    <div className="flex justify-center items-center border rounded-sm size-8">
                                         <RocketIcon className="shrink-0 size-4" />
                                     </div>
                                     {workspace.name}
@@ -99,8 +102,8 @@ export function WorkspacesDropdown() {
                             ))}
                             <DropdownMenuSeparator />
                             <CreateWorkspaceDialog trigger={
-                                <DropdownMenuItem className="gap-2 p-2">
-                                    <div className="flex justify-center items-center bg-background border rounded-md size-6">
+                                <DropdownMenuItem className="gap-2 p-2 cursor-pointer">
+                                    <div className="flex justify-center items-center bg-background border rounded-md size-8">
                                         <Plus className="size-4" />
                                     </div>
                                     <div className="font-medium text-muted-foreground">Create workspace</div>
