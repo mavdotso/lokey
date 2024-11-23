@@ -21,11 +21,10 @@ type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'update
 type TabType = 'shared' | 'requested';
 
 interface CredentialsProps {
-    params: Promise<{ slug: string }>;
+    params: { slug: string };
 }
 
 export default function CredentialsPage({ params }: CredentialsProps) {
-    const resolvedParams = use(params);
     const session = useSession();
     
     const [activeTab, setActiveTab] = useState<TabType>('shared');
@@ -39,7 +38,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
     const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
     const [isRequestDialogOpen, setRequestDialogOpen] = useState(false);
 
-    const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: resolvedParams.slug });
+    const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
     const credentialsRequests = useQuery(api.credentialsRequests.getWorkspaceCredentialsRequests, workspace ? { workspaceId: workspace._id } : 'skip');
 
