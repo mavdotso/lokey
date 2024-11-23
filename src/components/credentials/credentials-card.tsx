@@ -105,6 +105,7 @@ interface RequestStatusInfoProps {
 }
 
 export function RequestStatusInfo({ request }: RequestStatusInfoProps) {
+    // Add null check for credentials array
     const credentialsCount = request.credentials?.length || 0;
 
     return (

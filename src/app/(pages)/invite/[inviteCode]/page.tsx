@@ -7,7 +7,7 @@ import { useAction, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useSession } from 'next-auth/react';
 import { Id } from '@/convex/_generated/dataModel';
-import { setCookie } from "cookies-next";
+import { cookies } from 'next/headers';
 
 export default function InvitePage() {
     const session = useSession();
@@ -51,7 +51,7 @@ export default function InvitePage() {
         if (session.data?.user?.id) {
             setIsJoining(true);
             try {
-                joinWorkspace({ userId: session.data?.user?.id as Id<"users">, inviteCode });
+                await joinWorkspace({ userId: session.data?.user?.id as Id<"users">, inviteCode });
                 router.push('/dashboard');
             } catch (error) {
                 console.error('Error joining workspace:', error);
@@ -60,7 +60,10 @@ export default function InvitePage() {
             }
             setIsJoining(false);
         } else {
-            setCookie('inviteCode', inviteCode, { maxAge: 60 * 60 * 24 * 7 });
+            cookies().set('inviteCode', inviteCode, {
+                maxAge: 60 * 60 * 24 * 7, // 7 days
+                path: '/'
+            });
             router.push('/sign-in');
         }
     }

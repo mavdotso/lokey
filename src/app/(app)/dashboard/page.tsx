@@ -5,29 +5,38 @@ import { fetchAction } from 'convex/nextjs';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Id } from '@/convex/_generated/dataModel';
-import { deleteCookie } from "cookies-next";
 
 export default async function Dashboard() {
     const session = await auth();
+    if (!session?.user) redirect('/');
+
     const cookieStore = cookies();
-
-    if (!session || !session.user) redirect('/')
-
     const inviteCode = cookieStore.get('inviteCode')?.value;
-    const redirectResult = await fetchAction(api.workspaces.getUserRedirectWorkspace, { userId: session.user.id as Id<"users"> });
-
+    
+    // Handle invite code first if it exists
     if (inviteCode) {
-        await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, { userId: session.user.id as Id<"users">, inviteCode });
-        deleteCookie('inviteCode');
+        await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, {
+            userId: session.user.id as Id<"users">,
+            inviteCode
+        });
+        cookies().delete('inviteCode');
     }
 
-    if (!redirectResult.success || !redirectResult.workspace) {
-        return (
-            <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-sm w-screen h-screen">
-                <CreateWorkspaceDialog isOpen={true} />
-            </div>
-        );
-    } else {
-        redirect(`/dashboard/${redirectResult.workspace.slug}/credentials`);
+    // Get redirect workspace after potentially joining a new one
+    const { success, workspace } = await fetchAction(
+        api.workspaces.getUserRedirectWorkspace,
+        { userId: session.user.id as Id<"users"> }
+    );
+
+    // Redirect to workspace if exists
+    if (success && workspace) {
+        redirect(`/dashboard/${workspace.slug}/credentials`);
     }
+
+    // Show create workspace dialog if no workspace exists
+    return (
+        <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-sm w-screen h-screen">
+            <CreateWorkspaceDialog isOpen={true} />
+        </div>
+    );
 }
