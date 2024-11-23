@@ -16,6 +16,7 @@ import { InboxIcon, Share2Icon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CredentialsList } from '@/components/credentials/credentials-list';
 import { PageHeader } from '@/components/global/page-header';
+import { CredentialsListSkeleton, CredentialsSortControlsSkeleton } from '@/components/skeletons/credentials-skeleton';
 
 type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
@@ -43,10 +44,12 @@ export default function CredentialsPage({ params }: CredentialsProps) {
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
     const credentialsRequests = useQuery(api.credentialsRequests.getWorkspaceCredentialsRequests, workspace ? { workspaceId: workspace._id } : 'skip');
 
-    if (credentials === undefined || credentialsRequests === undefined) return <LoadingScreen />;
     if (!session || !session.data || !session.data.user) return <LoadingScreen />;
 
+    const isLoading = credentials === undefined || credentialsRequests === undefined;
+
     const filterItems = <T extends Credentials | CredentialsRequest>(items: T[], isCredentials: boolean): T[] => {
+        if (!items) return [];
         return items.filter(item =>
             item.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) &&
             (filters.selectedTypes.length === 0 || filters.selectedTypes.includes((isCredentials ? (item as Credentials).type : (item as CredentialsRequest).credentials[0]?.type) as CredentialsType)) &&
@@ -59,7 +62,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
         });
     };
 
-    const filteredItems = activeTab === 'shared' ? filterItems(credentials, true) : filterItems(credentialsRequests, false);
+    const filteredItems = activeTab === 'shared' ? filterItems(credentials || [], true) : filterItems(credentialsRequests || [], false);
 
     const isFiltered = filters.searchTerm || filters.selectedTypes.length > 0 || (activeTab === 'shared' && filters.hideExpired);
     const itemsPerPage = 14;
@@ -75,12 +78,29 @@ export default function CredentialsPage({ params }: CredentialsProps) {
         });
     }
 
-    const renderContent = (type: TabType) => (
-        (type === 'shared' ? credentials : credentialsRequests).length === 0 ? (
-            <div className='flex flex-grow justify-center items-center py-8'>
-                <p className='text-center text-muted-foreground'>{type === 'shared' ? "Share your first credentials to see them here" : "Request your first credentials to see them here"}</p>
-            </div>
-        ) : (
+    const renderContent = (type: TabType) => {
+        if (isLoading) {
+            return (
+                <div className='flex flex-col flex-grow gap-4 pt-4'>
+                    <CredentialsSortControlsSkeleton />
+                    <CredentialsListSkeleton count={4} />
+                </div>
+            );
+        }
+
+        const items = type === 'shared' ? credentials : credentialsRequests;
+
+        if (!items || items.length === 0) {
+            return (
+                <div className='flex flex-grow justify-center items-center py-8'>
+                    <p className='text-center text-muted-foreground'>
+                        {type === 'shared' ? "Share your first credentials to see them here" : "Request your first credentials to see them here"}
+                    </p>
+                </div>
+            );
+        }
+
+        return (
             <div className='flex flex-col flex-grow gap-4 pt-4'>
                 <CredentialsSortControls
                     {...filters}
@@ -101,8 +121,8 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                     />
                 )}
             </div>
-        )
-    );
+        );
+    };
 
     return (
         <div className="flex flex-col h-full">
@@ -129,10 +149,10 @@ export default function CredentialsPage({ params }: CredentialsProps) {
                 </CredentialsDialog>
             </PageHeader>
             <div className={`${totalPages > 1 && 'pb-10'} overflow-auto flex-grow flex flex-col`}>
-            <Tabs 
+                <Tabs
                     value={activeTab}
-                    defaultValue="shared" 
-                    className='px-8 py-4 h-full' 
+                    defaultValue="shared"
+                    className='px-8 py-4 h-full'
                     onValueChange={(value) => setActiveTab(value as TabType)}
                 >
                     <TabsList>
