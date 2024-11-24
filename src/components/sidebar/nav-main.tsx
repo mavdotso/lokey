@@ -27,7 +27,7 @@ export function NavMain({ items }: NavMainProps) {
 
   return (
     <SidebarGroup>
-      <SidebarMenu className="space-y-4">
+      <SidebarMenu>
         {items.map((item) => {
           const isActive = pathname.split('/').slice(-1)[0] === item.url
           return (
@@ -36,8 +36,8 @@ export function NavMain({ items }: NavMainProps) {
                 asChild
                 disabled={!!item.badge}
                 isActive={isActive}
+                size="lg"
                 className={cn(
-                  "py-3",
                   item.badge ? "opacity-50" : ""
                 )}
               >

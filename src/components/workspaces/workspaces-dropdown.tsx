@@ -67,7 +67,7 @@ export function WorkspacesDropdown() {
                                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                             >
                                 <div className="flex justify-center items-center bg-background rounded-sm text-sidebar-primary-foreground aspect-square size-8">
-                                    <RocketIcon className="size-4" />
+                                    <RocketIcon className="text-primary size-4" />
                                 </div>
                                 <div className="flex-1 grid text-left text-sm leading-tight">
                                     <span className="font-semibold truncate">

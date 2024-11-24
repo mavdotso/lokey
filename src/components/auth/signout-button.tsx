@@ -4,12 +4,13 @@ import { ReactNode } from 'react';
 
 interface SignoutButtonProps {
     children: ReactNode;
+    variant?: "outline" | "default" | "destructive" | "secondary" | "ghost" | "link";
 }
 
-export default function SignoutButton({ children }: SignoutButtonProps) {
+export default function SignoutButton({ children, variant = "outline" }: SignoutButtonProps) {
     return (
         <form action={signout}>
-            <Button variant="outline" size="icon" className="p-0" type="submit">
+            <Button variant={variant} size="icon" className="p-0" type="submit">
                 {children}
             </Button>
         </form>

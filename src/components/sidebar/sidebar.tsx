@@ -13,6 +13,8 @@ import { WorkspacesDropdown } from '@/components/workspaces/workspaces-dropdown'
 import { UpgradeBox } from './upgrade-box';
 import { NavMain } from './nav-main';
 import { cn } from '@/lib/utils';
+import { Suspense } from 'react';
+import { UserCardSkeleton } from '@/components/skeletons/user-card-skeleton';
 
 interface SidebarProps {
   params: { slug: string };
@@ -61,7 +63,7 @@ const helpItems = [
 
 export default function AppSidebar({ session, className }: SidebarProps) {
   return (
-    <Sidebar collapsible="icon" className={cn(className, `px-2`)}>
+    <Sidebar collapsible="icon" className={cn(className, `px-2 py-4`)}>
       <SidebarHeader>
         <WorkspacesDropdown />
       </SidebarHeader>
@@ -71,7 +73,9 @@ export default function AppSidebar({ session, className }: SidebarProps) {
       <SidebarFooter>
         <UpgradeBox />
         <NavMain items={helpItems} />
-        <UserCard session={session} />
+        <Suspense fallback={<UserCardSkeleton />}>
+          <UserCard session={session} />
+        </Suspense>
       </SidebarFooter>
     </Sidebar>
   )
