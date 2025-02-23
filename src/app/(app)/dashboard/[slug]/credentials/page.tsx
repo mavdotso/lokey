@@ -23,7 +23,9 @@ type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'update
 type TabType = 'shared' | 'requested';
 
 interface CredentialsProps {
-    params: { slug: string };
+    params: {
+        slug: string;
+    };
 }
 
 export default function CredentialsPage({ params }: CredentialsProps) {
@@ -93,7 +95,7 @@ export default function CredentialsPage({ params }: CredentialsProps) {
         if (!items || items.length === 0) {
             return (
                 <div className='flex flex-grow justify-center items-center py-8'>
-                    <p className='text-center text-muted-foreground'>
+                    <p className='text-muted-foreground text-center'>
                         {type === 'shared' ? "Share your first credentials to see them here" : "Request your first credentials to see them here"}
                     </p>
                 </div>
