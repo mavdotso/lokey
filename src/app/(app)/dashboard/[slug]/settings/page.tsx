@@ -25,7 +25,8 @@ const userSettingsItems = [
     { tabName: 'userSecurity', icon: LockIcon, name: 'Security' },
 ];
 
-export default async function SettingsPage({ params }: { params: { slug: string } }) {
+export default async function SettingsPage(props: { params: Promise<{ slug: string }> }) {
+    const params = await props.params;
     const session = await auth();
     const workspace = await fetchQuery(api.workspaces.getWorkspaceBySlug, { slug: params.slug });
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
@@ -23,12 +23,13 @@ type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'update
 type TabType = 'shared' | 'requested';
 
 interface CredentialsProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
-export default function CredentialsPage({ params }: CredentialsProps) {
+export default function CredentialsPage(props: CredentialsProps) {
+    const params = use(props.params);
     const session = useSession();
 
     const [activeTab, setActiveTab] = useState<TabType>('shared');
