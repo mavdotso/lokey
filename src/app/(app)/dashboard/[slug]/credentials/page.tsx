@@ -82,6 +82,10 @@ export default function CredentialsPage(props: CredentialsProps) {
     const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
     const paginatedItems = filteredItems.slice((state.currentPage - 1) * itemsPerPage, state.currentPage * itemsPerPage);
 
+    const handleFilterChange = useCallback((update: Partial<typeof state.filters>) => {
+        actions.setFilters(update);
+    }, [actions.setFilters]);
+
     function renderContent(type: TabType) {
         const items = type === 'shared' ? credentials : credentialsRequests;
 
