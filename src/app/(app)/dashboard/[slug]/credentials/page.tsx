@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, use, useReducer, useCallback } from 'react';
+import { useState, use, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useQuery } from 'convex/react';
 import { LoadingScreen } from '@/components/global/loading-screen';
@@ -41,8 +41,10 @@ export default function CredentialsPage(props: CredentialsProps) {
     const { state, actions } = useCredentialsManagement();
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: params.slug });
-    const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
-    const credentialsRequests = useQuery(api.credentialsRequests.getWorkspaceCredentialsRequests, workspace ? { workspaceId: workspace._id } : 'skip');
+    const [credentials, credentialsRequests] = await Promise.all([
+      useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip'),
+      useQuery(api.credentialsRequests.getWorkspaceCredentialsRequests, workspace ? { workspaceId: workspace._id } : 'skip')
+    ]);
 
     const isLoading = credentials === undefined || credentialsRequests === undefined;
 
