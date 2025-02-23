@@ -3,26 +3,24 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 interface PaginationComponentProps {
     currentPage: number;
     totalPages: number;
-    setCurrentPage: (page: number) => void;
+    hrefBuilder: (page: number) => string;
 }
 
-export function PagePagination({ currentPage, totalPages, setCurrentPage }: PaginationComponentProps) {
+export function PagePagination({ currentPage, totalPages, hrefBuilder }: PaginationComponentProps) {
     return (
         <Pagination className="pb-4 text-primary/70">
             <PaginationContent>
                 <PaginationItem className="hover:text-primary">
                     <PaginationPrevious
-                        href="#"
-                        onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
+                        href={hrefBuilder(Math.max(currentPage - 1, 1))}
                     />
                 </PaginationItem>
 
                 {[...Array(totalPages)].map((_, index) => (
                     <PaginationItem key={index} className="hover:text-primary">
                         <PaginationLink
-                            href="#"
-                            onClick={() => setCurrentPage(index + 1)}
-                            className={currentPage === index + 1 ? "font-bold" : ""}
+                            href={hrefBuilder(index + 1)}
+                            isActive={currentPage === index + 1}
                         >
                             {index + 1}
                         </PaginationLink>
@@ -37,8 +35,7 @@ export function PagePagination({ currentPage, totalPages, setCurrentPage }: Pagi
 
                 <PaginationItem className="hover:text-primary">
                     <PaginationNext
-                        href="#"
-                        onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
+                        href={hrefBuilder(Math.min(currentPage + 1, totalPages))}
                     />
                 </PaginationItem>
             </PaginationContent>

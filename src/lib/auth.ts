@@ -4,6 +4,7 @@ import Resend from 'next-auth/providers/resend';
 import { ConvexAdapter } from '@/lib/convex-adapter';
 import { getURL } from './utils';
 
+
 if (process.env.CONVEX_AUTH_PRIVATE_KEY === undefined) {
     throw new Error('Missing CONVEX_AUTH_PRIVATE_KEY Next.js environment variable');
 }
@@ -68,3 +69,5 @@ declare module 'next-auth' {
         convexToken: string;
     }
 }
+
+
