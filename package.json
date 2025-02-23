@@ -46,7 +46,7 @@
     "jsencrypt": "^3.3.2",
     "lucide-react": "^0.475.0",
     "next": "latest",
-    "next-auth": "beta",
+    "next-auth": "5.0.0-beta.25",
     "next-themes": "^0.3.0",
     "react": "latest",
     "react-day-picker": "^8.10.1",
