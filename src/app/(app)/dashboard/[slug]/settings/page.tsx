@@ -47,33 +47,45 @@ export default async function SettingsPage(props: { params: Promise<{ slug: stri
         return user!._id === workspace!.ownerId;
     }
 
+    const workspaceTabTriggers = workspaceSettingsItems.map((item) => (
+        <TabsTrigger
+            value={item.tabName}
+            key={item.name}
+            className="flex justify-start gap-2 data-[state=active]:bg-muted hover:bg-muted data-[state=active]:shadow-none py-2 w-full font-normal text-primary text-left"
+        >
+            <item.icon className="w-4 h-4" />
+            {item.name}
+        </TabsTrigger>
+    ));
+
+    const userTabTriggers = userSettingsItems.map((item) => (
+        <TabsTrigger
+            value={item.tabName}
+            key={item.name}
+            className="flex justify-start gap-2 data-[state=active]:bg-muted hover:bg-muted data-[state=active]:shadow-none py-2 w-full font-normal text-primary text-left"
+        >
+            <item.icon className="w-4 h-4" />
+            {item.name}
+        </TabsTrigger>
+    ));
+
     return (
         <div className="flex flex-col h-full">
             <PageHeader title="Settings" />
-            <div className="flex grow gap-4 px-8 py-4 overflow-hidden">
+            <div className="flex gap-4 px-8 py-4 overflow-hidden grow">
                 <Tabs defaultValue={isAdmin() ? "workspaceGeneral" : "userGeneral"} orientation="horizontal" className="flex gap-6 w-full h-full">
-                    <TabsList className="flex flex-col shrink-0 justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">
+                    <TabsList className="flex flex-col justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left shrink-0">
                         {isAdmin() && (
                             <>
-                                <p className="text-left text-muted-foreground text-sm">Workspace settings</p>
-                                {workspaceSettingsItems.map((item) => (
-                                    <TabsTrigger value={item.tabName} key={item.name} className="flex justify-start gap-2 hover:bg-muted data-[state=active]:bg-muted data-[state=active]:shadow-none py-2 w-full font-normal text-left text-primary">
-                                        <item.icon className="w-4 h-4" />
-                                        {item.name}
-                                    </TabsTrigger>
-                                ))}
+                                <p className="text-muted-foreground text-sm text-left">Workspace settings</p>
+                                {workspaceTabTriggers}
                                 <Separator className="my-4" />
                             </>
                         )}
-                        <p className="text-left text-muted-foreground text-sm">User settings</p>
-                        {userSettingsItems.map((item) => (
-                            <TabsTrigger value={item.tabName} key={item.name} className="flex justify-start gap-2 hover:bg-muted data-[state=active]:bg-muted data-[state=active]:shadow-none py-2 w-full font-normal text-left text-primary">
-                                <item.icon className="w-4 h-4" />
-                                {item.name}
-                            </TabsTrigger>
-                        ))}
+                        <p className="text-muted-foreground text-sm text-left">User settings</p>
+                        {userTabTriggers}
                     </TabsList>
-                    <div className="grow w-4/5 overflow-hidden">
+                    <div className="w-4/5 overflow-hidden grow">
                         <div className="pr-4 h-full overflow-y-auto">
                             <TabsContent value="workspaceGeneral">
                                 <WorkspaceSettings workspace={workspace} />

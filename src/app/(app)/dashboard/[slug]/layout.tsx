@@ -9,12 +9,8 @@ interface DashboardLayoutProps {
     params: Promise<{ slug: string }>;
 }
 
-export default async function DashboardLayout(props: DashboardLayoutProps) {
-    const params = await props.params;
-
-    const {
-        children
-    } = props;
+export default async function DashboardLayout({ children, params }: DashboardLayoutProps) {
+    const resolvedParams = await params;
 
     const session = await auth()
 
@@ -24,7 +20,7 @@ export default async function DashboardLayout(props: DashboardLayoutProps) {
         <main className="relative bg-muted h-screen">
             <div className='flex rounded-md h-full'>
                 <SidebarProvider>
-                    <Sidebar session={session} params={params} />
+                    <Sidebar session={session} params={resolvedParams} />
                     <SidebarInset className="flex-1 p-2">
                         <div className='relative bg-background border border-border rounded-lg w-full h-full overflow-hidden'>
                             {children}

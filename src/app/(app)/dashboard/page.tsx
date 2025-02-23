@@ -12,7 +12,7 @@ export default async function Dashboard() {
 
     const cookieStore = await cookies();
     const inviteCode = cookieStore.get('inviteCode')?.value;
-    
+
     // Handle invite code first if it exists
     if (inviteCode) {
         await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, {
