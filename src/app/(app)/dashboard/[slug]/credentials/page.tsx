@@ -84,7 +84,7 @@ export default function CredentialsPage(props: CredentialsProps) {
     const renderContent = (type: TabType) => {
         if (isLoading) {
             return (
-                <div className='flex flex-col flex-grow gap-4 pt-4'>
+                <div className='flex flex-col grow gap-4 pt-4'>
                     <CredentialsSortControlsSkeleton />
                     <CredentialsListSkeleton count={4} />
                 </div>
@@ -95,7 +95,7 @@ export default function CredentialsPage(props: CredentialsProps) {
 
         if (!items || items.length === 0) {
             return (
-                <div className='flex flex-grow justify-center items-center py-8'>
+                <div className='flex grow justify-center items-center py-8'>
                     <p className='text-muted-foreground text-center'>
                         {type === 'shared' ? "Share your first credentials to see them here" : "Request your first credentials to see them here"}
                     </p>
@@ -104,7 +104,7 @@ export default function CredentialsPage(props: CredentialsProps) {
         }
 
         return (
-            <div className='flex flex-col flex-grow gap-4 pt-4'>
+            <div className='flex flex-col grow gap-4 pt-4'>
                 <CredentialsSortControls
                     {...filters}
                     onSearchChange={(searchTerm) => setFilters({ ...filters, searchTerm })}
@@ -151,7 +151,7 @@ export default function CredentialsPage(props: CredentialsProps) {
                     </Button>
                 </CredentialsDialog>
             </PageHeader>
-            <div className={`${totalPages > 1 && 'pb-10'} overflow-auto flex-grow flex flex-col`}>
+            <div className={`${totalPages > 1 && 'pb-10'} overflow-auto grow flex flex-col`}>
                 <Tabs
                     value={activeTab}
                     defaultValue="shared"
@@ -171,7 +171,7 @@ export default function CredentialsPage(props: CredentialsProps) {
                 </Tabs>
             </div>
             {totalPages > 1 && (
-                <div className="right-0 bottom-0 left-0 absolute bg-gradient-to-t from-background to-transparent mx-auto pt-10">
+                <div className="right-0 bottom-0 left-0 absolute bg-linear-to-t from-background to-transparent mx-auto pt-10">
                     <PagePagination
                         currentPage={currentPage}
                         totalPages={totalPages}

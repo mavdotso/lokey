@@ -56,7 +56,7 @@ export default function LandingPage() {
             <div className='flex flex-col gap-4 pt-8 max-w-xl'>
                 <form action={handleSubmit} className="space-y-4">
                     <div className="flex gap-4">
-                        <div className="flex-grow">
+                        <div className="grow">
                             <Label>Password to share</Label>
                             <div className="relative">
                                 <Input

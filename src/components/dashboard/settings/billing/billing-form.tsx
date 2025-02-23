@@ -75,7 +75,7 @@ export function BillingForm({ user, workspace, products, prices, currency }: Bil
                                 ? "border-primary bg-secondary"
                                 : "border-border hover:bg-muted"}`}
                         onClick={() => product._id && setSelectedPlanId(product._id)}>
-                        <div className="flex flex-col flex-grow">
+                        <div className="flex flex-col grow">
                             <h3 className="font-semibold text-lg">{product.name}</h3>
                             <p className="text-muted-foreground text-sm">{product.description}</p>
                         </div>

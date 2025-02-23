@@ -50,9 +50,9 @@ export default async function SettingsPage(props: { params: Promise<{ slug: stri
     return (
         <div className="flex flex-col h-full">
             <PageHeader title="Settings" />
-            <div className="flex flex-grow gap-4 px-8 py-4 overflow-hidden">
+            <div className="flex grow gap-4 px-8 py-4 overflow-hidden">
                 <Tabs defaultValue={isAdmin() ? "workspaceGeneral" : "userGeneral"} orientation="horizontal" className="flex gap-6 w-full h-full">
-                    <TabsList className="flex flex-col flex-shrink-0 justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">
+                    <TabsList className="flex flex-col shrink-0 justify-start items-start gap-1 bg-transparent p-4 w-1/5 h-full text-left">
                         {isAdmin() && (
                             <>
                                 <p className="text-left text-muted-foreground text-sm">Workspace settings</p>
@@ -73,7 +73,7 @@ export default async function SettingsPage(props: { params: Promise<{ slug: stri
                             </TabsTrigger>
                         ))}
                     </TabsList>
-                    <div className="flex-grow w-4/5 overflow-hidden">
+                    <div className="grow w-4/5 overflow-hidden">
                         <div className="pr-4 h-full overflow-y-auto">
                             <TabsContent value="workspaceGeneral">
                                 <WorkspaceSettings workspace={workspace} />
