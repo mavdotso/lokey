@@ -12,7 +12,7 @@ export default async function Dashboard() {
 
     const cookieStore = await cookies();
     const inviteCode = cookieStore.get('inviteCode')?.value;
-    
+
     // Handle invite code first if it exists
     if (inviteCode) {
         await fetchAction(api.workspaceInvites.joinWorkspaceByInviteCode, {
@@ -36,7 +36,7 @@ export default async function Dashboard() {
 
     // Show create workspace dialog if no workspace exists
     return (
-        <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-sm w-screen h-screen">
+        <div className="fixed inset-0 flex justify-center items-center bg-primary-foreground/80 backdrop-blur-xs w-screen h-screen">
             <CreateWorkspaceDialog isOpen={true} />
         </div>
     );

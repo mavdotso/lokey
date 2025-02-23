@@ -6,7 +6,7 @@ import { CredentialsForm } from "./credentials-form";
 
 interface CredentialsDialogProps {
     isOpen: boolean,
-    setIsOpen: Dispatch<SetStateAction<boolean>>,
+    setIsOpen: (isOpen: boolean) => void;
     onCredentialsCreated?: () => void;
     onCredentialsUpdated?: () => void;
     onDialogClose?: () => void;

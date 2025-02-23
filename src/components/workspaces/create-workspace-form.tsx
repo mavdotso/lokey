@@ -129,8 +129,8 @@ export function CreateWorkspaceForm({ isCloseable }: CreateWorkspaceFormProps) {
                         </TooltipContent>
                     </Tooltip>
                 </Label>
-                <div className="relative flex shadow-sm rounded-md">
-                    <span className="inline-flex items-center bg-muted shadow-sm px-5 border border-r-0 border-border rounded-l-md text-muted-foreground sm:text-sm">
+                <div className="relative flex shadow-xs rounded-md">
+                    <span className="inline-flex items-center bg-muted shadow-xs px-5 border border-r-0 border-border rounded-l-md text-muted-foreground sm:text-sm">
                         lokey.cc/
                     </span>
                     <Input
