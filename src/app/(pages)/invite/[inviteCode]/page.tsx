@@ -3,11 +3,10 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useParams, redirect } from 'next/navigation';
-import { useAction, useQuery } from 'convex/react';
+import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useSession } from 'next-auth/react';
-import { Id } from '@/convex/_generated/dataModel';
-import { cookies } from 'next/headers';
+import { handleInviteAcceptance } from '@/lib/server-actions';
 
 export default function InvitePage() {
     const session = useSession();
@@ -24,7 +23,6 @@ export default function InvitePage() {
     const getWorkspaceName = useQuery(api.workspaces.getWorkspaceName,
         getInviteDetails?.workspaceId ? { workspaceId: getInviteDetails.workspaceId } : 'skip');
 
-    const joinWorkspace = useAction(api.workspaceInvites.joinWorkspaceByInviteCode);
 
     useEffect(() => {
         if (getInviteDetails === undefined) {
@@ -46,27 +44,18 @@ export default function InvitePage() {
         }
     }, [getWorkspaceName]);
 
-    async function handleAcceptInvite() {
-        const cookieStore = await cookies();
-        if (session.data?.user?.id) {
-            setIsJoining(true);
-            try {
-                await joinWorkspace({ userId: session.data?.user?.id as Id<"users">, inviteCode });
-                redirect('/dashboard');
-            } catch (error) {
-                console.error('Error joining workspace:', error);
-                setErrorMessage('Failed to join workspace. Please try again.');
-                setInviteStatus('error');
-            }
+    async function onClick() {
+        setIsJoining(true);
+        try {
+            await handleInviteAcceptance(session.data?.user?.id, inviteCode);
+        } catch (error) {
+            console.error('Error joining workspace:', error);
+            setErrorMessage('Failed to join workspace. Please try again.');
+            setInviteStatus('error');
             setIsJoining(false);
-        } else {
-            cookieStore.set('inviteCode', inviteCode, {
-                maxAge: 60 * 60 * 24 * 7, // 7 days
-                path: '/'
-            });
-            redirect('/sign-in');
         }
-    }
+    };
+
 
     return (
         <>
@@ -104,7 +93,7 @@ export default function InvitePage() {
 
                 <div className="mt-8">
                     {inviteStatus === 'pending' && (
-                        <Button onClick={handleAcceptInvite} disabled={isJoining}>
+                        <Button onClick={onClick} disabled={isJoining}>
                             {isJoining ? 'Joining...' : session ? 'Join Workspace' : 'Accept Invitation'}
                         </Button>
                     )}
