@@ -10,7 +10,7 @@ export default async function Dashboard() {
     const session = await auth();
     if (!session?.user) redirect('/');
 
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const inviteCode = cookieStore.get('inviteCode')?.value;
     
     // Handle invite code first if it exists
@@ -19,7 +19,8 @@ export default async function Dashboard() {
             userId: session.user.id as Id<"users">,
             inviteCode
         });
-        cookies().delete('inviteCode');
+        // Delete the invite code cookie after processing
+        cookieStore.set('inviteCode', '', { maxAge: 0, path: '/' });
     }
 
     // Get redirect workspace after potentially joining a new one

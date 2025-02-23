@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams, redirect } from 'next/navigation';
 import { useAction, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useSession } from 'next-auth/react';
@@ -16,7 +16,6 @@ export default function InvitePage() {
     const [errorMessage, setErrorMessage] = useState('');
     const [isJoining, setIsJoining] = useState(false);
 
-    const router = useRouter();
     const params = useParams();
 
     const inviteCode = params.inviteCode as string;
@@ -48,11 +47,12 @@ export default function InvitePage() {
     }, [getWorkspaceName]);
 
     async function handleAcceptInvite() {
+        const cookieStore = await cookies();
         if (session.data?.user?.id) {
             setIsJoining(true);
             try {
                 await joinWorkspace({ userId: session.data?.user?.id as Id<"users">, inviteCode });
-                router.push('/dashboard');
+                redirect('/dashboard');
             } catch (error) {
                 console.error('Error joining workspace:', error);
                 setErrorMessage('Failed to join workspace. Please try again.');
@@ -60,11 +60,11 @@ export default function InvitePage() {
             }
             setIsJoining(false);
         } else {
-            cookies().set('inviteCode', inviteCode, {
+            cookieStore.set('inviteCode', inviteCode, {
                 maxAge: 60 * 60 * 24 * 7, // 7 days
                 path: '/'
             });
-            router.push('/sign-in');
+            redirect('/sign-in');
         }
     }
 
@@ -76,7 +76,7 @@ export default function InvitePage() {
                         inviteStatus === 'pending' ? 'Workspace Invitation' :
                             'Invitation Error'}
                 </h1>
-                <p className="text-lg text-muted-foreground">
+                <p className="text-muted-foreground text-lg">
                     {inviteStatus === 'loading' ? 'Please wait while we process your invitation.' :
                         inviteStatus === 'pending' ? `You've been invited to join ${workspaceName}.` :
                             `There was an error processing your invitation: ${errorMessage}`}
@@ -86,7 +86,7 @@ export default function InvitePage() {
             <div className='flex flex-col pt-8 max-w-xl'>
                 <div className="space-y-4">
                     <div className="flex items-center bg-muted p-6 rounded-md">
-                        {(inviteStatus === 'loading' || inviteStatus === 'error') && <div className="border-4 border-primary mr-4 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>}
+                        {(inviteStatus === 'loading' || inviteStatus === 'error') && <div className="mr-4 border-4 border-primary border-t-transparent rounded-full w-12 h-12 animate-spin"></div>}
                         <div>
                             <h2 className="font-semibold text-xl">
                                 {inviteStatus === 'loading' ? 'Processing' :
