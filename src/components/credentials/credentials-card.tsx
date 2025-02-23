@@ -1,3 +1,4 @@
+"use client"
 import { api } from "@/convex/_generated/api";
 import { Credentials, CredentialsRequest } from "@/convex/types";
 import { useQuery } from "convex/react";
@@ -7,6 +8,7 @@ import { formatTimestamp } from "@/lib/utils";
 import { UserAvatar } from "@/components/global/user-avatar";
 import { EyeIcon, KeyIcon, TimerIcon } from "lucide-react";
 import { CredentialsActions } from "./credentials-actions";
+import { format } from 'date-fns';
 
 interface CredentialsCardProps {
     item: Credentials | CredentialsRequest;
@@ -89,7 +91,7 @@ export function CredentialsStatusInfo({ credentials }: CredentialsStatusInfoProp
             <div className="flex justify-start items-start gap-4 text-muted-foreground">
                 <div className='flex items-center gap-1'>
                     <TimerIcon className='w-4 h-4' />
-                    <span>{credentials.expiresAt ? new Date(credentials.expiresAt).toLocaleDateString() : 'No expiration'}</span>
+                    <span>{credentials.expiresAt ? format(new Date(credentials.expiresAt), 'yyyy-MM-dd') : 'No expiration'}</span>
                 </div>
                 <div className='flex items-center gap-1'>
                     <EyeIcon className='w-4 h-4' />

@@ -1,3 +1,5 @@
+"use client"
+
 import { FormEvent, useState, useEffect } from 'react'
 import { useAction, useMutation, useQuery } from 'convex/react'
 import { useParams } from 'next/navigation'
@@ -19,8 +21,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card } from '@/components/ui/card'
 import { credentialsFields } from '@/lib/config/credentials-fields'
 import { CREDENTIALS_TYPES } from '@/convex/schema'
-import { fetchAction } from 'convex/nextjs'
-import { useSession } from 'next-auth/react'
 
 interface CredentialsFormProps {
     setIsOpen: (isOpen: boolean) => void;

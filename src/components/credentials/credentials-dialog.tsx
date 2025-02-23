@@ -1,30 +1,30 @@
 import { DialogContent, DialogTitle, DialogDescription, DialogHeader, DialogTrigger, Dialog } from "@/components/ui/dialog";
-import { Dispatch, ReactNode, SetStateAction } from "react";
+import { ReactNode } from "react";
 import { Id } from "@/convex/_generated/dataModel";
 import { Credentials } from "@/convex/types";
 import { CredentialsForm } from "./credentials-form";
 
 interface CredentialsDialogProps {
-    isOpen: boolean,
-    setIsOpen: (isOpen: boolean) => void;
+    isOpen: boolean;
+    onOpenChange: (open: boolean) => void;
     onCredentialsCreated?: () => void;
     onCredentialsUpdated?: () => void;
     onDialogClose?: () => void;
-    editId?: Id<"credentials">;
-    existingData?: Credentials;
     children?: ReactNode;
     formType: 'new' | 'request';
+    editId?: Id<"credentials">;
+    existingData?: Credentials;
 }
 
-export function CredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCreated, onCredentialsUpdated, onDialogClose, editId, existingData, formType }: CredentialsDialogProps) {
+export function CredentialsDialog({ children, isOpen, onOpenChange, onCredentialsCreated, onCredentialsUpdated, onDialogClose, editId, existingData, formType }: CredentialsDialogProps) {
 
     function handleDialogClose() {
-        setIsOpen(false);
+        onOpenChange(false);
         onDialogClose && onDialogClose()
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
@@ -38,11 +38,12 @@ export function CredentialsDialog({ children, isOpen, setIsOpen, onCredentialsCr
                     <DialogDescription>
                         {editId ? 'Update the details for this credential.' :
                             formType === 'request' ? 'Fill in the details to create new credentials request.' :
-                                'Fill in the details to create new credentials.'}
+                                'Create new credentials'}
                     </DialogDescription>
+
                 </DialogHeader>
                 <CredentialsForm
-                    setIsOpen={setIsOpen}
+                    setIsOpen={onOpenChange}
                     editId={editId}
                     existingData={existingData}
                     onCredentialsCreated={onCredentialsCreated}
