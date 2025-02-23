@@ -17,8 +17,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CredentialsList } from '@/components/credentials/credentials-list';
 import { PageHeader } from '@/components/global/page-header';
 import { CredentialsListSkeleton, CredentialsSortControlsSkeleton } from '@/components/skeletons/credentials-skeleton';
+import { useCredentialsManagement } from '@/hooks/use-credentials-management';
+import type { 
+  CredentialsSortOption, 
+  CredentialsDialogType 
+} from '@/hooks/use-credentials-management';
 
-type CredentialsSortOption = 'name' | 'createdAtAsc' | 'createdAtDesc' | 'updatedAt';
 
 type TabType = 'shared' | 'requested';
 
@@ -28,67 +32,13 @@ interface CredentialsProps {
     }>;
 }
 
-interface CredentialsState {
-    filters: {
-        searchTerm: string;
-        sortOption: CredentialsSortOption;
-        selectedTypes: CredentialsType[];
-        hideExpired: boolean;
-    };
-    currentPage: number;
-    isCreateDialogOpen: boolean;
-    isRequestDialogOpen: boolean;
-}
-
-type CredentialsAction =
-    | { type: 'SET_FILTERS'; payload: Partial<CredentialsState['filters']> }
-    | { type: 'SET_CURRENT_PAGE'; payload: number }
-    | { type: 'SET_DIALOG_OPEN'; payload: { dialog: 'create' | 'request'; isOpen: boolean } };
-
-const credentialsReducer = (state: CredentialsState, action: CredentialsAction): CredentialsState => {
-    switch (action.type) {
-        case 'SET_FILTERS':
-            return {
-                ...state,
-                filters: {
-                    ...state.filters,
-                    ...action.payload
-                }
-            };
-        case 'SET_CURRENT_PAGE':
-            return {
-                ...state,
-                currentPage: action.payload
-            };
-        case 'SET_DIALOG_OPEN':
-            return {
-                ...state,
-                ...(action.payload.dialog === 'create'
-                    ? { isCreateDialogOpen: action.payload.isOpen }
-                    : { isRequestDialogOpen: action.payload.isOpen })
-            };
-        default:
-            return state;
-    }
-};
-
 export default function CredentialsPage(props: CredentialsProps) {
     const params = use(props.params);
     const session = useSession();
 
     const [activeTab, setActiveTab] = useState<TabType>('shared');
 
-    const [state, dispatch] = useReducer(credentialsReducer, {
-        filters: {
-            searchTerm: '',
-            sortOption: 'name' as CredentialsSortOption,
-            selectedTypes: [] as CredentialsType[],
-            hideExpired: false,
-        },
-        currentPage: 1,
-        isCreateDialogOpen: false,
-        isRequestDialogOpen: false,
-    });
+    const { state, actions } = useCredentialsManagement();
 
     const workspace = useQuery(api.workspaces.getWorkspaceBySlug, { slug: params.slug });
     const credentials = useQuery(api.credentials.getWorkspaceCredentials, workspace ? { workspaceId: workspace._id } : 'skip');
@@ -116,15 +66,13 @@ export default function CredentialsPage(props: CredentialsProps) {
     }, [state.filters]);
 
     const resetFilters = () => {
-        dispatch({
-            type: 'SET_FILTERS', payload: {
-                searchTerm: '',
-                sortOption: 'name',
-                selectedTypes: [],
-                hideExpired: false
-            }
+        actions.setFilters({
+            searchTerm: '',
+            sortOption: 'name',
+            selectedTypes: [],
+            hideExpired: false
         });
-        dispatch({ type: 'SET_CURRENT_PAGE', payload: 1 });
+        actions.setCurrentPage(1);
     };
 
     const filteredItems = activeTab === 'shared' ? filterItems(credentials || [], true) : filterItems(credentialsRequests || [], false);
@@ -151,16 +99,10 @@ export default function CredentialsPage(props: CredentialsProps) {
             <div className='flex flex-col gap-4 pt-4 grow'>
                 <CredentialsSortControls
                     {...state.filters}
-                    onSearchChange={(searchTerm) => dispatch({ type: 'SET_FILTERS', payload: { searchTerm } })}
-                    onSortChange={(sortOption) => dispatch({
-                        type: 'SET_FILTERS',
-                        payload: { sortOption: sortOption as CredentialsSortOption }
-                    })}
-                    onTypeChange={(types) => dispatch({
-                        type: 'SET_FILTERS',
-                        payload: { selectedTypes: types as CredentialsType[] }
-                    })}
-                    onHideExpiredChange={(hideExpired) => dispatch({ type: 'SET_FILTERS', payload: { hideExpired } })}
+                    onSearchChange={(searchTerm) => actions.setFilters({ searchTerm })}
+                    onSortChange={(sortOption) => actions.setFilters({ sortOption: sortOption as CredentialsSortOption })}
+                    onTypeChange={(types) => actions.setFilters({ selectedTypes: types as CredentialsType[] })}
+                    onHideExpiredChange={(hideExpired) => actions.setFilters({ hideExpired })}
                     showHideExpired={type === 'shared'}
                 />
                 {paginatedItems.length === 0 && isFiltered ? (
@@ -191,7 +133,7 @@ export default function CredentialsPage(props: CredentialsProps) {
             <PageHeader title="Credentials">
                 <CredentialsDialog
                     isOpen={state.isCreateDialogOpen}
-                    setIsOpen={(isOpen) => dispatch({ type: 'SET_DIALOG_OPEN', payload: { dialog: 'create', isOpen: !state.isCreateDialogOpen } })}
+                    setIsOpen={() => actions.setDialogOpen('create', !state.isCreateDialogOpen)}
                     formType="new"
                 >
                     <Button className='gap-2' variant={"outline"} >
@@ -201,7 +143,7 @@ export default function CredentialsPage(props: CredentialsProps) {
                 </CredentialsDialog>
                 <CredentialsDialog
                     isOpen={state.isRequestDialogOpen}
-                    setIsOpen={(isOpen) => dispatch({ type: 'SET_DIALOG_OPEN', payload: { dialog: 'request', isOpen: !state.isRequestDialogOpen } })}
+                    setIsOpen={() => actions.setDialogOpen('request', !state.isRequestDialogOpen)}
                     formType="request"
                 >
                     <Button className='gap-2'>
@@ -234,7 +176,7 @@ export default function CredentialsPage(props: CredentialsProps) {
                     <PagePagination
                         currentPage={state.currentPage}
                         totalPages={totalPages}
-                        setCurrentPage={(page) => dispatch({ type: 'SET_CURRENT_PAGE', payload: page })}
+                        setCurrentPage={(page) => actions.setCurrentPage(page)}
                     />
                 </div>
             )}
